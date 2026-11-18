@@ -1,0 +1,8 @@
+/* Natural Earth 1:50m coast mask. Source data: public domain via world-atlas. */
+const {feature}=require('topojson-client');
+const {booleanPointInPolygon}=require('@turf/boolean-point-in-polygon');
+const {lineIntersect}=require('@turf/line-intersect');
+function prepare(topology){const collection=feature(topology,topology.objects.land),land=collection.type==='FeatureCollection'?collection.features[0]:collection,polygons=land.geometry.type==='MultiPolygon'?land.geometry.coordinates:[land.geometry.coordinates];return polygons.map(rings=>{let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;for(const [x,y] of rings[0]){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y)}return {bbox:[minX,minY,maxX,maxY],polygon:{type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:rings}}}})}
+function pointOnLand(index,lat,lon){return index.some(({bbox:b,polygon})=>lon>=b[0]&&lon<=b[2]&&lat>=b[1]&&lat<=b[3]&&booleanPointInPolygon([lon,lat],polygon))}
+function crossing(index,start,end){const a=[start.lon,start.lat],b=[end.lon,end.lat];if(Math.abs(a[0]-b[0])>180)throw new Error('Tarih çizgisini aşan rota desteklenmiyor');const bounds=[Math.min(a[0],b[0]),Math.min(a[1],b[1]),Math.max(a[0],b[0]),Math.max(a[1],b[1])],line={type:'Feature',properties:{},geometry:{type:'LineString',coordinates:[a,b]}};let first=null,best=Infinity;for(const item of index){const q=item.bbox;if(q[2]<bounds[0]||q[0]>bounds[2]||q[3]<bounds[1]||q[1]>bounds[3])continue;for(const hit of lineIntersect(line,item.polygon).features){const [x,y]=hit.geometry.coordinates,d=(x-a[0])**2+(y-a[1])**2;if(d<best){best=d;first={lat:y,lon:x}}}}return first}
+module.exports={prepare,pointOnLand,crossing};

@@ -1,0 +1,5 @@
+.comparison-panel{margin:18px 0;padding:16px;border:1px solid #5271a2;border-radius:8px;background:#081d4a}
+.comparison-panel>strong{color:#e9f7ff}.comparison-panel p{line-height:1.65}.comparison-panel button{width:100%;font-weight:700}
+.comparison-images{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.comparison-images[hidden]{display:none}.comparison-images figure{min-width:0;margin:0}.comparison-images figcaption{min-height:3em;margin-bottom:6px;color:#cce6fa;overflow-wrap:anywhere}.comparison-images img{display:block;width:100%;height:140px;object-fit:contain;background:#061443}
+@media(max-width:420px){.comparison-images{grid-template-columns:1fr}.comparison-images img{height:180px}}
+.controls .spatial-drift-btn{width:100%;margin-top:10px;padding:14px;border:1px solid #265bc5;border-radius:5px;background:#e9f2ff;color:#102e74;font-weight:800;font-size:12px}.controls .spatial-drift-btn:hover{background:#d6e9ff}

@@ -1,0 +1,8 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),{simulate}=require('../js/spatial-drift.js');
+const sea={pointOnLand:()=>false,crossing:()=>null};
+const series=(speed,direction)=>Array.from({length:25},()=>({speed,direction}));
+const bounds={minLat:-1,maxLat:1,minLon:-1,maxLon:1};
+test('changes current model cell along the path',()=>{const r=simulate({lat:0,lon:0,hours:3,windage:0,coast:sea,bounds,marineCells:[{lat:0,lon:0,samples:series(10,90)},{lat:0,lon:.15,samples:series(10,0)}],windCells:[{lat:0,lon:0,samples:series(0,0)}]});assert.equal(r.elapsedHours,3);assert.equal(r.currentCells,2);assert.ok(r.points.at(-1).lat>0)});
+test('rejects missing or distant model data instead of fabricating a route',()=>{const common={lat:0,lon:0,hours:3,windage:0,coast:sea,bounds,windCells:[{lat:0,lon:0,samples:series(0,0)}]};assert.throws(()=>simulate({...common,marineCells:[{lat:5,lon:5,samples:series(1,0)}]}),/hücresi yok/);assert.throws(()=>simulate({...common,marineCells:[{lat:0,lon:0,samples:[]}]}),/verisi eksik/)});
+test('stops at the approximate coast',()=>{const coast={pointOnLand:lat=>lat>=.01,crossing:(a,b)=>a.lat<.01&&b.lat>=.01?{lat:.01,lon:0}:null};const r=simulate({lat:0,lon:0,hours:3,windage:0,coast,bounds,marineCells:[{lat:0,lon:0,samples:series(2,0)}],windCells:[{lat:0,lon:0,samples:series(0,0)}]});assert.equal(r.coastHit,true);assert.ok(r.elapsedHours<1)});
+test('rejects a route that exits the sampled domain',()=>{assert.throws(()=>simulate({lat:0,lon:0,hours:3,windage:0,coast:sea,bounds:{minLat:-.01,maxLat:.01,minLon:-.01,maxLon:.01},marineCells:[{lat:0,lon:0,samples:series(10,90)}],windCells:[{lat:0,lon:0,samples:series(0,0)}]}),/alanın dışına/)});

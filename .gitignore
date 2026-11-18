@@ -1,0 +1,42 @@
+﻿node_modules/
+test-results/
+playwright-report/
+.baseline.cjs
+.live-check.cjs
+/data/
+ml/datasets/
+ml/output/
+
+# Local credentials and environment configuration
+.env
+.env.*
+*.env
+*.pem
+*.key
+credentials.json
+credentials-*.json
+*service-account*.json
+.netrc
+_netrc
+.npmrc
+.pypirc
+
+# Local Python environments, caches and test artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage/
+blob-report/
+*.log
+*.tmp
+
+# Local exploratory browser scripts
+/.band-check.cjs
+/.check-*.cjs
+/.cog-check.cjs
+/.live-*.cjs
+/.nasa-check.cjs
+/.visual-check.cjs

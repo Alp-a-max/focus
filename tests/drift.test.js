@@ -1,0 +1,4 @@
+﻿const {test}=require('node:test');const assert=require('node:assert/strict');const {vector,calculate}=require('../js/drift.js');
+test('current moves toward bearing; wind moves away from bearing',()=>{for(const [i,xy] of [[0,[0,1]],[90,[1,0]],[180,[0,-1]],[270,[-1,0]]]){let c=vector(1,i,false),w=vector(1,i,true);assert.ok(Math.abs(c[0]-xy[0])<1e-10&&Math.abs(c[1]-xy[1])<1e-10);assert.ok(Math.abs(w[0]+xy[0])<1e-10&&Math.abs(w[1]+xy[1])<1e-10)}});
+test('hour and windage scenarios are deterministic',()=>{for(const n of [3,6,12,24])for(const w of [0,.01,.03]){let p=calculate(0,0,Array.from({length:n},()=>({currentSpeed:1,currentDirection:0,windSpeed:10,windDirection:180})),w);assert.equal(p.length,n+1);assert.ok(Math.abs(p[n].lat-(n*(1+10*w)/111.32))<1e-9)}});
+test('invalid values rejected',()=>{assert.throws(()=>vector(-1,0,false));assert.throws(()=>calculate(90,0,[{}],0));assert.throws(()=>calculate(0,0,[{currentSpeed:null}],0));});
