@@ -39,6 +39,8 @@ test('local Host and optional local Origin allow reading, creating and updating 
       const updated = await request(base, 'PUT', '/api/observations/' + id, headers, {...body, note:'Düzenlendi'});
       assert.equal(updated.status, 200);
       assert.equal(JSON.parse(updated.text).note, 'Düzenlendi');
+      const removed = await request(base, 'DELETE', '/api/observations/' + id, headers);
+      assert.equal(removed.status, 200);
     }
   }
 });
@@ -72,13 +74,16 @@ test('invalid Host or Origin cannot read or change stored observations', {timeou
     ['Host', validHost, 'Origin', base, 'Origin', base]
   ];
   for (const headers of cases) {
-    for (const method of ['GET', 'POST', 'PUT']) {
-      const target = '/api/observations' + (method === 'PUT' ? '/' + id : '');
+    for (const method of ['GET', 'POST', 'PUT', 'DELETE']) {
+      const target = '/api/observations' + (['PUT', 'DELETE'].includes(method) ? '/' + id : '');
       const result = await request(base, method, target, headers, method === 'GET' ? undefined : {...body, note:'İzinsiz'});
       // Node rejects HTTP/1.1 requests with no Host before the handler runs.
       assert.equal(result.status, headers.length === 0 ? 400 : 403, `${method} ${JSON.stringify(headers)}`);
       assert.equal(result.text.includes('Korunacak kayıt'), false);
     }
+    const removePhoto = await request(base, 'PUT', '/api/observations/' + id, headers,
+      {...body, removePhoto: true, status: 'unreviewed'});
+    assert.equal(removePhoto.status, headers.length === 0 ? 400 : 403);
   }
   const after = await request(base, 'GET', '/api/observations', ['Host', validHost]);
   assert.equal(after.status, 200);
