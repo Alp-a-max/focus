@@ -1,4 +1,5 @@
 const {test, expect} = require('@playwright/test');
+test.beforeEach(async ({page}) => {await page.route('**/api/observations', route => route.fulfill({json:[]}));});
 const data = require('../assets/gpgp-contours.json');
 
 async function open(page) {
@@ -8,6 +9,7 @@ async function open(page) {
   });
   await page.route('**/v1/{marine,forecast}?*', route => route.abort());
   await page.goto('/#intelligence');
+  await page.locator('#layerDrawer > summary').click();
   await expect(page.locator('#gpgpToggle')).toBeVisible();
 }
 

@@ -1,5 +1,7 @@
 # ODAK
 
+Harita odaklı çalışma alanında katmanlar, deniz koşulları, uydu analizi ve yerel bildirimler ayrı açılır alanlardadır. CYGNSS Kuzey Pasifik örneği 28 Ekim 2026 verisiyle doğrulandı. Aylık kontrol, yerel Earthdata yapılandırması ve doğrulama komutları [CYGNSS güncelleme belgesinde](tools/CYGNSS-GUNCELLEME.md) açıklanır. Bilimsel kapsam 25–30° K, 150–145° B bölgesi, yaklaşık 1° alan ve 30 günlük ortalamadır.
+
 ODAK, OpenStreetMap, NASA GIBS, Sentinel-2 ve Open-Meteo kullanan yerel sunuculu bir araştırma prototipidir. Doğrulanmış otomatik atık tespiti içermez.
 
 ## Çalıştırma

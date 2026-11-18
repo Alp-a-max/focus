@@ -56,5 +56,6 @@ if (!Number.isInteger(port) || port < 0 || port > 65535) {
 } else {
   server.listen(port, host, () => {
     console.log(`ODAK hazır: http://${host}:${server.address().port}`);
+    if (process.env.ODAK_CYGNSS_AUTO_UPDATE !== '0') require('./cygnss-update.cjs').startCygnssUpdates();
   });
 }

@@ -6,7 +6,7 @@ const {once} = require('node:events');
 
 function launchServer(t, port = '0') {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'odak-http-test-'));
-  const env = {...process.env, PELAGIC_DATA_DIR: dir};
+  const env = {...process.env, PELAGIC_DATA_DIR: dir, ODAK_CYGNSS_AUTO_UPDATE: '0'};
   if (port === null) delete env.PELAGIC_PORT;
   else env.PELAGIC_PORT = String(port);
   const child = spawn(process.execPath, ['server.cjs'], {

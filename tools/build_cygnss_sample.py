@@ -9,7 +9,7 @@ DATE = '2018-08-16T12:00:00'
 BBOX = {'west': -150.0, 'south': 25.0, 'east': -145.0, 'north': 30.0}
 
 
-def build(data):
+def build(data, expected_date=DATE, require_complete=True):
     if data['source']['doi'] != DOI or data['bbox'] != BBOX:
         raise ValueError('Expected the verified North Pacific sample.')
     if data['units']['mp_concentration'] != 'count km-2':
@@ -18,13 +18,13 @@ def build(data):
     if (str(metadata.get('version_id')) != '3.2' or str(metadata.get('l3_data_version')) != '3.3'
             or metadata.get('time_coverage_duration') != 'P30DT00H00M00S'):
         raise ValueError('Unexpected product version or averaging duration.')
-    if len(data['cells']) != 441:
+    if (require_complete and len(data['cells']) != 441) or len(data['cells']) > 441:
         raise ValueError('Expected 441 input cells.')
     cells = []
     seen = set()
     for row in data['cells']:
         lat, lon = row['lat'], row['lon']
-        if row['date'] != DATE or not (25 <= lat <= 30 and -150 <= lon <= -145):
+        if row['date'] != expected_date or not (25 <= lat <= 30 and -150 <= lon <= -145):
             raise ValueError('Unexpected date or cell position.')
         if lat * 4 != round(lat * 4) or lon * 4 != round(lon * 4) or (lat, lon) in seen:
             raise ValueError('Expected unique 0.25 degree grid centers.')
@@ -37,7 +37,7 @@ def build(data):
     cells.sort(key=lambda row: (row[0], row[1]))
     return {'schema_version': 1, 'source_doi': DOI,
             'source_units': 'count km-2', 'display_units': 'adet/km²',
-            'date': DATE + 'Z', 'bbox_centers': BBOX, 'grid_step_deg': 0.25,
+            'date': expected_date + 'Z', 'bbox_centers': BBOX, 'grid_step_deg': 0.25,
             'averaging_days': 30, 'averaging_degrees': 1,
             'product_version': '3.2', 'data_version': '3.3',
             'columns': ['lat', 'lon', 'mp_concentration', 'num_mp_samples'],

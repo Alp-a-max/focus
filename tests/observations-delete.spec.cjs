@@ -21,6 +21,7 @@ async function open(page, request, local) {
   }
   await page.route('**/v1/{marine,forecast}?*', route => route.abort());
   await page.goto(local.base + '/#intelligence');
+  await page.locator('#recordsPanel > summary').click();
   await expect(page.locator('#observationList > li')).toHaveCount(2);
   await expect(page.locator('.observation-marker')).toHaveCount(2);
 }

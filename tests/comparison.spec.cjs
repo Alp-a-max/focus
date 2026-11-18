@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+test.beforeEach(async ({page}) => {await page.route('**/api/observations', route => route.fulfill({json:[]}));});
 
 test('comparison displays two dates and clears when the selected location changes', async ({page})=>{
   await page.route('**/api/satellite/comparison?*', route=>route.fulfill({json:{
@@ -7,6 +8,8 @@ test('comparison displays two dates and clears when the selected location change
     summary:{commonPixels:150,totalPixels:2500,medianDelta:.0123}
   }}));
   await page.goto('/#intelligence');
+  await page.locator('#analysisPanel > summary').click();
+  await page.locator('#comparisonPanel > summary').click();
   await expect(page.locator('#comparisonRun')).toBeVisible();
   await page.locator('#comparisonRun').click();
   await expect(page.locator('#comparisonStatus')).toContainText('150 ortak geçerli');

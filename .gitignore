@@ -32,6 +32,7 @@ coverage/
 blob-report/
 *.log
 *.tmp
+.cygnss-update.lock
 
 # Local exploratory browser scripts
 /.band-check.cjs

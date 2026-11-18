@@ -12,7 +12,7 @@ window.OdakGpgp = function (map) {
     <div id="gpgpMassLegend" hidden aria-label="Tüm boyut sınıfları kütle yoğunluğu renk açıklaması"></div>
     <p id="gpgpMassStatus" role="status" aria-live="polite">Yoğunluk katmanı kapalı.</p>
     <p><a href="https://doi.org/10.6084/m9.figshare.5873142.v2" target="_blank" rel="noopener noreferrer">Kaynak · Lebreton &amp; Reisser / Figshare</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p>`;
-  document.getElementById('mapHelp').after(panel);
+  document.getElementById('researchLayers').append(panel);
   const toggle = panel.querySelector('#gpgpToggle');
   const go = panel.querySelector('#gpgpGo');
   const status = panel.querySelector('#gpgpStatus');
