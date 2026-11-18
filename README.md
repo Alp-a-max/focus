@@ -1,5 +1,11 @@
 # ODAK
 
+## Çoklu parçacık sürüklenme senaryoları
+
+Sürüklenme bölümündeki **Senaryoları hesapla**, seçili güncel konum çevresindeki 25 başlangıcı %0, %1 ve %3 rüzgâr varsayımlarıyla hesaplar. 6/12/24 saatlik sonuçlar ve tamamlanamayan parçacık sayıları gösterilir. Harita katmanı temizlenebilir, bütün hesaplanan yollar JSON olarak indirilebilir. Alanlar iki toplu API isteğiyle alınır ve 15 dakika önbelleklenir. Hareket boyunca konum ve saat yeniden örneklenir.
+
+Bu bir deneysel duyarlılık incelemesidir; olasılık veya doğrulanmış atık takibi değildir. Başlangıç yayılımı varsayımsaldır, geçmiş uydu konumlarından bugüne takip yapılmaz. Kıyı ve model kapsamı sınırlıdır. Yöntem, kaynaklar ve doğrulama sınırları [tools/DRIFT-MODELI.md](tools/DRIFT-MODELI.md) içinde açıklanır.
+
 Harita odaklı çalışma alanında katmanlar, deniz koşulları, uydu analizi ve yerel bildirimler ayrı açılır alanlardadır. CYGNSS Kuzey Pasifik örneği 28 Ekim 2026 verisiyle doğrulandı. Aylık kontrol, yerel Earthdata yapılandırması ve doğrulama komutları [CYGNSS güncelleme belgesinde](tools/CYGNSS-GUNCELLEME.md) açıklanır. Bilimsel kapsam 25–30° K, 150–145° B bölgesi, yaklaşık 1° alan ve 30 günlük ortalamadır.
 
 ODAK, OpenStreetMap, NASA GIBS, Sentinel-2 ve Open-Meteo kullanan yerel sunuculu bir araştırma prototipidir. Doğrulanmış otomatik atık tespiti içermez.

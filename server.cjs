@@ -29,7 +29,8 @@ const server = http.createServer(async (req, res) => {
     json(res, 400, {error: 'Geçersiz istek adresi.'});
     return;
   }
-  if(url.pathname==='/api/observations'||/^\/api\/observations\/[0-9a-f-]{36}$/.test(url.pathname)){const recordId=url.pathname.split('/')[3]||null;if (!allowObservationRequest(req, res)) return;if (req.method === 'DELETE' && recordId) {
+  if (url.pathname.startsWith('/api/') && !allowObservationRequest(req, res)) return;
+  if(url.pathname==='/api/observations'||/^\/api\/observations\/[0-9a-f-]{36}$/.test(url.pathname)){const recordId=url.pathname.split('/')[3]||null;if (req.method === 'DELETE' && recordId) {
     try {
       json(res, 200, await observations.remove(recordId));
     } catch (error) {
