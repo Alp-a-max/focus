@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+require('./experience-fixture.cjs')(test);
 test.beforeEach(async ({page}) => {await page.route('**/api/observations', route => route.fulfill({json:[]}));});
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/aWQAAAAASUVORK5CYII=','base64');
 function data(marine,lat=36.45,lon=31.3,empty=false){let start=new Date();start.setUTCMinutes(0,0,0);let time=Array.from({length:72},(_,i)=>new Date(start.getTime()+i*3600000).toISOString().slice(0,16));let names=marine?['ocean_current_velocity','ocean_current_direction']:['wind_speed_10m','wind_direction_10m'];let hourly={time,[names[0]]:time.map(()=>empty?null:marine?1:10),[names[1]]:time.map(()=>empty?null:marine?90:180)},units={[names[0]]:'km/h',[names[1]]:'°'};return {latitude:lat,longitude:lon,current:{time:time[0],[names[0]]:empty?null:marine?1:10,[names[1]]:empty?null:marine?90:180,...(marine?{wave_height:empty?null:.6,sea_surface_temperature:empty?null:20}:{})},current_units:units,hourly_units:units,hourly}}

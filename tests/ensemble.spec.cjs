@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+require('./experience-fixture.cjs')(test);
 async function setup(page,{fail=false,delay=0}={}) {
   let fields=0;
   await page.route('**/api/observations',r=>r.fulfill({json:[]}));

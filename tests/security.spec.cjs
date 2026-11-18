@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+require('./experience-fixture.cjs')(test);
 test('remote model timestamps are displayed as text rather than executable markup',async({page})=>{
   await page.route('**/api/observations',r=>r.fulfill({json:[]}));
   const attack='<img src=x onerror="window.odakInjected=true">';

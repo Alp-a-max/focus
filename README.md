@@ -73,6 +73,16 @@ Analiz edilen sahnenin TCI görseli yaklaşık 10 m çözünürlükte, en fazla 
 
 Analiz panelindeki İki Tarihi Karşılaştır düğmesi, son 45 günde uygun bir Sentinel-2 sahnesini ve önceki 45 günden ikinci bir sahneyi arar. Izgaraları eşleşen ve her iki sahnede geçerli olan en az 100 su hücresi gerektirir. Yan yana görseller ve medyan FDI farkı, yalnızca deneysel değişim incelemesidir; atık varlığını, türünü, yaşını veya geri dönüşüm değerini belirlemez. Sahne bulutluluğu tüm sahneye aittir; yerel bulut, dalga ve gözlem koşulları sonucu etkileyebilir. Sahneler bulunamaz veya ortak su alanı yetersizse karşılaştırma yapılmaz.
 
+## Başlangıç ekranı, deneyim düzenleri ve dil
+
+İlk ziyarette Türkçe / English ve Standart / Pro / Max seçimi sunulur. Bunlar çalışma alanı düzenleridir; bütün araçlar her düzende kullanılabilir. Standart haritayı ve deniz koşullarını öne çıkarır; Pro katman ve uydu analizi panellerini de açar; Max vektörler, karşılaştırma ve yerel bildirimleri de açık başlatır. Buz mavisi, deniz yeşili ve gümüş lavanta vurguları mevcut koyu ODAK kimliği içinde düzenleri ayırt eder. Açık paneller kullanıcı tarafından serbestçe kapatılabilir.
+
+Üstteki **Deneyim / Experience** veya çalışma alanındaki **Düzeni ve dili değiştir / Change layout and language** düğmesinden seçim değiştirilebilir. Geri dön / Escape, kaydedilmiş seçime döner. Tercih yalnızca bu tarayıcı ve yerel adres için `odak-experience-v1` anahtarıyla saklanır; tarayıcı depolaması kapalı olsa da ekran çalışır. Yeni düzen seçildiğinde açık panel tercihleri yeniden uygulanır. Katmanların açık/kapalı durumları ve yüklenmiş verileri bu seçimden etkilenmez.
+
+Arayüz metinleri, katman açıklamaları, CYGNSS tarih/sayı biçimleri, hücre bilgileri, model sonuçları ve yaygın hata/onay mesajları iki dillidir. Kullanıcının saha notları ve giriş değerleri çevrilmez; bilimsel veri ve API alanları değiştirilmez. `js/i18n.js` yeni arayüz metinleri için çeviri sözlüğü ve dinamik mesaj kalıplarını içerir. Yeni mesajlar eklenirken her iki dilde kontrol edilmelidir.
+
+Başlangıç akışı için `tests/experience.spec.cjs`; diğer özellik testleri için kayıtlı Türkçe/Standart kullanıcı tercihlerini kuran `tests/experience-fixture.cjs` kullanılır. Testler gerçek yerel kayıtları değiştirmez: gözlem istekleri taklit edilir veya ayrı geçici sunucu/veri klasörü kullanılır.
+
 ## Deneysel alana göre sürüklenme
 
 Sürüklenme bölümündeki **Alana Göre Tahmin Et**, seçilen konum çevresinde 3×3 koordinat için Open-Meteo deniz ve rüzgâr model hücrelerini sorgular. Her 15 dakikalık adımda güncel tahmin konumuna en yakın geçerli hücreyi kullanır ve saatlik vektörler arasında enterpolasyon yapar. Hücreler 25 km'den uzaktaysa, saatlik veriler eksikse veya rota sorgulanan alanı terk ederse tahmin iptal edilir. Kıyı kontrolü yaklaşık Natural Earth maskesine dayanır. Seçilen konumda atık bulunduğunu veya önceki uydu görüntüsünden bugüne aynı noktada kaldığını doğrulamaz; geçmişten bugüne takip yapmaz.

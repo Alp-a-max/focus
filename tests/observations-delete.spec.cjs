@@ -11,6 +11,7 @@ const test = base.extend({
     finally { for (const callback of cleanup) await callback(); }
   }
 });
+require('./experience-fixture.cjs')(test);
 
 async function open(page, request, local) {
   for (const note of ['Birinci kayıt', 'İkinci kayıt']) {

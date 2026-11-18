@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+require('./experience-fixture.cjs')(test);
 test.beforeEach(async ({page}) => {await page.route('**/api/observations', route => route.fulfill({json:[]}));});
 
 test('comparison displays two dates and clears when the selected location changes', async ({page})=>{

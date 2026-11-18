@@ -1,4 +1,5 @@
 const {test, expect} = require('@playwright/test');
+require('./experience-fixture.cjs')(test);
 const sample = require('../assets/cygnss-latest.json');
 const state = require('../assets/cygnss-status.json');
 
@@ -89,6 +90,7 @@ test('overdue monthly schedule does not show a fresh successful-check label', as
 
 test('390px touch layout stays readable with open controls and adequate targets', async ({browser}) => {
   const context = await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  await require('./experience-fixture.cjs').prepare(context);
   const page = await context.newPage();
   try {
     await open(page);

@@ -1,4 +1,5 @@
 const {test, expect} = require('@playwright/test');
+require('./experience-fixture.cjs')(test);
 const data = require('../assets/cygnss-latest.json');
 
 async function open(page) {

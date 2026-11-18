@@ -23,14 +23,15 @@ window.OdakCygnss = function (map) {
   const bins = [0, 12750, 13000, 13250, 13500, 13750];
   const colors = ['#443983', '#31688e', '#21918c', '#35b779', '#90d743', '#fde725'];
   const labels = ['<12 750', '12 750–<13 000', '13 000–<13 250', '13 250–<13 500', '13 500–<13 750', '≥13 750'];
-  const format = value => value.toLocaleString('tr-TR', {maximumFractionDigits: 2});
+  const locale = () => window.OdakI18n?.locale || 'tr-TR';
+  const format = value => value.toLocaleString(locale(), {maximumFractionDigits: 2});
   const dateFormat = value => {
     const date = new Date(value);
-    return Number.isFinite(date.getTime()) ? date.toLocaleString('tr-TR', {
+    return Number.isFinite(date.getTime()) ? date.toLocaleString(locale(), {
       timeZone:'UTC', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
     }) + ' UTC' : 'Bilgi yok';
   };
-  let layer, data, pending, warning = '';
+  let layer, data, pending, lastState, warning = '';
   map.createPane('cygnss');
   map.getPane('cygnss').style.zIndex = '375';
 
@@ -76,7 +77,7 @@ window.OdakCygnss = function (map) {
       L.rectangle([[lat - .125, lon - .125], [lat + .125, lon + .125]], {
         pane:'cygnss', className:'cygnss-cell', stroke:false, fillColor:colors[bin], fillOpacity:.7,
         bubblingMouseEvents:false, attribution:'NASA PO.DAAC / CYGNSS V3.2 · ' + sample.date.slice(0,10) + ' · DOI 10.5067/CYGNS-L3P32'
-      }).bindPopup(popup(row, sample), {maxWidth:300}).addTo(group);
+      }).bindPopup(() => popup(row, sample), {maxWidth:300}).addTo(group);
     }
     if (!group.getBounds().isValid()) throw Error('Geçerli hücre yok');
     return group;
@@ -103,6 +104,7 @@ window.OdakCygnss = function (map) {
   }
 
   function updateState(state) {
+    lastState = state;
     $('cygnssDataDate').textContent = dateFormat(data.date);
     $('cygnssCatalogDate').textContent = /^\d{4}-\d{2}-\d{2}$/.test(state.latest_available_date || '')
       ? dateFormat(state.latest_available_date + 'T12:00:00Z').replace(' 12:00 UTC', '') : 'Bilgi yok';
@@ -167,4 +169,10 @@ window.OdakCygnss = function (map) {
   });
   $('cygnssGo').addEventListener('click', () => { toggle.checked = true; show(true); });
   $('cygnssReload').addEventListener('click', () => show(false, true));
+  window.addEventListener('odak:language', () => {
+    if (!data) return;
+    map.closePopup();
+    updateState(lastState || {});
+    if (toggle.checked) show(false);
+  });
 };
