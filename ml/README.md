@@ -53,6 +53,22 @@ Uç hücreler dahil 21×21 = 441 hücre seçildi ve tamamı geçerliydi. JSON'da
 
 Ana bölgede maskeli hücre bulunmadığından eksik veri kontrolü aynı gerçek dosyanın `[140, -37.25, 140.5, -36.75]` küçük bölgesinde ayrıca yapıldı. Altı hücrenin beşi dışlandı, biri aktarıldı. Kaynakta maskeli olan 37° S, 140,25° E hücresi JSON hücre listesine alınmadı ve sıfır yoğunluğa dönüştürülmedi. Gerçek dosya karşılaştırmasına ek olarak ilgili yedi yapay regresyon testi geçti.
 
+### Haritadaki sınırlı CYGNSS örneğini tekrar üretme
+
+`assets/cygnss-north-pacific-20180816.json`, doğrulanan Kuzey Pasifik bölgesinin 441 hücrelik yaklaşık 16 KB web kopyasıdır. Yayınlanan alanlar yalnızca hücre merkezi enlem/boylamı, `mp_concentration`, `num_mp_samples` ve ortak kaynak/zaman/kapsam metaverisidir. Dosya bir izin listesiyle oluşturulur. Girdi dosyasındaki diğer metaveri veya alanlar web varlığına kopyalanmaz. `stddev_mp_samples` etiketindeki belirsizlik nedeniyle web varlığından çıkarılmıştır.
+
+```powershell
+py tools/build_cygnss_sample.py
+py -m unittest discover -s tools -p test_build_cygnss_sample.py
+npx.cmd playwright test -c tests/cygnss.config.cjs
+```
+
+Üretici, `ml/output/cygnss-north-pacific-20180816.json` dosyasını okur. Kaynak DOI, V3.2/d33 sürümü, 30 günlük süre, 16 Ağustos 2018 tarihi ve 0,25° ızgara merkezleri kontrol edilir. Çıktı sıralı ve tekrar üretilebilirdir. Geçersiz yoğunluk veya örnek sayısı hücrenin dışlanmasına yol açar. Gerçek sıfır yoğunluk, pozitif örnek sayısıyla korunur. Maskeli değerlerden sıfır üretilmez. Ham NetCDF ve `ml/output/` dosyaları Git dışında kalır, web varlığı kaynak kodla birlikte özel depoda saklanır.
+
+Haritada CYGNSS bağımsız bir aç/kapat kontrolüne ve bölgeye git düğmesine sahiptir. Her kare hücre merkezinin iki yönünde 0,125° genişletilir, toplam 0,25° × 0,25° ızgara alanı gösterilir. Tam dış kapsam 24,875..30,125° K ve 150,125..144,875° B olur. Etkin ortalama 30 gün ve yaklaşık 1° alandır. Kareler bu ortalamaların yayın ızgarasını gösterir. Yoğunluk `count km-2` biriminden sayısal değer değiştirilmeden Türkçe `adet/km²` etiketiyle gösterilir. Renk sınıfları adet/km² cinsinden `<12.750`, `12.750–<13.000`, `13.000–<13.250`, `13.250–<13.500`, `13.500–<13.750`, `≥13.750` şeklindedir. Kaynak değerler yuvarlanmadan saklanır, bilgi penceresinde iki ondalığa kadar biçimlenir.
+
+Bilgi penceresinde 16 Ağustos 2018 12:00 UTC tarihi, yoğunluk, örnek sayısı, ortalama kapsamı ve NASA PO.DAAC DOI bağlantısı gösterilir. CYGNSS adet/km² değerleri, GPGP g/km² rasterından ve mikroplastik sınır çizgilerinden ayrı kontroller ve renk açıklamalarıyla sunulur. Katman yeniden açıldığında aynı yerel Leaflet nesnesi kullanılır. Hata halinde kontrol kapatılır ve yeniden deneme metni gösterilir. 8767 test yapılandırması mevcut sunucuyu kullanır, sunucu başlatma/durdurma adımı içermez. Testlerde kullanıcı bildirimi API'si sahte boş yanıtla karşılanır.
+
 Bu klasör deniz yüzeyindeki atık tespiti için **sınırlı bir fizibilite deneyi** içerir. Model sitedeki canlı uydu analizine bağlı değildir; çıktısı doğrulanmış atık tespiti, plastik türü veya atığın yaşı değildir.
 
 Veri kaynağı: Kikaki ve diğerleri, *MARIDA: A benchmark for Marine Debris detection from Sentinel-2 remote sensing data* (2022), [veri kümesi](https://doi.org/10.5281/zenodo.5151941), CC BY 4.0. İndirme, NTUA'nın [Source Cooperative kopyasını](https://source.coop/ntua/marida) kullanır. Veri ve üretilen model kaynak kod deposuna eklenmez.

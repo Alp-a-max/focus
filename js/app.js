@@ -12,6 +12,7 @@ function initMap(){
  map=L.map('map',{zoomControl:false,worldCopyJump:true,scrollWheelZoom:false}).setView([lat,lon],6);
  L.control.zoom({position:'topright'}).addTo(map);
  window.OdakGpgp(map);
+ window.OdakCygnss(map);
  baseLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
  let baseErrors=0;
  baseLayer.on('loading',()=>{baseErrors=0});
