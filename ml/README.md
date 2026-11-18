@@ -24,7 +24,34 @@ Yoğunluk birimi resmî sözlükte `count km-2`, örnek sayısı ve geometrik st
 
 [Earthdata Search koleksiyonunu](https://search.earthdata.nasa.gov/search/granules?p=C2893924134-POCLOUD) açın, Earthdata hesabıyla giriş yapın, bir gün seçip `.nc` dosyasını indirin ve yerel yolunu yukarıdaki komuta verin. Hesap için [Earthdata Login](https://urs.earthdata.nasa.gov/) kullanılabilir. Okuyucu ağ bağlantısı veya kimlik bilgisi gerektirmez.
 
-Gerçek `.nc` dosyasının içeriği bu ortamda doğrulanamadı. Testlerde yalnızca resmî sözlükle uyumlu yapay NetCDF dosyaları kullanıldı. Eksik veriler, ölçekleme, boyut sırası, tarih, boylam dönüşümü, bölge seçimi ve komut satırı çıktısı sınandı.
+İlk geliştirmede yalnızca yapay NetCDF dosyaları kullanılabilmişti. Aşağıdaki gerçek dosya doğrulaması, kullanıcı dosyayı indirdikten sonra 18 Kasım 2026 tarihinde tamamlandı.
+
+### Gerçek V3.2 dosyasıyla doğrulama
+
+`cyg.ddmi.s20180816-120000-e20180816-120000.l3.grid-microplastic.a32.d33.nc`, Downloads klasöründen `ml/datasets/cygnss/` içine kopyalandı. Boyutu 6.877.416 bayttır. Kaynak ve kopyanın doğrulama öncesi/sonrası SHA-256 özeti `7b05b37d96b0e128e41d81b277837211f33b3a88f5ebfa52cdaff54e3f46e5a2` olarak eşleşti. Her iki dosya içeriği korundu. Yerel `.nc` dosyası ve `ml/output/` sonuçları Git dışında tutulur.
+
+Dosyada `time=1`, `lat=297`, `lon=1440` boyutları okundu. Global `version_id=3.2`, `l3_algorithm_version=3.2`, `l3_data_version=3.3` değerleri bulundu. Bu alanlar birbirinden ayrı sürüm bilgileridir. Enlem -37..37, boylam 0..359,75 aralığındadır. Koordinat adımı 0,25°'dir. Kaynak boylamları JSON için -180..180 aralığına dönüştürüldü.
+
+Zaman birimi `days since 1970-01-01 00:00:00 UTC`, ham zaman değeri 17759,5, çözülen hücre zaman etiketi `2018-08-16T12:00:00` UTC'dir. Global zaman kapsamı 16 Ağustos 2018 00:00:00–23:59:59, ortalama süresi `P30DT00H00M00S` ve yayın zaman adımı bir gündür. Değişken yorumları 1° × 1° alanda, zaman etiketinin çevresindeki 30 günlük ortalamayı belirtir.
+
+`mp_concentration` birimi `count km-2`, `num_mp_samples` ve `stddev_mp_samples` birimleri `1` olarak dosyadan okundu. Üç alan da `(time, lat, lon)` sırasındadır. Yoğunluk ve değişkenlik Float32, örnek sayısı Int64'tür. Üç değişkende `_FillValue=-9999` tanımlıdır. Tüm dosyada yoğunluk için 116.603, örnek sayısı için 115.724, değişkenlik için 116.838 maskeli hücre saptandı.
+
+**Gerçek dosyada bulunan uyumsuzluk ve düzeltme.** `stddev_mp_samples` metaveride geometrik standart sapma olarak tanımlanıyor, ancak dosyadaki sonlu değerler yaklaşık 0,002431618–0,36071122 aralığında bulunuyor. Okuyucunun önceki `<1` filtresi geçerli kaynak değerlerini `null` yapıyordu. Filtre yalnızca negatif değerleri dışlayacak şekilde düzeltildi. Sonlu ve negatif olmayan değerler dosyada saklandığı haliyle aktarılır, maskeli/sonsuz değerler `null` kalır. Bu alan için üstel dönüşüm veya başka bir düzeltme uygulanmadı. Kaynak etiketinin bu sayılarla ilişkisi ek bilimsel açıklama gerektirir; bu değerleri geometrik çarpan olarak kullanmadan önce veri sağlayıcısıyla netleştirin. İlgili regresyon testine 1'in altındaki değerin korunması ve negatif değerin dışlanması eklendi.
+
+Küçük Kuzey Pasifik bölgesi mevcut komut satırı okuyucusuyla aktarıldı.
+
+```powershell
+py ml/read_cygnss.py ml/datasets/cygnss/cyg.ddmi.s20180816-120000-e20180816-120000.l3.grid-microplastic.a32.d33.nc --bbox -150 25 -145 30 --out ml/output/cygnss-north-pacific-20180816.json
+py -m unittest discover -s ml -p test_read_cygnss.py
+```
+
+Uç hücreler dahil 21×21 = 441 hücre seçildi ve tamamı geçerliydi. JSON'daki **441 hücrenin tamamı**, okuyucunun bölge seçiminden bağımsız olarak doğrudan NetCDF'den 210..215° doğu boylamları ve 25..30° kuzey enlemleri seçilerek karşılaştırıldı. Koordinatlar, çözülen tarih, yoğunluk, örnek sayısı ve `stddev_mp_samples` değerleri birebir eşleşti. Üç örneğin ortak tarih etiketi 16 Ağustos 2018 12:00 UTC'dir.
+
+- 25° N, 150° W hücresinde yoğunluk 12681,7431640625 count km-2, örnek sayısı 1058, `stddev_mp_samples` 0,14537413418293.
+- 27,5° N, 147,5° W hücresinde yoğunluk 13448,09765625 count km-2, örnek sayısı 1152, `stddev_mp_samples` 0,17989492416381836.
+- 30° N, 145° W hücresinde yoğunluk 13829,740234375 count km-2, örnek sayısı 1209, `stddev_mp_samples` 0,19249387085437775.
+
+Ana bölgede maskeli hücre bulunmadığından eksik veri kontrolü aynı gerçek dosyanın `[140, -37.25, 140.5, -36.75]` küçük bölgesinde ayrıca yapıldı. Altı hücrenin beşi dışlandı, biri aktarıldı. Kaynakta maskeli olan 37° S, 140,25° E hücresi JSON hücre listesine alınmadı ve sıfır yoğunluğa dönüştürülmedi. Gerçek dosya karşılaştırmasına ek olarak ilgili yedi yapay regresyon testi geçti.
 
 Bu klasör deniz yüzeyindeki atık tespiti için **sınırlı bir fizibilite deneyi** içerir. Model sitedeki canlı uydu analizine bağlı değildir; çıktısı doğrulanmış atık tespiti, plastik türü veya atığın yaşı değildir.
 

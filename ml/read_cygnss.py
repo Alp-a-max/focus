@@ -106,7 +106,10 @@ def read_region(filename, bounds):
                     deviation = number(grids[FIELDS[2]][row, col])
                     if concentration is None or concentration < 0 or samples is None or samples <= 0 or not samples.is_integer():
                         continue
-                    if deviation is not None and deviation < 1:
+                    # The real V3.2/d33 file stores positive values below 1
+                    # despite its geometric-standard-deviation label. Preserve
+                    # the source values without inventing a transformation.
+                    if deviation is not None and deviation < 0:
                         deviation = None
                     cells.append({'date': date, 'lat': float(latitude[lat_index]),
                                   'lon': float(longitude[lon_index]),
@@ -123,7 +126,7 @@ def read_region(filename, bounds):
             'calendar': calendar,
             'date_timezone': 'UTC per CYGNSS product specification',
             'selection': 'Inclusive cell centers; west > east crosses the antimeridian.',
-            'missing_policy': 'Invalid concentration or missing/nonpositive sample count excludes the cell. Invalid geometric deviation is null.',
+            'missing_policy': 'Invalid concentration or missing/nonpositive sample count excludes the cell. Missing, nonfinite or negative deviation is null; other deviation values are retained as stored.',
             'counts': {'considered': considered, 'exported': len(cells),
                        'excluded': considered - len(cells), 'invalid_times': skipped_times},
             'cells': cells,

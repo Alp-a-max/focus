@@ -61,7 +61,17 @@ class ReaderTests(unittest.TestCase):
         result = read_region(self.file, [170, 35, -170, 38])
         self.assertEqual(len(result['cells']), 6)
         self.assertEqual({cell['lon'] for cell in result['cells']}, {179, -179})
-        self.assertEqual(sum(cell['stddev_mp_samples'] is None for cell in result['cells']), 2)
+        self.assertEqual(sum(cell['stddev_mp_samples'] is None for cell in result['cells']), 1)
+        self.assertEqual(next(cell['stddev_mp_samples'] for cell in result['cells']
+                              if cell['date'] == '2020-01-01T12:00:00'
+                              and cell['lat'] == 37 and cell['lon'] == -179), .5)
+
+    def test_negative_deviation_remains_missing(self):
+        with netCDF4.Dataset(self.file, 'a') as ds:
+            ds['stddev_mp_samples'][3, 0, 0] = -0.1
+        result = read_region(self.file, [-32, 35, -30, 38])
+        self.assertIsNone(next(cell['stddev_mp_samples'] for cell in result['cells']
+                               if cell['lat'] == 36 and cell['date'] == '2020-01-01T12:00:00'))
 
     def test_negative_longitude_and_empty_region(self):
         result = read_region(self.file, [-32, 35, -30, 38])
