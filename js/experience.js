@@ -64,5 +64,9 @@
   document.getElementById('experienceChange').addEventListener('click',show);
   refreshChoice();
   if(saved||juryDemo)applyPreset();else show();
-  if(juryDemo)setTimeout(()=>document.getElementById('monitorHeading')?.scrollIntoView({block:'start'}),250);
+  if(juryDemo)setTimeout(()=>{
+    let target;
+    try{target=document.getElementById(decodeURIComponent(location.hash.slice(1)));}catch{}
+    (target||document.getElementById('releaseIntro'))?.scrollIntoView({block:'start',behavior:'instant'});
+  },250);
 })();

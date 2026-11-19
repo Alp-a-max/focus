@@ -3,6 +3,20 @@
 (()=>{
   'use strict';
   const entries=`
+Bölge seç|Choose a region
+Kopuşu hesapla|Calculate release
+Sonucu incele|Inspect the result
+Kuzey Pasifik örneğini seç|Choose the North Pacific example
+Kesim ve salım ayrıntıları|Section and release settings
+Haritada rüzgâr senaryosu|Windage displayed on map
+%0 — yalnız akıntı|0% — current only
+%1 — düşük rüzgâr etkisi|1% — low windage
+%3 — yüksek rüzgâr etkisi|3% — high windage
+Kaynağa dön|Return to source
+Tüm sonucu göster|Fit the full result
+Veri ve rapor indir|Download data and report
+Dalga koşulları|Wave conditions
+Seçili koordinat; atık tespiti değil|Selected coordinate; not a waste detection
 Birikimden kopan parçalar nereye gider?|Where do fragments released from an accumulation travel?
 Birikimin kenarındaki bir kopuş kesimini haritadan seçin. Bu kesimden ayrıldığı varsayılan sanal parçaların 6, 12 ve 24 saat sonraki yayılımını inceleyin.|Select a release section at the edge of an accumulation. Explore the spread of virtual fragments assumed to detach from this section after 6, 12 and 24 hours.
 Seçili harita noktasını kopuş kesimi yap|Use the selected map point as a release section

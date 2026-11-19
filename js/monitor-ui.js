@@ -4,7 +4,7 @@ window.FocusMonitorUI={mount(map,{open}){
  const date=v=>v?new Date(v).toLocaleString(window.OdakI18n?.locale||'tr-TR',{timeZone:'UTC',dateStyle:'medium',timeStyle:'short'})+' UTC':tr('Henüz yok','Not yet');
  const root=document.createElement('section');root.className='monitor-panel';root.setAttribute('aria-labelledby','monitorHeading');
  root.innerHTML='<div class="monitor-head"><h2 id="monitorHeading"></h2><button id="monitorWorld" type="button"></button><button id="monitorReload" type="button"></button></div><p id="monitorScope"></p><p id="monitorStatus" role="status" aria-live="polite"></p><div id="monitorRegions" class="monitor-regions"></div>';
- document.querySelector('.map-wrap').before(root);
+ root.classList.add('monitor-secondary');document.querySelector('.map-panel').after(root);
  const $=id=>root.querySelector('#'+id),layer=L.featureGroup().addTo(map);
  let feed,loading=false,failed=false;
  const labels=()=>({ready:tr('Sonuç hazır','Result available'),no_scene:tr('Uygun görüntü yok','No usable scene'),error:tr('Son kontrol başarısız','Last check failed'),not_scanned:tr('Henüz taranmadı','Not scanned yet'),reference_only:tr('Açık okyanus · görüntü kapsamı ayrı','Open ocean · separate image coverage')});

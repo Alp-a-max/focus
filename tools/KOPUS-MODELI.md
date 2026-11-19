@@ -20,6 +20,8 @@ Kaynak: https://open-meteo.com/en/docs/marine-weather-api#hourly-parameter-defin
 
 ## Çıktı ve sınırlar
 
+Arayüzde üç adım kullanılır: bölge seç, kopuşu hesapla, sonucu incele. 32°N, 145°W Kuzey Pasifik kısayolu, yukarıdaki gibi yalnız varsayımsal başlangıç seçimidir; onay kutusunu otomatik işaretlemez. Harita lejantı kaynak kesimini, hareket yönünü ve tahmini konumları açıklar; gri artı koordinat seçicisidir, atık tespiti değildir. Başlangıç ve seçili ufuk haritada etiketlenir. Başlangıçta yalnız %1 doğrudan rüzgâr etkisi gösterilir; kullanıcı %0/%1/%3 arasında geçer. Üç fizik hesabı ve dışa aktarılan üç senaryo korunur. Kalabalığı azaltmak için seçili senaryoda en fazla beş örnek yol ve hareket varsa en fazla üç yön oku çizilir; bütün salınmış parçaların hesaplanan konumları korunur. Ufuk/senaryo kontrolleri ve kaynak/tüm sonuç görünümü haritanın hemen altındadır. Sonuç özeti gerçek model başlangıcı, seçili ufuk ve kıyı/eksik veri/alan sınırı durmalarını ayırır. Bölge kartları ana haritanın altına taşınmıştır.
+
 JSON; varsayılan kaynak kesimini, salım saatlerini, model başlangıç/alım zamanını, bütün normalize edilmiş dalga/akıntı/rüzgâr hücrelerini, üç senaryonun izlerini ve gerçek durma zamanlarını içerir. Aynı bilgilerle kaynaklı HTML raporu indirilir. Hesaplama istemcidedir; GitHub Pages üzerinde çalışır, yeni uydu tarama sunucusunun açık olmasını gerektirmez.
 
 Sorgu alanı merkezden ±0,2° ile sınırlıdır. Bu alanın veya 25 km hücre yakınlığının dışındaki, kıyıya temas eden veya eksik veriye ulaşan parçacık durdurulur; devam etmiş gibi gösterilmez. Batma, nesne boyutu, biyolojik süreçler ve gerçek mekanik parçalanma bu sürümde modellenmez. 2018 GPGP çizgileri güncel sınır değildir; yalnızca tarihli referans olarak tutulur.
