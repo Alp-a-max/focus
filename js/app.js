@@ -15,6 +15,8 @@ function initMap(){
  L.control.zoom({position:'topright'}).addTo(map);
  window.OdakGpgp(map);
  window.OdakCygnss(map);
+ FocusMapSearch.mount({select});
+ document.getElementById('legacyDrift').addEventListener('toggle',()=>window.dispatchEvent(new Event('resize')));
  baseLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'}).addTo(map);
  let baseErrors=0;
  baseLayer.on('loading',()=>{baseErrors=0});

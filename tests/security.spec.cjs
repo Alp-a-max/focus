@@ -8,7 +8,7 @@ test('remote model timestamps are displayed as text rather than executable marku
     return r.fulfill({json:{latitude:36.45,longitude:31.3,current:{time:attack,[s]:1,[d]:90},current_units:{[s]:'km/h',[d]:'°'},
       hourly:{time:[],[s]:[],[d]:[]},hourly_units:{[s]:'km/h',[d]:'°'}}});
   });
-  await page.goto('/#intelligence');
+  await page.goto('/platform.html#intelligence');
   await expect(page.locator('#dataStatus')).toContainText(attack);
   await expect(page.locator('#dataStatus img')).toHaveCount(0);
   expect(await page.evaluate(()=>window.odakInjected)).toBeUndefined();

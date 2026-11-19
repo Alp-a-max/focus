@@ -9,7 +9,7 @@ async function open(page) {
     await route.fulfill({response, body: 'L.Map.addInitHook(function(){window.testMap=this;});\n' + await response.text()});
   });
   await page.route('**/v1/{marine,forecast}?*', route => route.abort());
-  await page.goto('/#intelligence');
+  await page.goto('/platform.html#intelligence');
   await page.locator('#layerDrawer > summary').click();
   await expect(page.locator('#gpgpToggle')).toBeVisible();
 }

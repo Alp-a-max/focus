@@ -3,7 +3,32 @@
 (()=>{
   'use strict';
   const entries=`
-ODAK — Okyanus araştırma platformu|ODAK — Ocean research workspace
+Araştırma demosu · Tüm araçlar inceleme için açık.|Research demo · All tools are open for exploration.
+Nereden başlamak istersiniz?|Where would you like to start?
+Karadeniz, Antalya veya 41.6, 30.9|Black Sea, Antalya or 41.6, 30.9
+Konumu bul ↗|Find location ↗
+Türkiye kıyılarındaki başlangıç noktalarını veya koordinatları arayın. Konum bulunması atık bulunduğunu göstermez.|Search coastal starting points in Turkey or enter coordinates. Finding a location does not mean finding waste.
+Seçili noktada uydu incelemesine geç →|Investigate the selected point with satellite data →
+Bu ad için kayıt yok. Enlem, boylam girerek devam edebilirsiniz.|No matching name. Enter latitude, longitude to continue.
+Koordinat model kapsamı dışında.|Coordinates are outside the model coverage.
+Bir kıyı bölgesi veya enlem, boylam girin.|Enter a coastal area or latitude, longitude.
+Tam çalışma alanını aç|Open the full workspace
+Bağlantıyı kontrol et|Check connection
+Çalışma alanı bağlantısı|Workspace connection
+Harita ve modeller açık. Uydu incelemesi ve kayıtlar için tam çalışma alanına geçin.|The map and models are available. Open the full workspace for satellite investigation and reports.
+Uydu inceleme ve kayıt servisi şu anda bağlı değil. FOCUS başlatıldıktan sonra bağlantıyı yeniden kontrol edin.|Satellite investigation and report services are disconnected. Start FOCUS and check the connection again.
+İnceleme servisine ulaşılamıyor. Tam çalışma alanını açın veya bağlantıyı yeniden kontrol edin.|The investigation service is unavailable. Open the full workspace or check the connection again.
+Yerel bildirim servisine ulaşılamıyor. Tam çalışma alanını açın.|The local report service is unavailable. Open the full workspace.
+İşlem zaman aşımına uğradı. Lütfen tekrar deneyin.|The operation timed out. Please try again.
+Servis yanıtı okunamadı. Lütfen tekrar deneyin.|The service response could not be read. Please try again.
+
+Sade|Simple
+Araştırma|Research
+Gelişmiş|Advanced
+Ana sayfa|Home
+Yıllık paketleri incele|Explore annual plans
+İleri modeller ve karşılaştırma|Advanced models and comparison
+FOCUS — Araştırma çalışma alanı|FOCUS — Research workspace
 Harita|Map
 Sürüklenme|Drift
 Kaynaklar|Sources
@@ -391,11 +416,23 @@ TRAJECTORY / NOT TO SCALE|TRAJECTORY / NOT TO SCALE
 Saatlik model tahmini; en yakın model hücresi. Kaynak modelinin üretim zamanı API yanıtında doğrulanmadı.|Hourly model forecast; nearest model cell. The source model production time was not verified in the API response.
 Uydu fotoğrafı aynı sahnenin gerçek renk ürünüdür; yaklaşık 10 m çözünürlükte en fazla 3×3 km alan gösterir ve deniz için parlaklığı artırılmıştır. Kıyı ve bulut gölgesi hataları olabilir. FDI katmanı yaklaşık 1×1 km alanı 20 m çözünürlükte gösterir. Bulut, kara, sınıflandırılmamış alan ve görüntü kenarlarına yaklaşık 60 m güvenlik payı uygulanır; bazı etkiler maskelenemeyebilir. Atık tespiti değildir.|The satellite photo is a true-colour product from the same scene, showing up to 3×3 km at about 10 m resolution, brightened for sea visibility. Coast and cloud-shadow artefacts may occur. The FDI layer covers about 1×1 km at 20 m resolution. An approximately 60 m buffer surrounds cloud, land, unclassified areas and image edges; some effects may remain unmasked. This is not waste detection.
 `;
+  const more=`
+Analiz edilen Sentinel-2 sahnesinin yaklaşık gerçek renkli görüntüsü|Approximate true-colour image of the analysed Sentinel-2 scene
+Önceki uydu sahnesi|Earlier satellite scene
+Sonraki uydu sahnesi|Later satellite scene
+Katalog sayfalaması tekrarlanıyor.|Catalogue pagination is repeating.
+Katalog zaman sıralaması doğrulanamadı.|Could not verify catalogue time ordering.
+Katalog devam bağlantısı doğrulanamadı.|Could not verify catalogue continuation link.
+Katalog tarama sınırına ulaşıldı. Bu aramada uygun sahne doğrulanamadı.|Catalogue search limit reached. No suitable scene could be verified in this search.
+Görüntü arama tarihi geçersiz.|Invalid image search date.
+`;
+  for(const line of more.trim().split('\n')){const i=line.indexOf('|');dictionary.set(line.slice(0,i),line.slice(i+1));}
   for(const line of extra.trim().split('\n')){const i=line.indexOf('|');dictionary.set(line.slice(0,i),line.slice(i+1));}
   let language='tr';
   const originals=new WeakMap(),attributes=new WeakMap();
   const normalize=text=>text.replace(/\s+/g,' ').trim();
   const patterns=[
+    [/^(.+) seçildi\. Bu konumda atık olup olmadığı henüz bilinmiyor\.$/,'$1 selected. Waste presence at this location is unknown.'],
     [/^Model servisi yanıt vermedi \(HTTP (\d+)\)\.$/,'Model service did not respond (HTTP $1).'],
     [/^NASA MODIS TRUE COLOR · İstenen uydu görüntüsü tarihi: (.+)$/,'NASA MODIS TRUE COLOR · Requested image date: $1'],
     [/^(\d+) yerel kullanıcı bildirimi$/,'$1 local user reports'],
@@ -444,8 +481,8 @@ Uydu fotoğrafı aynı sahnenin gerçek renk ürünüdür; yaklaşık 10 m çöz
         ['Sahne bulutluluğu %','Scene cloud cover (%) '],[' geçerli / ',' valid / '],[' maskeli hücre.',' masked cells.'],['FDI aralığı','FDI range'],['renkler görecelidir, çöp veya güven skoru göstermez.','colours are relative and do not indicate waste or a confidence score.'],
         ['Senaryo oluşturulamadı:','Could not generate scenario:'],['Tahmin oluşturulamadı:','Could not generate forecast:'],['Alan tahmini oluşturulamadı:','Could not generate spatial forecast:']
       ];
+      for(const [from,to] of [...dictionary].sort((a,b)=>b[0].length-a[0].length))if(from.length>24)result=result.replaceAll(from,to);
       for(const [from,to] of clauses)result=result.replaceAll(from,to);
-      for(const [from,to] of dictionary)if(from.length>24)result=result.replaceAll(from,to);
     }
     return result===undefined?text:text.replace(text.trim(),result);
   }
@@ -484,7 +521,7 @@ Uydu fotoğrafı aynı sahnenin gerçek renk ürünüdür; yaklaşık 10 m çöz
   observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['aria-label','title','placeholder','alt']});
   window.OdakI18n={t,translate,get language(){return language},get locale(){return language==='en'?'en-GB':'tr-TR'},setLanguage(value){
     const changed=language!==value;language=value==='en'?'en':'tr';document.documentElement.lang=language;
-    document.title=t('ODAK — Okyanus araştırma platformu');translate();
+    document.title=t('FOCUS — Araştırma çalışma alanı');translate();
     if(changed)window.dispatchEvent(new CustomEvent('odak:language',{detail:{language}}));
   }};
 })();

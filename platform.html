@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="tr">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="#080d13" name="theme-color"/>
+  <title>
+   FOCUS — Araştırma çalışma alanı
+  </title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Manrope:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/comparison.css" rel="stylesheet"/>
+  <link href="css/premium.css" rel="stylesheet"/>
+  <link href="css/ensemble.css" rel="stylesheet"/>
+  <link href="css/experience.css" rel="stylesheet"/>
+  <link href="css/focus-workspace.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <header>
+   <a class="logo" href="index.html">
+    FOCUS
+    <i>
+    </i>
+   </a>
+   <nav aria-label="Ana gezinme" class="nav">
+    <a class="workspace-nav-home" href="index.html">
+     Ana sayfa
+    </a>
+    <a href="#intelligence">
+     Harita
+    </a>
+    <a href="#laboratory">
+     Sürüklenme
+    </a>
+    <a href="#method">
+     Kaynaklar
+    </a>
+   </nav>
+   <button aria-haspopup="dialog" class="experience-trigger" id="experienceOpen" type="button">
+    Deneyim
+    <span id="experienceBadge">
+     Standart · TR
+    </span>
+   </button>
+  </header>
+  <main>
+   <section class="section dashboard" id="intelligence">
+    <div class="section-top">
+     <div>
+      <div class="eyebrow">
+       ÇALIŞMA ALANI
+      </div>
+      <h2>
+       Denizi keşfet.
+      </h2>
+     </div>
+     <p class="section-desc">
+      Haritadan bir deniz noktası seçin. Araştırma katmanlarını açın veya seçili konumun deniz koşullarını inceleyin.
+     </p>
+    </div>
+    <p class="workspace-demo-note">
+     Araştırma demosu · Tüm araçlar inceleme için açık.
+     <a href="index.html#plans">
+      Yıllık paketleri incele
+     </a>
+    </p>
+    <div class="dash-grid">
+     <div class="panel map-panel">
+      <div class="panel-head">
+       <span class="panel-title" id="mapTitle">
+        HARİTA / OPENSTREETMAP
+       </span>
+       <span class="live" id="satStatus" role="status">
+        HARİTA KATMANI
+       </span>
+      </div>
+      <div class="map-wrap">
+       <div id="map">
+       </div>
+       <div class="map-legend">
+        <b>
+         ●
+        </b>
+        SEÇİLEN NOKTA
+        <br/>
+        <span id="mapSource">
+         KAYNAK: OPENSTREETMAP
+        </span>
+        <br/>
+        UYDU GÖRÜNTÜSÜ ≠ ATIK TESPİTİ
+       </div>
+      </div>
+      <p class="map-help" id="mapHelp">
+       Nokta seçmek için haritaya tıkla; sürükleyerek gez, + / − ile yakınlaştır.
+      </p>
+      <details class="workspace-group" id="layerDrawer">
+       <summary>
+        <span>
+         Katmanlar
+        </span>
+        <small>
+         Araştırma · uydu · vektörler
+        </small>
+       </summary>
+       <div class="workspace-body" id="researchLayers">
+        <details class="workspace-group advanced-group" id="vectorPanel">
+         <summary>
+          <span>
+           Rüzgâr ve akıntı alanı
+          </span>
+          <small>
+           İleri kontrol
+          </small>
+         </summary>
+         <div class="workspace-body">
+          <div aria-label="Vektör katmanları" class="field-controls">
+           <strong>
+            Model vektörleri
+           </strong>
+           <label for="fieldTime">
+            Model saati (UTC)
+           </label>
+           <select id="fieldTime">
+            <option value="0">
+             Güncel saat
+            </option>
+            <option value="3">
+             +3 saat
+            </option>
+            <option value="6">
+             +6 saat
+            </option>
+            <option value="12">
+             +12 saat
+            </option>
+            <option value="24">
+             +24 saat
+            </option>
+           </select>
+           <label>
+            <input id="windField" type="checkbox"/>
+            Rüzgâr alanı (açık mavi)
+           </label>
+           <span id="windFieldStatus" role="status">
+            Kapalı
+           </span>
+           <label>
+            <input id="currentField" type="checkbox"/>
+            Akıntı alanı (yeşil)
+           </label>
+           <span id="currentFieldStatus" role="status">
+            Kapalı
+           </span>
+           <p>
+            Oklar hareket yönünü gösterir; rüzgâr verisi geldiği yönden çevrilir. Noktalar seçili konum çevresindeki sınırlı model örnekleridir. Değer için okun üzerine gelin veya odaklanın.
+           </p>
+          </div>
+         </div>
+        </details>
+       </div>
+      </details>
+      <div class="map-tools">
+       <button aria-controls="map" aria-pressed="false" class="touch-move-btn" id="touchMoveBtn">
+        HARİTAYI TAŞI
+       </button>
+       <button aria-pressed="false" id="satBtn">
+        Uydu görüntüsü
+       </button>
+       <button aria-pressed="true" class="active" id="baseBtn">
+        Temel harita
+       </button>
+       <button id="refreshBtn">
+        Verileri yenile
+       </button>
+       <button disabled="" id="exportBtn">
+        CSV indir
+       </button>
+      </div>
+     </div>
+     <div class="side">
+      <div class="context-column">
+       <details class="workspace-group" id="conditionsPanel" open="">
+        <summary>
+         <span>
+          Deniz koşulları
+         </span>
+         <span class="live" id="apiState">
+          BAĞLANIYOR
+         </span>
+        </summary>
+        <div class="workspace-body">
+         <div class="location-title" id="placeName">
+          Antalya Açıkları
+         </div>
+         <div class="locations">
+          <button class="active" data-lat="36.45" data-lon="31.3" data-name="Antalya Açıkları">
+           ANTALYA
+          </button>
+          <button data-lat="40.75" data-lon="29.2" data-name="Marmara Denizi">
+           MARMARA
+          </button>
+          <button data-lat="41.6" data-lon="30.9" data-name="Karadeniz">
+           KARADENİZ
+          </button>
+          <button data-lat="38.1" data-lon="25.6" data-name="Ege Denizi">
+           EGE
+          </button>
+         </div>
+         <div class="metric-grid">
+          <div class="metric">
+           <label>
+            DALGA YÜKSEKLİĞİ
+           </label>
+           <strong id="wave">
+            —
+           </strong>
+           <small>
+            m
+           </small>
+          </div>
+          <div class="metric">
+           <label>
+            DENİZ SICAKLIĞI
+           </label>
+           <strong id="temp">
+            —
+           </strong>
+           <small>
+            °C
+           </small>
+          </div>
+          <div class="metric">
+           <label>
+            AKINTI HIZI
+           </label>
+           <strong id="current">
+            —
+           </strong>
+           <small>
+            km/sa
+           </small>
+          </div>
+          <div class="metric">
+           <label>
+            RÜZGÂR HIZI
+           </label>
+           <strong id="wind">
+            —
+           </strong>
+           <small>
+            km/sa
+           </small>
+          </div>
+         </div>
+         <div aria-live="polite" class="status" id="dataStatus" role="status">
+          Veri kaynaklarına bağlanılıyor…
+         </div>
+         <a class="drift-link" href="#laboratory">
+          BU NOKTANIN SÜRÜKLENMESİNİ GÖR ↗
+         </a>
+         <details class="workspace-group" id="modelNotes">
+          <summary>
+           <span>
+            Model ve kapsam notları
+           </span>
+           <small>
+           </small>
+          </summary>
+          <div class="workspace-body">
+           <div class="data-note">
+            Bu ölçümler canlı API üzerinden alınan
+            <strong>
+             model tabanlı tahminlerdir
+            </strong>
+            ; sahada ölçülmüş atık yoğunluğu veya doğrulanmış plastik tespiti değildir. Kıyı akıntısı verileri sınırlı doğruluğa sahiptir. Kıyı denetimi yaklaşık 1:50m Natural Earth verisini kullanır; küçük adalar ve yeni kıyı değişiklikleri eksik olabilir. Deniz modeli en yakın uygun hücreyi kullanabilir.
+           </div>
+          </div>
+         </details>
+        </div>
+       </details>
+      </div>
+      <div class="analysis-column">
+       <details class="workspace-group" id="analysisPanel">
+        <summary>
+         <span>
+          Uydu analizi
+         </span>
+         <small>
+          Sentinel-2
+         </small>
+        </summary>
+        <div class="workspace-body">
+         <div class="scene-controls">
+          <strong>
+           Görüntü kataloğu
+          </strong>
+          <p>
+           Seçilen nokta çevresindeki son 30 günün uydu sahnelerini bul. Sahne bulutluluğu tüm görüntüye aittir; listelenmesi atık tespiti değildir.
+          </p>
+          <button id="sceneSearch" type="button">
+           Uydu sahnelerini ara
+          </button>
+          <p aria-live="polite" id="sceneStatus" role="status">
+           Seçilen konum için katalog araması yapılmadı.
+          </p>
+          <ul id="sceneList">
+          </ul>
+         </div>
+         <div class="scene-controls">
+          <strong>
+           Spektral inceleme
+          </strong>
+          <p>
+           Seçili noktanın çevresindeki yaklaşık 1 km² alanda son 45 günden sahne bulutluluğu %30 veya daha düşük ilk uygun Sentinel-2 sahnesinin bantlarını işle. Renkler yalnızca göreceli FDI değerleridir; çöp tespiti veya güven düzeyi değildir.
+          </p>
+          <button id="analysisRun" type="button">
+           Bölgeyi analiz et
+          </button>
+          <button disabled="" id="analysisClear" type="button">
+           Katmanı kaldır
+          </button>
+          <p aria-live="polite" id="analysisStatus" role="status">
+           Seçili nokta için analiz yapılmadı.
+          </p>
+          <details class="comparison-panel" id="comparisonPanel">
+           <summary>
+            İki tarihi karşılaştır
+           </summary>
+           <p>
+            Aynı bölgenin iki uygun Sentinel-2 sahnesini incele. Görüntülerdeki değişim, çöp tespiti veya atığın yeni olduğunu göstermez.
+           </p>
+           <button id="comparisonRun" type="button">
+            İki tarihi karşılaştır
+           </button>
+           <p aria-live="polite" id="comparisonStatus" role="status">
+            Henüz karşılaştırma yapılmadı.
+           </p>
+           <div class="comparison-images" hidden="" id="comparisonImages">
+            <figure>
+             <figcaption id="comparisonOlderLabel">
+             </figcaption>
+             <img alt="Önceki uydu sahnesi" id="comparisonOlder"/>
+            </figure>
+            <figure>
+             <figcaption id="comparisonNewerLabel">
+             </figcaption>
+             <img alt="Sonraki uydu sahnesi" id="comparisonNewer"/>
+            </figure>
+           </div>
+          </details>
+          <p>
+           <label for="analysisLayer">
+            Harita katmanı
+           </label>
+           <select id="analysisLayer">
+            <option value="photo">
+             Aynı sahnenin uydu fotoğrafı
+            </option>
+            <option value="spectral">
+             Deneysel FDI farkı
+            </option>
+           </select>
+          </p>
+          <img alt="Analiz edilen Sentinel-2 sahnesinin yaklaşık gerçek renkli görüntüsü" class="scene-preview" hidden="" id="scenePreview"/>
+          <p id="candidateStatus">
+           Analizden sonra spektral inceleme noktaları burada görünür.
+          </p>
+          <div class="candidate-list" id="candidateList">
+          </div>
+          <button id="inspectCenter" type="button">
+           Seçili noktayı incele
+          </button>
+          <div class="inspection-details" hidden="" id="analysisDetails">
+           <strong>
+            İNCELEME NOKTASI — ATIK OLDUĞU DOĞRULANMADI
+           </strong>
+           <p id="inspectionCoord">
+           </p>
+           <p id="inspectionScene">
+           </p>
+           <p id="inspectionReason">
+           </p>
+           <button id="inspectionRoute" type="button">
+            Sürüklenmeyi incele
+           </button>
+           <label for="inspectionNote">
+            Saha açıklaması
+           </label>
+           <textarea id="inspectionNote" maxlength="1000" placeholder="Gördüğünüzü ve gözlem tarihini yazın"></textarea>
+           <label for="inspectionPhoto">
+            Saha fotoğrafı (isteğe bağlı, JPEG/PNG, en fazla 1 MB)
+           </label>
+           <input accept="image/jpeg,image/png" id="inspectionPhoto" type="file"/>
+           <label for="inspectionStatus">
+            Bildirim durumu
+           </label>
+           <select id="inspectionStatus">
+            <option value="unreviewed">
+             İncelenmemiş kullanıcı bildirimi
+            </option>
+            <option value="field_reported">
+             Fotoğraflı saha bildirimi (kullanıcı beyanı)
+            </option>
+           </select>
+           <button id="inspectionSave" type="button">
+            Bu bilgisayara kaydet
+           </button>
+           <p aria-live="polite" id="inspectionFeedback" role="status">
+            Gözlem henüz kaydedilmedi.
+           </p>
+          </div>
+         </div>
+        </div>
+       </details>
+       <details class="workspace-group" id="recordsPanel">
+        <summary>
+         <span>
+          Yerel bildirimler
+         </span>
+         <small>
+          Bu bilgisayarda
+         </small>
+        </summary>
+        <div class="workspace-body">
+         <div class="detection-note">
+          <p id="observationStatus" role="status">
+           Yerel kayıtlar yükleniyor…
+          </p>
+          <ul id="observationList">
+          </ul>
+         </div>
+        </div>
+       </details>
+      </div>
+     </div>
+    </div>
+   </section>
+   <section class="section lab" id="laboratory">
+    <div class="section-top">
+     <div>
+      <div class="eyebrow">
+       SÜRÜKLENME MODELİ
+      </div>
+      <h2>
+       Hareketi öngör.
+      </h2>
+     </div>
+     <p class="section-desc">
+      Seçili konum için akıntı ve rüzgâr girdileriyle varsayımsal sürüklenme senaryosunu inceleyin.
+     </p>
+    </div>
+    <div class="lab-grid">
+     <details class="workspace-group legacy-drift" id="legacyDrift">
+      <summary>
+       İleri modeller ve karşılaştırma
+      </summary>
+      <div class="lab-grid">
+       <div class="panel">
+        <div class="panel-head">
+         <span class="panel-title">
+          Senaryo ayarları
+         </span>
+         <span class="live">
+          Model girdileri
+         </span>
+        </div>
+        <div class="controls">
+         <label for="coord">
+          SEÇİLEN KONUM
+         </label>
+         <input id="coord" readonly="" value="36.4500° N / 31.3000° E"/>
+         <label for="hours">
+          TAHMİN SÜRESİ
+         </label>
+         <select id="hours">
+          <option value="3">
+           3 SAAT
+          </option>
+          <option selected="" value="6">
+           6 SAAT
+          </option>
+          <option value="12">
+           12 SAAT
+          </option>
+          <option value="24">
+           24 SAAT
+          </option>
+         </select>
+         <label for="windage">
+          RÜZGÂR SÜRÜKLENME KATSAYISI (VARSAYIM)
+         </label>
+         <select id="windage">
+          <option value="0">
+           %0 — SADECE AKINTI
+          </option>
+          <option selected="" value="0.01">
+           %1 — DÜŞÜK RÜZGÂR ETKİSİ
+          </option>
+          <option value="0.03">
+           %3 — YÜKSEK RÜZGÂR ETKİSİ
+          </option>
+         </select>
+         <button class="primary" disabled="" id="predictBtn">
+          Rotayı haritada göster
+         </button>
+         <button class="spatial-drift-btn" id="spatialPredictBtn" type="button">
+          Alan verileriyle hesapla · deneysel
+         </button>
+         <details class="plain-details">
+          <summary>
+           Alan modelinin sınırları
+          </summary>
+          <p class="lab-note">
+           Alan tahmini için çevredeki model hücreleri sorgulanır. Eski tarihli uydu görüntüsündeki bir noktanın bugünkü konumu bilinmez; bu işlem geçmişten bugüne takip yapmaz.
+          </p>
+         </details>
+         <details class="plain-details">
+          <summary>
+           Noktasal modelin sınırları
+          </summary>
+          <p class="lab-note">
+           Bu basitleştirilmiş noktasal tahmin başlangıç konumundaki saatlik API vektörlerini kullanır. Saatlik veriler arasında vektörler 15 dakikalık adımlarla hesaplanır; yaklaşık kıyı maskesine ulaşınca rota durur. Yeni konumlarda akıntı yeniden örneklenmez; gerçek atık konumu veya toplama rotası olarak kullanılamaz.
+          </p>
+         </details>
+        </div>
+       </div>
+       <div class="panel">
+        <div class="panel-head">
+         <span class="panel-title">
+          Model sonucu
+         </span>
+         <span class="live" id="predictionState">
+          VERİ BEKLENİYOR
+         </span>
+        </div>
+        <div class="path-view">
+         <canvas id="pathCanvas">
+         </canvas>
+        </div>
+        <div aria-live="polite" class="path-caption" id="predictionText" role="status">
+         Önce canlı deniz verisinin gelmesini bekle, ardından tahmini hesapla. Sonuçlar gerçek tahmin girdilerine dayalı basitleştirilmiş bir modeldir.
+        </div>
+       </div>
+      </div>
+     </details>
+    </div>
+   </section>
+   <section class="section how" id="method">
+    <details class="workspace-group">
+     <summary>
+      <span>
+       Kaynaklar ve yöntem
+      </span>
+      <small>
+       Araştırma notları
+      </small>
+     </summary>
+     <div class="workspace-body">
+      <p>
+       Katman tarihleri ve birimleri farklıdır. Araştırma sonuçları saha teyidi gerektirir. Veriler, kaynaklarının kapsam ve çözünürlük sınırlarıyla sunulur.
+      </p>
+      <p class="source-links">
+       <a href="https://doi.org/10.5067/CYGNS-L3P32" rel="noopener noreferrer" target="_blank">
+        NASA PO.DAAC / CYGNSS
+       </a>
+       <a href="https://doi.org/10.6084/m9.figshare.5873142.v2" rel="noopener noreferrer" target="_blank">
+        GPGP · Lebreton ve Reisser
+       </a>
+       <a href="https://open-meteo.com/en/docs/marine-weather-api" rel="noopener noreferrer" target="_blank">
+        Open-Meteo
+       </a>
+       <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">
+        OpenStreetMap
+       </a>
+      </p>
+      <div class="steps">
+       <article class="step">
+        <h3>
+         Gözlemle.
+        </h3>
+        <p>
+         NASA GIBS servisinden gerçek tarihli MODIS uydu görüntülerini harita üzerinde görüntüle. Görüntü tarihini ve kaynağını şeffaf biçimde sun.
+        </p>
+       </article>
+       <article class="step">
+        <h3>
+         Yorumla.
+        </h3>
+        <p>
+         Open-Meteo deniz ve hava tahminlerinden dalga, yüzey sıcaklığı, akıntı ve rüzgâr verilerini koordinata göre sorgula.
+        </p>
+       </article>
+       <article class="step">
+        <h3>
+         Öngör.
+        </h3>
+        <p>
+         Akıntı ve rüzgâr girdileriyle varsayımsal sürüklenme analizi yap. Gerçek plastik algılama için ayrı bir uydu görüntüsü işleme ve doğrulama modeli gereklidir.
+        </p>
+       </article>
+      </div>
+     </div>
+    </details>
+   </section>
+  </main>
+  <footer>
+   <div>
+    FOCUS
+    <span>
+     Okyanus araştırma platformu
+    </span>
+   </div>
+   <a href="#method">
+    Kaynaklar ve araştırma notları ↗
+   </a>
+  </footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+  <script src="js/coast.js">
+  </script>
+  <script src="js/scenes.js">
+  </script>
+  <script src="js/candidates.js">
+  </script>
+  <script src="js/service.js">
+  </script>
+  <script src="js/map-search.js">
+  </script>
+  <script src="js/satellite-ui.js">
+  </script>
+  <script src="js/drift.js">
+  </script>
+  <script src="js/spatial-drift.js">
+  </script>
+  <script src="js/fields.js">
+  </script>
+  <script src="js/gpgp.js">
+  </script>
+  <script src="js/cygnss.js">
+  </script>
+  <script src="js/forecast-data.js">
+  </script>
+  <script src="js/ensemble-coast.js">
+  </script>
+  <script src="js/ensemble-drift.js">
+  </script>
+  <script src="js/ensemble-ui.js">
+  </script>
+  <script src="js/i18n.js">
+  </script>
+  <script src="js/app.js">
+  </script>
+  <script src="js/experience.js">
+  </script>
+ </body>
+</html>

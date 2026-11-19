@@ -8,7 +8,7 @@ test('comparison displays two dates and clears when the selected location change
     newer:{date:'2026-01-10T10:00:00Z',cloud:7,photoWidth:1,photoHeight:1,rgb:[45,65,95]},
     summary:{commonPixels:150,totalPixels:2500,medianDelta:.0123}
   }}));
-  await page.goto('/#intelligence');
+  await page.goto('/platform.html#intelligence');
   await page.locator('#analysisPanel > summary').click();
   await page.locator('#comparisonPanel > summary').click();
   await expect(page.locator('#comparisonRun')).toBeVisible();

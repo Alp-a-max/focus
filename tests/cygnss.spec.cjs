@@ -9,7 +9,7 @@ async function open(page) {
   });
   await page.route('**/v1/{marine,forecast}?*', route => route.abort());
   await page.route('**/api/observations', route => route.fulfill({json:[]}));
-  await page.goto('/#intelligence');
+  await page.goto('/platform.html#intelligence');
   await page.locator('#layerDrawer > summary').click();
   await expect(page.locator('#cygnssToggle')).toBeVisible();
 }

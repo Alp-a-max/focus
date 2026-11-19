@@ -1,4 +1,4 @@
-# ODAK
+# FOCUS
 
 ## Çoklu parçacık sürüklenme senaryoları
 
@@ -12,27 +12,24 @@ ODAK, OpenStreetMap, NASA GIBS, Sentinel-2 ve Open-Meteo kullanan yerel sunuculu
 
 ## Çalıştırma
 
-Node.js 20+ kuruluysa proje klasöründe aşağıdaki komutları çalıştırın. Sunucu hazır adresini terminale yazınca http://127.0.0.1:8766 adresini açın. Sunucuyu durdurmak için Ctrl+C kullanın.
+Node.js 20+ ile proje klasöründe `npm.cmd install`, ardından `npm.cmd start` çalıştırın. Varsayılan tam uygulama adresi http://127.0.0.1:8772. Brave'de açmak için `npm.cmd run start:browser` veya `FOCUS-BASLAT.cmd` kullanın. Başlatıcı mevcut sağlıklı FOCUS sunucusunu yeniden kullanır; diğer süreçleri kapatmaz. Yeni başlattığı sunucuyu terminalde Ctrl+C ile durdurabilirsiniz.
+
+`index.html` tanıtım, yıllık paketler ve ücretsiz demo girişidir; `platform.html` araştırma çalışma alanıdır. Standart ücretsiz, Pro 20 USD/yıl, Max 100 USD/yıl olarak planlanmıştır. Ödeme, hesap açma ve sunucu taraflı üyelik hakları henüz kurulmadı. Paket seçimi ücretli üyelik başlatmaz; araştırma demosunda tüm araçlar incelenebilir. Sade / Araştırma / Gelişmiş yalnızca panel düzenidir.
+
+Live Server 5500'de tanıtım açılabilir. Demo bağlantısı `assets/focus-runtime.json` içindeki yerel 8772 sunucusunun sağlığını kontrol eder. Hazırsa tam uygulamaya yönlendirir. Sağlık bilgisi dışında kullanıcı kayıtları ve işleme uçları farklı origin'e açılmaz. Sunucu çalışmıyorsa çalışma alanı açık bir servis uyarısı verir; HTML yanıtını JSON gibi göstermeye çalışmaz.
+
+Farklı port için `$env:PELAGIC_PORT='8767'; npm.cmd start` kullanabilirsiniz. Live Server geçişi için `assets/focus-runtime.json` içindeki adresi de aynı porta ayarlayın. Eski `node server.cjs` komutu varsayılan 8766'yı korur; `PELAGIC_PORT=0` yalnızca doğrudan sunucu çağrısında boş port ister. Sunucu yalnızca loopback adresine bağlanır; internete yayın veya hesap sistemi değildir.
+
+PowerShell yürütme ilkesi `npm.ps1` dosyasını engellerse `npm.cmd` kullanın; sistem ilkesini değiştirmeniz gerekmez. Kayıt ve fotoğraflar Git dışında `data/observations.json` içinde kalır. `PELAGIC_DATA_DIR` başka bir yerel klasör seçebilir. Testler geçici veri klasörleri veya taklit istekler kullanır.
+
+`npm.cmd test` birim/API testlerini çalıştırır. Mevcut tam uygulamaya karşı arayüz denetimi:
 
 ```powershell
-npm install
-npm start
+$env:ODAK_TEST_URL='http://127.0.0.1:8772'
+npx.cmd playwright test -c tests/premium.config.cjs
 ```
 
-PowerShell `npm.ps1` için çalıştırma ilkesi hatası verirse aynı komutları `npm.cmd install`, `npm.cmd start` ve testler için `npm.cmd test` şeklinde çalıştırın. Böylece sistemin çalıştırma ilkesini değiştirmeniz gerekmez. Doğrudan `node server.cjs` komutu da desteklenir.
-
-8766 portu kullanımdayken sunucu anlaşılır bir mesajla ve hata çıkış koduyla kapanır. Kendi açtığınız önceki sunucuyu Ctrl+C ile durdurabilir veya PowerShell'de alternatif port seçebilirsiniz.
-
-```powershell
-$env:PELAGIC_PORT = '8767'
-npm.cmd start
-```
-
-Bu durumda http://127.0.0.1:8767 adresini açın. Varsayılan porta dönmek için `Remove-Item Env:PELAGIC_PORT` çalıştırın. `PELAGIC_PORT=0` işletim sisteminden boş port ister ve seçilen adres terminalde gösterilir. Gözlem kayıtları ve fotoğraflar varsayılan olarak `data/observations.json` dosyasında saklanır. `PELAGIC_DATA_DIR` farklı bir kayıt klasörü seçer. HTTP testleri ayrı geçici klasörler ve işletim sisteminin ayırdığı boş portlar kullanır, test sunucusu kapandıktan sonra geçici klasörler temizlenir.
-
-VS Code Live Server arayüzü açabilir. Yerel gözlem ve uydu API'leri için Node sunucusunu kullanın. Servisler ve kütüphaneler için internet gerekir. Tarayıcıda güncel Chromium, Firefox veya Safari kullanın. API anahtarı projeye gömülmemiştir.
-
-`npm test` matematik testlerini, `npm run test:e2e` Playwright testlerini çalıştırır. Playwright yapılandırması varsayılan olarak Windows'taki Brave yolunu kullanır; farklı bilgisayarda `playwright.config.cjs` içindeki yolu değiştirin veya Playwright Chromium kullanın. Testte üretilen API verileri yalnızca test ağına yönlendirilir.
+Harita araması, kayıtlı Türkiye kıyı başlangıç noktaları ile `enlem, boylam` girişini destekler; küresel adres arama veya doğrulanmış atık veritabanı değildir. Seçilen noktadan uydu incelemesine geçilebilir. Güncel Chromium/Firefox/Safari ve haricî veri servisleri için internet gerekir.
 
 ## Model ve kısıtlar
 
@@ -41,7 +38,7 @@ VS Code Live Server arayüzü açabilir. Yerel gözlem ve uydu API'leri için No
 - Vektör katmanları istenirse 3×3 sorgu noktasıyla sınırlı, Open-Meteo model hücrelerinde çizilen ayrık örneklerdir. Sürekli alan veya gözlem değildir. Birim/tarih/geçerlilik kontrolünden geçmeyen vektörler gösterilmez. Örneklerin arası 0,3 enlem/boylam derecesidir; hücreler çakışabilir. Bir seçimde en çok dokuz koordinat ve etkin iki katman için iki çoklu istek yapılır; 15 dakika önbellek ve konum değişiminde 350 ms bekleme uygulanır. Konum kartı beş dakika önbellek kullanır; Yenile düğmesi bu önbelleği temizler.
 - NASA GIBS MODIS True Color yalnızca görüntü katmanıdır. Ekrandaki tarih istenen görüntü tarihidir; bulut, veri boşluğu veya servis davranışı nedeniyle her pikselde gerçek görüntü elde edildiği garanti edilemez. Atık göstermez.
 - Copernicus STAC üzerinden seçilen noktanın son 30 gündeki beş Sentinel-2 L2A sahnesinin tarihi ve sahne genelindeki bulutluluk oranı aranabilir. Bu katalog verileri işlenmiş atık tespiti değildir. Doğrulanmış atık veritabanı bağlı değildir. Deneysel spektral inceleme alanları ve bu bilgisayarda saklanan kullanıcı bildirimleri, doğrulanmış atık gözlemi veya güven puanı değildir. Haritadaki uyarı veri kaynağının eksikliğini belirtir; o bölgede atık bulunmadığını kanıtlamaz.
-- Dekoratif 3B sahne yalnızca giriş görünürken ve sekme etkinken çalışır; 768 px altında ve azaltılmış hareket tercihinde açılmaz.
+- Girişteki rota çizimi şematiktir; gerçek atık konumu veya tahmin sonucu değildir.
 
 ## Veri kaynakları
 
@@ -51,16 +48,16 @@ VS Code Live Server arayüzü açabilir. Yerel gözlem ve uydu API'leri için No
 
 ## Atık tespiti için sonraki geliştirme aşaması
 
-Sentinel-2 sahnelerinde tarih, kapsam, çözünürlük ve bulutluluk doğrulanmalı; atmosfer düzeltmesi ve kara/bulut/gölge maskeleri uygulanmalıdır. FDI gibi yöntemler köpük, yosun ve gemi gibi karıştırıcı örneklerle karşılaştırılmalı; bağımsız etiketli sahalar ve saha gözlemleriyle doğrulanmalıdır. Adaylar gözlem tarihi, işleme sürümü, kaynak, belirsizlik ve doğrulama durumuyla GeoJSON olarak yönetilmeli; kullanıcı bildirimleri doğrulanmış gözlemlerden ayrı tutulmalıdır. [FDI çalışması](https://www.nature.com/articles/s41598-020-62298-z) ve [spektral yorumlama uyarısı](https://repository.library.noaa.gov/view/noaa/68394/noaa_68394_DS1.pdf) başlangıç kaynaklarıdır. Bu aşama henüz uygulanmamıştır.
+Sentinel-2 sahnelerinde tarih, kapsam, çözünürlük ve bulutluluk doğrulanmalı; atmosfer düzeltmesi ve kara/bulut/gölge maskeleri uygulanmalıdır. FDI gibi yöntemler köpük, yosun ve gemi gibi karıştırıcı örneklerle karşılaştırılmalı; bağımsız etiketli sahalar ve saha gözlemleriyle doğrulanmalıdır. Adaylar gözlem tarihi, işleme sürümü, kaynak, belirsizlik ve doğrulama durumuyla GeoJSON olarak yönetilmeli; kullanıcı bildirimleri doğrulanmış gözlemlerden ayrı tutulmalıdır. [FDI çalışması](https://www.nature.com/articles/s41598-020-62298-z) ve [spektral yorumlama uyarısı](https://repository.library.noaa.gov/view/noaa/68394/noaa_68394_DS1.pdf) başlangıç kaynaklarıdır. Deneysel spektral inceleme uygulanmıştır; bağımsız doğrulanmış otomatik plastik sınıflandırıcısı henüz uygulamaya bağlanmamıştır.
 
 - [Natural Earth](https://www.naturalearthdata.com/about/terms-of-use/): kamu malı 1:50m kara verisi; küçük adaları, ayrıntılı kıyıları ve güncel değişiklikleri kaçırabilir. Kıyı için operasyonel kullanım uygun değildir.
 - [Copernicus Data Space STAC](https://documentation.dataspace.copernicus.eu/APIs/STAC.html): görüntü katalog metaverisi; listedeki bulutluluk sahne geneli içindir.
 
 ## Deneysel Sentinel-2 spektral analizi
 
-Bu özellik için Live Server'ın 5500 portu yeterli değildir; `node server.cjs` çalıştırıp `http://127.0.0.1:8766` adresini açın. Haritada bir deniz noktası seçin, veri kartındaki **Bölgeyi Analiz Et** düğmesine basın. Sunucu yalnızca yerel bilgisayara bağlanır; seçilen koordinat Sentinel-2 sahnesini bulmak üzere Earth Search ve ilgili bantları okumak üzere AWS açık veri servisine gönderilir. Copernicus şifresi veya API anahtarı bu yöntem için kullanılmaz.
+Bu özellik için tam Node uygulamasını `npm.cmd start` ile açın ve `http://127.0.0.1:8772/platform.html` adresini kullanın. Haritada bir deniz noktası seçin, veri kartındaki **Bölgeyi Analiz Et** düğmesine basın. Sunucu yalnızca yerel bilgisayara bağlanır; seçilen koordinat Sentinel-2 sahnesini bulmak üzere Earth Search ve ilgili bantları okumak üzere AWS açık veri servisine gönderilir. Copernicus şifresi veya API anahtarı bu yöntem için kullanılmaz.
 
-Sunucu seçili nokta çevresindeki yaklaşık 1 km² için son 45 gündeki ve sahne genelinde bulutluluğu en fazla %30 olan ilk uygun Sentinel-2 L2A sahnesini Earth Search kataloğundan seçer. Seçim mevcut Copernicus sahne listesindeki tıklamaya bağlı değildir. Bulutluluk oranı tüm sahneye aittir. B08, B06, B11, SCL ve aynı sahnenin gerçek renkli TCI verileri kamuya açık COG dosyalarından bölgesel aralık istekleriyle okunur. SCL sınıfı 6 dışındaki pikseller ile bunların ve analiz kenarının yaklaşık 60 m çevresi dışlanır; sınıflandırma hatalı veya eksik olabilir ve maskenin dışındaki bulutları kapsamaz. B06/B11 20 m olduğundan spektral çıktı yaklaşık 20 m grid olarak gösterilir; uydu fotoğrafı TCI bandının yaklaşık 10 m verisidir. UTM penceresi coğrafi haritaya yaklaşık yerleştirilir.
+Sunucu seçili nokta çevresindeki yaklaşık 1 km² için son 45 gündeki ve sahne genelinde bulutluluğu en fazla %30 olan tarih sırasıyla en yeni uygun Sentinel-2 L2A sahnesini Earth Search kataloğundan seçer. `sortby=-properties.datetime` ile en fazla 5 sayfa / 100 kayıt taranır; sınır aşılırsa uygun veri bulunamadığı açıkça bildirilir. Devam bağlantısının katalog origin ve yolu doğrulanır. Sağlayıcının [STAC API açıklaması](https://earth-search.aws.element84.com/v1/api.html) esas alınır. Seçim mevcut Copernicus sahne listesindeki tıklamaya bağlı değildir. Bulutluluk oranı tüm sahneye aittir. B08, B06, B11, SCL ve aynı sahnenin gerçek renkli TCI verileri kamuya açık COG dosyalarından bölgesel aralık istekleriyle okunur. SCL sınıfı 6 dışındaki pikseller ile bunların ve analiz kenarının yaklaşık 60 m çevresi dışlanır; sınıflandırma hatalı veya eksik olabilir ve maskenin dışındaki bulutları kapsamaz. B06/B11 20 m olduğundan spektral çıktı yaklaşık 20 m grid olarak gösterilir; uydu fotoğrafı TCI bandının yaklaşık 10 m verisidir. UTM penceresi coğrafi haritaya yaklaşık yerleştirilir.
 
 L2A yüzey yansımasından deneysel `B08 - (B06 + (B11-B06)*((842-665)/(1610-665))*10)` yaklaşımı hesaplanır. Kullanılan yüzey yansıması, özgün makaledeki suya özgü düzeltmenin yerine geçmez; yöntem bu projede doğrulanmamıştır. Her analizde renkler yalnızca geçerli alanın kendi en düşük/en yüksek değerlerine göre ölçeklenir. Renkler çöp, birikim, olasılık veya güven skoru değildir; sahneler arası sayısal karşılaştırma için otomatik renkler kullanılmamalıdır. Yosun, köpük, gemi, dalga, yansıma, kıyı ve maskeleme hataları sonucu etkileyebilir. En az 100 geçerli piksel bulunan sahnelerde, pozitif ve ilgili alanın en yüksek %1 FDI değerleri arasında komşu en az iki hücre içeren gruplar deneysel inceleme alanı olarak önerilebilir; bu eşik bağımsız olarak doğrulanmamıştır ve herhangi bir atık olasılığı veya güven skoru göstermez. Eşik karşılanmaması atık bulunmadığını göstermez. Nokta koordinatları yaklaşık konumdadır.
 
@@ -75,7 +72,7 @@ Analiz panelindeki İki Tarihi Karşılaştır düğmesi, son 45 günde uygun bi
 
 ## Başlangıç ekranı, deneyim düzenleri ve dil
 
-İlk ziyarette Türkçe / English ve Standart / Pro / Max seçimi sunulur. Bunlar çalışma alanı düzenleridir; bütün araçlar her düzende kullanılabilir. Standart haritayı ve deniz koşullarını öne çıkarır; Pro katman ve uydu analizi panellerini de açar; Max vektörler, karşılaştırma ve yerel bildirimleri de açık başlatır. Buz mavisi, deniz yeşili ve gümüş lavanta vurguları mevcut koyu ODAK kimliği içinde düzenleri ayırt eder. Açık paneller kullanıcı tarafından serbestçe kapatılabilir.
+Çalışma alanına ilk ziyarette Türkçe / English ve Sade / Araştırma / Gelişmiş seçimi sunulur. Bunlar çalışma alanı düzenleridir; bütün araçlar her düzende kullanılabilir. Sade haritayı ve deniz koşullarını öne çıkarır; Araştırma katman ve uydu analizi panellerini de açar; Gelişmiş vektörler, karşılaştırma ve yerel bildirimleri de açık başlatır. Buz mavisi, deniz yeşili ve gümüş lavanta vurguları koyu FOCUS kimliği içinde düzenleri ayırt eder. Açık paneller kullanıcı tarafından serbestçe kapatılabilir.
 
 Üstteki **Deneyim / Experience** veya çalışma alanındaki **Düzeni ve dili değiştir / Change layout and language** düğmesinden seçim değiştirilebilir. Geri dön / Escape, kaydedilmiş seçime döner. Tercih yalnızca bu tarayıcı ve yerel adres için `odak-experience-v1` anahtarıyla saklanır; tarayıcı depolaması kapalı olsa da ekran çalışır. Yeni düzen seçildiğinde açık panel tercihleri yeniden uygulanır. Katmanların açık/kapalı durumları ve yüklenmiş verileri bu seçimden etkilenmez.
 

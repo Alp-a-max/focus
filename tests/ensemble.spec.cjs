@@ -19,7 +19,7 @@ async function setup(page,{fail=false,delay=0}={}) {
       hourly:{time,[sk]:time.map(()=>isMarine?1:10),[dk]:time.map(()=>isMarine?90:180)}}));
     await route.fulfill({json:items.length===1?items[0]:items});
   });
-  await page.goto('/#laboratory');
+  await page.goto('/platform.html#laboratory');
   await expect(page.locator('#ensembleRun')).toBeVisible();
   return ()=>fields;
 }

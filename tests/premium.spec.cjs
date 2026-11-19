@@ -6,7 +6,7 @@ const state = require('../assets/cygnss-status.json');
 async function open(page) {
   await page.route('**/api/observations', route => route.fulfill({json:[]}));
   await page.route('**/v1/{marine,forecast}?*', route => route.abort());
-  await page.goto('/#intelligence');
+  await page.goto('/platform.html#intelligence');
   await expect(page.locator('#layerDrawer')).toBeVisible();
 }
 

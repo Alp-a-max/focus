@@ -3,7 +3,7 @@ const sample=require('../assets/cygnss-latest.json');
 async function open(page){
   await page.route('**/api/observations',r=>r.fulfill({json:[]}));
   await page.route('**/v1/{marine,forecast}?*',r=>r.abort());
-  await page.goto('/');
+  await page.goto('/platform.html');
   await expect(page.locator('#experienceDialog')).toBeVisible();
 }
 async function enter(page,language='tr',mode='standard'){
@@ -21,9 +21,9 @@ test('first visit, keyboard selection, Turkish copy and persistence',async({page
   await expect(page.locator('[name=experience][value=pro]')).toBeChecked();
   await page.locator('#experienceStart').click();
   await expect(page.locator('#analysisPanel')).toHaveAttribute('open','');
-  await expect(page.locator('#experienceBadge')).toHaveText('Pro · TR');
+  await expect(page.locator('#experienceBadge')).toHaveText('Araştırma · TR');
   await page.reload();await expect(page.locator('#experienceDialog')).not.toBeVisible();
-  await expect(page.locator('#experienceBadge')).toHaveText('Pro · TR');
+  await expect(page.locator('#experienceBadge')).toHaveText('Araştırma · TR');
   expect(errors).toEqual([]);
 });
 for(const mode of ['standard','pro','max'])test(`${mode} preset changes only disclosure defaults and keeps all tools`,async({page})=>{
@@ -67,9 +67,9 @@ test('English local report validation and user-written text are preserved',async
 test('storage unavailable still allows starting, language change and all controls',async({page})=>{
   await page.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new DOMException('Blocked','SecurityError')}})});
   await open(page);await enter(page,'en','standard');
-  await expect(page.locator('#experienceBadge')).toHaveText('Standard · EN');
+  await expect(page.locator('#experienceBadge')).toHaveText('Simple · EN');
   await page.locator('#experienceOpen').click();await enter(page,'tr','max');
-  await expect(page.locator('#experienceBadge')).toHaveText('Max · TR');
+  await expect(page.locator('#experienceBadge')).toHaveText('Gelişmiş · TR');
 });
 test('English model results and disclosures translate fully; cancel restores saved preferences',async({page})=>{
   await open(page);
@@ -90,7 +90,7 @@ test('English model results and disclosures translate fully; cancel restores sav
   await page.locator('#experienceOpen').click();await page.locator('[data-language=tr]').click();
   await page.locator('#experienceCancel').click();
   await expect(page.locator('html')).toHaveAttribute('lang','en');
-  await expect(page.locator('#experienceBadge')).toHaveText('Max · EN');
+  await expect(page.locator('#experienceBadge')).toHaveText('Advanced · EN');
   const untranslated=await page.evaluate(()=>{
     const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),found=[];
     while(walker.nextNode()){

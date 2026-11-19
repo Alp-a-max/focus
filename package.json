@@ -1,1 +1,23 @@
-{"name":"pelagic-ocean-intelligence","version":"1.0.0","private":true,"scripts":{"start":"node server.cjs","test":"node --test tests/*.test.js","test:e2e":"playwright test"},"devDependencies":{"@playwright/test":"^1.65.1"},"dependencies":{"@turf/boolean-point-in-polygon":"^7.4.0","@turf/line-intersect":"^7.4.0","esbuild":"^0.28.2","geotiff":"^3.0.5","proj4":"^2.23.0","topojson-client":"^3.1.0","world-atlas":"^2.0.2"}}
+{
+  "name": "pelagic-ocean-intelligence",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node tools/start-local.cjs",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "start:browser": "node tools/start-local.cjs --open"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  },
+  "dependencies": {
+    "@turf/boolean-point-in-polygon": "^7.4.0",
+    "@turf/line-intersect": "^7.4.0",
+    "esbuild": "^0.28.2",
+    "geotiff": "^3.0.5",
+    "proj4": "^2.23.0",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  }
+}
