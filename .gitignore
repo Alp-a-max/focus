@@ -41,3 +41,4 @@ blob-report/
 /.live-*.cjs
 /.nasa-check.cjs
 /.visual-check.cjs
+/.demo-tools/

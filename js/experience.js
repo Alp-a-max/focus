@@ -5,7 +5,8 @@
   const names={standard:'Sade',pro:'Araştırma',max:'Gelişmiş'};
   let saved;
   try { const value=JSON.parse(localStorage.getItem(key)); if(value&&modes.includes(value.mode)&&['tr','en'].includes(value.language)&&value.completed===true)saved=value; } catch {}
-  let selection={mode:saved?.mode||'standard',language:saved?.language||'tr'};
+  const juryDemo=new URLSearchParams(location.search).get('demo')==='1';
+  let selection={mode:saved?.mode||(juryDemo?'pro':'standard'),language:saved?.language||'tr'};
   const dialog=document.createElement('dialog');
   dialog.id='experienceDialog';dialog.className='experience-dialog';dialog.setAttribute('aria-labelledby','experienceTitle');
   dialog.innerHTML=`<form method="dialog" class="experience-shell">
@@ -62,5 +63,6 @@
   document.getElementById('experienceOpen').addEventListener('click',show);
   document.getElementById('experienceChange').addEventListener('click',show);
   refreshChoice();
-  if(saved)applyPreset();else show();
+  if(saved||juryDemo)applyPreset();else show();
+  if(juryDemo)setTimeout(()=>document.getElementById('monitorHeading')?.scrollIntoView({block:'start'}),250);
 })();

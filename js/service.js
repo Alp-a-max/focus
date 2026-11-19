@@ -39,6 +39,7 @@
     if(!['127.0.0.1','localhost'].includes(location.hostname)){
       document.body.classList.add('public-feed-mode');box.classList.add('public-feed-notice');box.hidden=false;link.hidden=true;
       message.textContent='Ortak uydu sonuçları küresel izleme ağında yayımlanır. Yeni isteğe bağlı tarama ve kişisel kayıtlar yerel çalışma alanındadır. Tarihli sürüklenme hesabı bu yayında kullanılabilir.';
+      window.addEventListener('load',()=>window.FocusPublicAPI?.ready.then(available=>{if(available)message.textContent='Demo tarama servisi bağlı. Haritadan deniz noktası seçip yeni uydu incelemesi başlatabilir, adaydan tarihli hareket hesabı ve kaynaklı rapor alabilirsiniz. Demo sunucusu bu bilgisayar açıkken çalışır; istekler sıraya alınır.';}));
       retry.textContent='İzleme ağına git';retry.onclick=()=>document.getElementById('monitorHeading')?.scrollIntoView({behavior:'smooth',block:'start'});return;
     }
     async function update(){

@@ -17,11 +17,14 @@ window.FocusDetectionUI = (()=>{
     const root=document.getElementById('detectionControls');
     root.innerHTML=`<p id="detectionIntro"></p><p class="detection-origin" id="detectionOrigin"></p><div class="detection-actions"><button type="button" id="detectionRun"></button><button type="button" id="detectionClear" disabled></button><button type="button" id="detectionExport" disabled></button></div><p class="detection-status" id="detectionStatus" role="status" aria-live="polite"></p><p id="detectionDates"></p><p id="detectionCoverage"></p><ul class="detection-list" id="detectionList"></ul><div class="detection-selection" id="detectionSelection" hidden><p id="detectionSelected"></p><label><input type="checkbox" id="detectionAssume"><span id="detectionAssumptionLabel"></span></label><button type="button" id="detectionForecast" disabled></button></div><details class="plain-details"><summary id="detectionNotesTitle"></summary><p id="detectionLimit"></p><a id="detectionPaper" href="${paper}" target="_blank" rel="noopener noreferrer"></a><pre class="detection-source" id="detectionSource"></pre></details>`;
     const $=id=>root.querySelector('#'+id),layer=L.featureGroup().addTo(map);
+    const reportButton=document.createElement('button');reportButton.type='button';reportButton.id='detectionReport';root.querySelector('.detection-actions').append(reportButton);reportButton.onclick=()=>document.getElementById('reportPanel')?.scrollIntoView({block:'start'});
     $('detectionSelection').setAttribute('role','region');$('detectionSelection').setAttribute('aria-labelledby','detectionSelected');
     $('detectionAssume').setAttribute('aria-describedby','detectionSelected');$('detectionForecast').setAttribute('aria-describedby','detectionSelected');
-    let origin,controller,seq=0,result,selected,assumption,phase='idle',errorCode='',model;
+    let origin,controller,seq=0,result,selected,assumption,phase='idle',errorCode='',model,progress='';
     const errors=()=>({
-      MODEL_UNAVAILABLE:words('Araştırma tespit modeli bu bilgisayarda henüz hazır değil.','The research detector is not ready on this computer.'),
+      MODEL_UNAVAILABLE:words('Araştırma tespit modeli şu anda hazır değil.','The research detector is not ready.'),
+      RATE_LIMITED:words('Demo kullanım sınırına ulaşıldı. Hazır bölge sonuçlarını inceleyebilirsiniz.','Demo usage limit reached. Published regional results remain available.'),
+      QUEUE_FULL:words('Tarama sırası dolu. Biraz sonra tekrar deneyin.','Scan queue is full. Please try again shortly.'),
       ANALYSIS_BUSY:words('Başka bir analiz devam ediyor. Tamamlanınca tekrar deneyin.','Another analysis is running. Try again when it finishes.'),
       DETECTION_TIMEOUT:words('Tespit işlemi zaman aşımına uğradı. Tekrar deneyin.','Detection timed out. Try again.'),
       INVALID_COORDINATES:words('Geçerli bir deniz koordinatı seçin.','Select valid coordinates at sea.'),
@@ -36,16 +39,16 @@ window.FocusDetectionUI = (()=>{
       document.getElementById('detectionHeading').textContent=words('Yapay zekâ ile atık adayları · araştırma','AI waste candidates · research');
       $('detectionIntro').textContent=words('Seçili nokta çevresinde yaklaşık 1 km² alanda gerçek Sentinel-2 L2A bantlarıyla UNet++ incelemesi. Üretilen konumlar doğrulanmamış atık adaylarıdır.','UNet++ inspection over about 1 km² around the selected point using actual Sentinel-2 L2A bands. Returned locations are unverified waste candidates.');
       $('detectionOrigin').textContent=origin?words('Arama merkezi: ','Search centre: ')+origin.lat.toFixed(4)+'°, '+origin.lon.toFixed(4)+'°':'';
-      $('detectionRun').textContent=published?words('Yeni tarama yerel çalışma alanında','New scans require the local workspace'):words('Yapay zekâ ile atık adaylarını ara','Search for waste candidates with AI');
+      $('detectionRun').textContent=published&&!window.FocusPublicAPI?.available?words('Yeni tarama servisi bağlı değil','New scan service disconnected'):words('Yapay zekâ ile atık adaylarını ara','Search for waste candidates with AI');
       $('detectionClear').textContent=phase==='loading'?words('Aramayı iptal et','Cancel search'):words('Aday katmanını temizle','Clear candidate layer');
       $('detectionExport').textContent=words('Adayları GeoJSON indir','Download candidates as GeoJSON');
-      $('detectionStatus').textContent=phase==='loading'?words('Uydu bantları ve araştırma modeli işleniyor…','Processing satellite bands and the research model…'):
+      $('detectionStatus').textContent=phase==='loading'?(progress||words('Uydu bantları ve araştırma modeli işleniyor…','Processing satellite bands and the research model…')):
         phase==='error'?(errors()[errorCode]||errors().DETECTION_FAILED):result?
           (result.features.length?result.features.length+words(' doğrulanmamış aday. Listeden veya haritadan inceleyin.',' unverified candidates. Inspect the list or map.'):
             words('Aday bulunmadı; atık yok anlamına gelmez.','No candidates found; this does not mean waste is absent.')):
           published?words('Küresel izleme ağından yayımlanmış bir bölge sonucu açın.','Open a published regional result from the global monitoring network.'):model?.available===false?errors().MODEL_UNAVAILABLE:words('Haritadan bir deniz noktası seçin ve aramayı başlatın.','Select a point at sea and start a search.');
-      $('detectionRun').disabled=!origin||phase==='loading'||!['localhost','127.0.0.1'].includes(location.hostname);$('detectionClear').disabled=phase!=='loading'&&!result;
-      $('detectionExport').disabled=!result||phase==='loading';
+      $('detectionRun').disabled=!origin||phase==='loading'||(published&&!window.FocusPublicAPI?.available);$('detectionClear').disabled=phase!=='loading'&&!result;
+      $('detectionExport').disabled=!result||phase==='loading';reportButton.disabled=!result||phase==='loading';reportButton.textContent=words('Kaynaklı raporu aç','Open evidence report');
       const m=result?.metadata;
       $('detectionCoverage').textContent=m?(m.eligible_pixels===0?words('Geçerli su pikseli yok; maske veya eksik veri analizi sınırlar. ','No eligible water pixels; masks or missing data limit the analysis. '):'')+
         m.eligible_pixels+words(' incelenebilir su pikseli · ',' eligible water pixels · ')+m.excluded_pixels+words(' maskeli veya eksik piksel.',' masked or missing pixels.')+
@@ -74,9 +77,9 @@ window.FocusDetectionUI = (()=>{
       origin={lat:feature.geometry.coordinates[1],lon:feature.geometry.coordinates[0]};onSelect(context());render();$('detectionAssume').focus({preventScroll:true});
     }
     function clear(){seq++;controller?.abort();controller=null;phase='idle';result=null;selected=null;assumption=null;layer.clearLayers();
-      $('detectionSelection').hidden=true;$('detectionAssume').checked=false;render();}
+      $('detectionSelection').hidden=true;$('detectionAssume').checked=false;window.dispatchEvent(new CustomEvent('focus:result',{detail:null}));render();}
     function showSnapshot(data){
-      const validated=validate(data);clear();origin={...validated.metadata.query};result=validated;phase='success';render();drawResult();
+      const validated=validate(data);clear();origin={...validated.metadata.query};result=validated;phase='success';render();drawResult();window.dispatchEvent(new CustomEvent('focus:result',{detail:structuredClone(result)}));
       document.getElementById('detectionPanel').open=true;
     }
     function drawResult(){
@@ -90,14 +93,18 @@ window.FocusDetectionUI = (()=>{
     }
     async function run(){
       if(!origin||phase==='loading')return;
-      clear();const current=seq,p={...origin};phase='loading';controller=new AbortController();render();
+      clear();const current=seq,p={...origin};phase='loading';progress='';controller=new AbortController();render();
       try{
+        let data;
+        if(published){data=await window.FocusPublicAPI.detect(p,{signal:controller.signal,onProgress:j=>{if(current===seq){progress=j.state==='queued'?words('Tarama sırada · sıra: ','Scan queued · position: ')+j.position:words('Gerçek uydu bantları ve model işleniyor…','Processing actual satellite bands and model…');render();}}});}
+        else {
         const response=await fetch('/api/satellite/detection?'+new URLSearchParams(p),{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(120000)]),cache:'no-store'});
         if(!/application\/json\b/.test(response.headers.get('content-type')||''))throw Error('SERVICE_UNAVAILABLE');
-        let data;try{data=await response.json();}catch{throw Error('INVALID_RESULT');}
+        try{data=await response.json();}catch{throw Error('INVALID_RESULT');}
         if(!response.ok)throw Error(errors()[data?.code]?data.code:'DETECTION_FAILED');
+        }
         const validated=validate(data);if(validated.metadata.query?.lat!==p.lat||validated.metadata.query?.lon!==p.lon)throw Error('INVALID_RESULT');if(current!==seq)return;
-        result=validated;phase='success';render();
+        result=validated;phase='success';render();window.dispatchEvent(new CustomEvent('focus:result',{detail:structuredClone(result)}));
         drawResult();
       }catch(error){if(current!==seq)return;phase='error';errorCode=error.name==='TimeoutError'?'DETECTION_TIMEOUT':errors()[error.message]?error.message:'SERVICE_UNAVAILABLE';render();}
       finally{if(current===seq){controller=null;render();}}
@@ -116,7 +123,7 @@ window.FocusDetectionUI = (()=>{
       a.href=url;a.download='focus-waste-candidates-'+result.metadata.observed_at.slice(0,10)+'.geojson';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     };
     if(['localhost','127.0.0.1'].includes(location.hostname))fetch('/api/detection/status',{signal:AbortSignal.timeout(4000),cache:'no-store'}).then(r=>r.ok?r.json():null).then(value=>{model=value;render();}).catch(()=>{});
-    window.addEventListener('odak:language',render);render();
+    window.FocusPublicAPI?.ready.then(render);window.addEventListener('odak:language',render);render();
     return {setOrigin(lat,lon){origin={lat,lon};clear();},showSnapshot};
   }
   return {mount,describeContext};

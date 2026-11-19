@@ -12,8 +12,9 @@ window.FocusTrackingUI={mount(map,{coastReady}){
   $('trackingExport').textContent=tr('Tarihli rotaları indir','Download dated trajectories');$('trackingExport').disabled=!result;
   $('trackingStatus').textContent=controller?tr('Geçmiş ve gelecek model alanları işleniyor · ','Processing archived and forecast fields · ')+batches+tr(' alan sorgusu',' field batches'):error?tr('Hesap tamamlanamadı: ','Calculation could not finish: ')+error:result?tr('Kesikli çizgi geçmiş model hesabı; düz çizgi gelecek tahmini. Konumlar saha doğrulaması değildir.','Dashed line: past model advection; solid line: forecast. Positions are not field-verified.'):source?tr('Başlangıç gözlemi: ','Starting observation: ')+date(source.observation.observed_at):tr('Önce bir uydu adayı seçin.','Select a satellite candidate first.');
  }
- function clear(){sequence++;controller?.abort();controller=null;result=null;error='';group.clearLayers();$('trackingResults').replaceChildren();$('trackingConsent').checked=false;render();}
+ function clear(){sequence++;controller?.abort();controller=null;result=null;window.dispatchEvent(new CustomEvent('focus:trajectory',{detail:null}));error='';group.clearLayers();$('trackingResults').replaceChildren();$('trackingConsent').checked=false;render();}
  function draw(){
+  window.dispatchEvent(new CustomEvent('focus:trajectory',{detail:structuredClone(result)}));
   group.clearLayers();$('trackingResults').replaceChildren();
   result.scenarios.forEach((s,i)=>{
    const color=['#72caff','#8ef0b5','#d9aaff'][i],now=Date.parse(result.now),past=s.points.filter(p=>p.time<=now),future=s.points.filter(p=>p.time>=now),to=p=>[p.lat,p.lon];
@@ -24,10 +25,10 @@ window.FocusTrackingUI={mount(map,{coastReady}){
   });
   if(group.getLayers().length)map.fitBounds(group.getBounds(),{padding:[30,30],maxZoom:12});
  }
- $('trackingConsent').onchange=()=>{if(!$('trackingConsent').checked){result=null;group.clearLayers();$('trackingResults').replaceChildren();}render();};
+ $('trackingConsent').onchange=()=>{if(!$('trackingConsent').checked){result=null;window.dispatchEvent(new CustomEvent('focus:trajectory',{detail:null}));group.clearLayers();$('trackingResults').replaceChildren();}render();};
  $('trackingRun').onclick=async()=>{
   if(!source||!$('trackingConsent').checked||controller)return;const seq=++sequence,selected=structuredClone(source);controller=new AbortController();const control=controller;result=null;error='';batches=0;group.clearLayers();$('trackingResults').replaceChildren();render();
-  const timer=setTimeout(()=>control.abort(),150000);
+  window.dispatchEvent(new CustomEvent('focus:trajectory',{detail:null}));const timer=setTimeout(()=>control.abort(),150000);
   try{let coast=await coastReady;if(!coast)throw Error('COAST_UNAVAILABLE');const origin=selected.observation.geometry.coordinates;if(coast.regional)coast=coast.regional({minLat:origin[1]-2,maxLat:origin[1]+2,minLon:origin[0]-2,maxLon:origin[0]+2});const provider=FocusTrackingCore.provider({signal:control.signal,onProgress:n=>{if(seq===sequence){batches=n;render();}}}),[lon,lat]=selected.observation.geometry.coordinates;
    const value=await FocusTrackingCore.simulate({lat,lon,observedAt:selected.observation.observed_at,getFields:provider.getFields,coast,signal:control.signal});
    if(seq!==sequence)return;result={...value,observation_source:selected.observation,environment_sources:provider.sources,request_batches:provider.requestBatches,validation_status:'unvalidated_model_trajectory',assumptions:{floating_object:true,windages:[0,.01,.03],stokes_drift:false,object_identity_verified:false}};draw();
