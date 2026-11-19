@@ -18,7 +18,8 @@ test('map search handles Turkish names and coordinates without inventing debris 
  assert.deepEqual(search('41.6, 30.9')[0],{name:'Seçilen koordinat',lat:41.6,lon:30.9});
  assert.equal(search('not-a-known-location').length,0);assert.throws(()=>search('91,30'));
 });
-test('approved prices are annual USD, with sales disabled until real account and payment setup',()=>{
- assert.equal(plans.currency,'USD');assert.equal(plans.billing,'year');assert.equal(plans.salesEnabled,false);
- assert.deepEqual(plans.plans.map(p=>p.annualPrice),[0,20,100]);
+test('approved pricing is in integer USD cents and sales stay disabled',()=>{
+ assert.equal(plans.currency,'USD');assert.equal(plans.billing,'month');assert.equal(plans.salesEnabled,false);
+ assert.equal(plans.centsPerForecastHour,5);assert.equal(plans.planChangesEnabled,false);
+ assert.deepEqual(plans.plans.filter(p=>p.monthlyForecasts).map(p=>p.monthlyCents),[6900,27900,99900]);
 });

@@ -1,11 +1,32 @@
 const {test,expect}=require('@playwright/test');
+
+test('approved forecast-hour pricing is bilingual, planned and readable at desktop and 390px',async({page})=>{
+ await page.goto('/#plans');await expect(page.locator('#planGrid .plan-card')).toHaveCount(5);
+ await expect(page.locator('[data-plan=free]')).toContainText('3 saate kadar');await expect(page.locator('[data-plan=free]')).toContainText('Günde 5');
+ await expect(page.locator('[data-plan=starter]')).toContainText('$69');await expect(page.locator('[data-plan=starter]')).toContainText('$690');
+ await expect(page.locator('#pricingScope')).toContainText('üç ayrı hak düşmez');
+ await page.locator('#pricingHours').fill('72');await expect(page.locator('#pricingEstimate')).toContainText('$3,60');
+ await expect(page.locator('#pricingEstimate')).toContainText('sunulmuyor');
+ await expect(page.locator('#pricingLimits')).toContainText('$60');await expect(page.locator('#pricingLimits')).toContainText('Abonelik her kullanımda daha ucuz değildir');
+ await page.getByRole('button',{name:'EN',exact:true}).click();
+ await expect(page.locator('[data-plan=professional]')).toContainText('Annual total: $2,790');
+ await expect(page.locator('[data-plan=enterprise]')).toContainText('Annual total: $9,990');
+ await expect(page.locator('#pricingExamples')).toContainText('12h = $0.60');await expect(page.locator('#pricingExamples')).toContainText('24h = $1.20');
+ await expect(page.locator('#pricingExamples')).toContainText('48h = $2.40');await expect(page.locator('#pricingExamples')).toContainText('72h = $3.60');
+ await expect(page.locator('#pricingLimits')).toContainText('plan changes are planned, not active');
+ await page.locator('#pricingHours').fill('1.5');await expect(page.locator('#pricingEstimate')).toContainText('whole number');
+ await page.locator('#pricingHours').fill('12');
+ for(const width of [1440,390]){await page.setViewportSize({width,height:960});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.evaluate(()=>document.getElementById('plans').scrollIntoView({behavior:'instant',block:'start'}));await page.screenshot({path:require('node:path').join(require('node:os').tmpdir(),`focus-pricing-${width}.png`)});}
+ await page.locator('[data-plan=professional] button').click();await expect(page.locator('#planDialogCopy')).toContainText('collects no payment');
+ await expect(page.locator('input[type=password],input[autocomplete=cc-number]')).toHaveCount(0);
+});
 test('public entry shows FOCUS annual prices and planned memberships without a fake checkout',async({page})=>{
  await page.goto('/');
  await expect(page.locator('.wordmark')).toContainText('FOCUS');
- await expect(page.locator('#planGrid .plan-card')).toHaveCount(3);
- await expect(page.locator('#planGrid')).toContainText('$20');await expect(page.locator('#planGrid')).toContainText('$100');
+ await expect(page.locator('#planGrid .plan-card')).toHaveCount(5);
+ await expect(page.locator('#planGrid')).toContainText('$69');await expect(page.locator('#planGrid')).toContainText('$999');
  await expect(page.locator('#plans')).toContainText('yıllık toplam');
- const pro=page.locator('.plan-card').filter({has:page.getByRole('heading',{name:'Pro',exact:true})});
+ const pro=page.locator('.plan-card').filter({has:page.getByRole('heading',{name:'Profesyonel',exact:true})});
  await pro.getByRole('button').click();await expect(page.locator('#planDialog')).toBeVisible();
  await expect(page.locator('#planDialogCopy')).toContainText('henüz açılmadı');
  expect(await page.locator('input[type=password],input[autocomplete=cc-number]').count()).toBe(0);
@@ -13,7 +34,7 @@ test('public entry shows FOCUS annual prices and planned memberships without a f
 });
 test('public English changes plan language and takes the user to the full local workspace',async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'EN',exact:true}).click();
- await expect(page.locator('html')).toHaveAttribute('lang','en');await expect(page.locator('#planGrid')).toContainText('USD / year');
+ await expect(page.locator('html')).toHaveAttribute('lang','en');await expect(page.locator('#planGrid')).toContainText('USD / month');
  await page.getByRole('link',{name:'Open demo ↗',exact:true}).click();
  await expect(page).toHaveURL(/\/platform\.html$/);await expect(page.locator('#experienceDialog')).toBeVisible();
  await expect(page.locator('html')).toHaveAttribute('lang','en');
@@ -22,7 +43,7 @@ test('mobile public entry stays within the viewport with accessible navigation a
  await page.setViewportSize({width:390,height:844});await page.goto('/');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await page.getByRole('link',{name:'Paketler',exact:true}).click();await expect(page.locator('#planGrid')).toBeVisible();
- const pro=page.locator('.plan-card').filter({has:page.getByRole('heading',{name:'Pro',exact:true})});await pro.getByRole('button').click();
+ const pro=page.locator('.plan-card').filter({has:page.getByRole('heading',{name:'Profesyonel',exact:true})});await pro.getByRole('button').click();
  expect(await page.locator('#planDialog').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
 });
 async function platform(page){
