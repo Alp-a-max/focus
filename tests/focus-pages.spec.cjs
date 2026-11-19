@@ -1,5 +1,32 @@
 const {test,expect}=require('@playwright/test');
 
+test('five pricing cards stay in one readable desktop row, with a raised middle and a stacked mobile layout',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');
+ const ids=['free','payg','starter','professional','enterprise'];
+ for(const language of ['tr','en']){
+  await page.locator('[data-public-language='+language+']').click();
+  for(const width of [1440,1920]){
+   await page.setViewportSize({width,height:1200});
+   const cards=await page.locator('#planGrid .plan-card').evaluateAll(nodes=>nodes.map(n=>({id:n.dataset.plan,x:n.getBoundingClientRect().x,y:n.getBoundingClientRect().y,right:n.getBoundingClientRect().right,bottom:n.getBoundingClientRect().bottom,width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height,overflow:n.scrollWidth>n.clientWidth,font:parseFloat(getComputedStyle(n.querySelector('li')).fontSize)})));
+   expect(cards.map(c=>c.id)).toEqual(ids);
+   expect(Math.max(...cards.map(c=>c.y))-Math.min(...cards.map(c=>c.y))).toBeLessThanOrEqual(20);
+   expect(Math.max(...cards.map(c=>c.bottom))-Math.min(...cards.map(c=>c.bottom))).toBeLessThanOrEqual(2);
+   for(let i=0;i<5;i++){expect(cards[i].width).toBeGreaterThanOrEqual(230);expect(cards[i].height).toBeGreaterThan(cards[i].width);expect(cards[i].overflow).toBe(false);expect(cards[i].font).toBeGreaterThanOrEqual(14);if(i)expect(cards[i].x).toBeGreaterThan(cards[i-1].right);}
+   expect(cards[2].y).toBeLessThan(cards[1].y);expect(cards[2].y).toBeLessThan(cards[3].y);
+   expect(cards[4].right).toBeLessThanOrEqual(width);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  }
+  await page.setViewportSize({width:390,height:960});
+  const mobile=await page.locator('#planGrid .plan-card').evaluateAll(nodes=>nodes.map(n=>({x:n.getBoundingClientRect().x,y:n.getBoundingClientRect().y,bottom:n.getBoundingClientRect().bottom,overflow:n.scrollWidth>n.clientWidth})));
+  for(let i=0;i<5;i++){expect(mobile[i].x).toBeCloseTo(mobile[0].x);expect(mobile[i].overflow).toBe(false);if(i)expect(mobile[i].y).toBeGreaterThan(mobile[i-1].bottom);}
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+ await page.locator('[data-public-language=tr]').click();await page.setViewportSize({width:1920,height:1200});await page.evaluate(async()=>{await document.fonts.ready;const el=document.querySelector('#plans .section-heading');window.scrollTo({top:el.getBoundingClientRect().top+scrollY-110,behavior:'instant'});});
+ const heading=await page.locator('#plans .section-heading').boundingBox(),container=await page.locator('#plans > .container').boundingBox(),note=await page.locator('#pricingCardNote').boundingBox();
+ const folder=require('node:path').join(require('node:os').tmpdir(),'focus-presentation');require('node:fs').mkdirSync(folder,{recursive:true});
+ await page.screenshot({path:require('node:path').join(folder,'FOCUS-bes-plan-tek-sira-1920.png'),clip:{x:container.x-20,y:heading.y-24,width:container.width+40,height:note.y+note.height-heading.y+48}});
+ await page.setViewportSize({width:390,height:960});await page.evaluate(()=>window.scrollTo({top:document.getElementById('planGrid').getBoundingClientRect().top+scrollY-155,behavior:'instant'}));await page.screenshot({path:require('node:path').join(folder,'FOCUS-bes-plan-mobil-390.png')});
+});
+
 test('approved forecast-hour pricing is bilingual, planned and readable at desktop and 390px',async({page})=>{
  await page.goto('/#plans');await expect(page.locator('#planGrid .plan-card')).toHaveCount(5);
  await expect(page.locator('[data-plan=free]')).toContainText('3 saate kadar');await expect(page.locator('[data-plan=free]')).toContainText('Günde 5');
