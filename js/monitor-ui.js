@@ -28,7 +28,7 @@ window.FocusMonitorUI={mount(map,{open}){
   }
  }
  async function load(){if(loading)return;loading=true;render();
-  try{const url=location.hostname.endsWith('.github.io')?'https://raw.githubusercontent.com/Alp-a-max/focus/main/assets/monitor-feed.json':'assets/monitor-feed.json';
+  try{const url=location.hostname.endsWith('.github.io')?`https://raw.githubusercontent.com/Alp-a-max/focus/main/assets/monitor-feed.json?v=${Date.now()}`:'assets/monitor-feed.json';
    const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(10000)});if(!response.ok)throw Error('feed');const value=FocusMonitorCore.validate(await response.json());feed=value;failed=false;
   }catch{failed=true;}finally{loading=false;render();}}
  $('monitorReload').onclick=load;$('monitorWorld').onclick=()=>{map.setView([8,0],2);document.querySelector('.map-wrap').scrollIntoView({behavior:'auto',block:'start'});map.getContainer().focus({preventScroll:true});};

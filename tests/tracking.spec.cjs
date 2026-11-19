@@ -20,7 +20,7 @@ test('GitHub Pages mode reads public results and runs dated drift without callin
   const u=new URL(route.request().url()),p=u.pathname.replace('/focus','');if(p.startsWith('/api/')){if(p.includes('detection'))inference++;return route.fulfill({status:404,body:'static host'});}
   const response=await page.request.get(baseURL+(p||'/')+u.search);return route.fulfill({response});
  });
- await page.route('https://raw.githubusercontent.com/Alp-a-max/focus/main/assets/monitor-feed.json',r=>r.fulfill({json:f}));
+ await page.route(url=>url.hostname==='raw.githubusercontent.com'&&url.pathname==='/Alp-a-max/focus/main/assets/monitor-feed.json',r=>r.fulfill({json:f}));
  await page.goto('https://alp-a-max.github.io/focus/platform.html');await expect(page.locator('body')).toHaveClass(/public-feed-mode/);await expect(page.locator('#analysisPanel')).toBeHidden();await expect(page.locator('#detectionRun')).toBeDisabled();
  await page.locator('.monitor-card').filter({hasText:'Karadeniz'}).getByRole('button',{name:'Sonucu haritada aç'}).click();await page.locator('#detectionList button').click();await page.locator('#trackingConsent').check();await page.locator('#trackingRun').click();await expect(page.locator('#trackingExport')).toBeEnabled({timeout:15000}).catch(async e=>{throw Error((await page.locator('#trackingStatus').innerText())+' | checked='+await page.locator('#trackingConsent').isChecked()+' | '+e.message);});expect(inference).toBe(0);
 });
