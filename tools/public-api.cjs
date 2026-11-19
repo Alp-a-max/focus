@@ -12,7 +12,7 @@ function createApi({detect=detector.detect,status=detector.status,now=Date.now}=
   finally{clearTimeout(timer);active=false;setImmediate(work);}
  }
  return http.createServer(async(req,res)=>{
-  prune();const origin=req.headers.origin,allowed=origin==='https://alp-a-max.github.io'||/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin||'');
+  prune();const origin=req.headers.origin,allowed=origin==='https://alp-a-max.github.io'||origin==='https://focusocean.xo.je'||/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin||'');
   if(origin&&!allowed){reply(res,403,{code:'ORIGIN_DENIED'});return;}
   if(allowed){res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');}
   res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type');
