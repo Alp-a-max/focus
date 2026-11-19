@@ -8,7 +8,7 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
     <div class="ensemble-body"><div class="ensemble-intro"><div><h3>Tek rota yerine olası hareketler.</h3>
     <p>Seçilen deniz noktasının çevresinden 25 sanal parçacık başlatın. Akıntı ve rüzgârın farklı etkilerini aynı haritada inceleyin.</p></div>
     <button id="ensembleRun" class="primary" type="button">Senaryoları hesapla ↗</button></div>
-    <p class="ensemble-origin" id="ensembleOrigin"></p>
+    <p class="ensemble-origin" id="ensembleOrigin"></p><p id="ensembleObservation" class="ensemble-observation" translate="no" hidden></p>
     <div class="ensemble-toolbar"><div class="ensemble-times" role="group" aria-label="Senaryo zamanı">
     <button type="button" data-ensemble-hour="6" aria-pressed="true">6 saat</button>
     <button type="button" data-ensemble-hour="12" aria-pressed="false">12 saat</button>
@@ -31,9 +31,15 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
   const reasons = {active:'Hesaplanan konum',coast:'Yaklaşık kıyı maskesinde durdu',land_start:'Başlangıç kara maskesinde',
     missing:'Model verisi yetersiz; son hesaplanan konum',outside:'Sorgulanan alanın dışına çıkacak; son hesaplanan konum',
     coast_unknown:'Kıyı geçişi doğrulanamadı; son hesaplanan konum',invalid:'Hesaplama tamamlanamadı'};
-  let result, data, hour = 6, sequence = 0, controller;
+  let result, data, provenance, hour = 6, sequence = 0, controller;
+  function sourceLabel(){
+    const context=provenance||getOrigin().detection;
+    $('ensembleObservation').hidden=!context;
+    $('ensembleObservation').textContent=window.FocusDetectionUI?.describeContext(context)||'';
+  }
   function originLabel() {
     const p=getOrigin(); $('ensembleOrigin').textContent=`Seçili başlangıç: ${p.lat.toFixed(4)}°, ${p.lon.toFixed(4)}° · Güncel model saati kullanılır.`;
+    sourceLabel();
   }
   function hull(points) {
     const unique = [...new Map(points.map(p=>[[p.lon,p.lat].join(','),[p.lon,p.lat]])).values()].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
@@ -45,6 +51,7 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
   function render(fit=false) {
     group.clearLayers(); $('ensembleSummary').replaceChildren();
     if (!result) return;
+    sourceLabel();
     const start=Date.parse(data.startTime), display=new Date(start+hour*3600000).toISOString().slice(0,16).replace('T',' ')+' UTC';
     let incomplete=0;
     result.scenarios.forEach((scenario,i)=>{
@@ -80,12 +87,13 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
     $('ensembleClear').disabled=false; $('ensembleExport').disabled=false;
   }
   function reset() {
-    sequence++;controller?.abort();controller=null;result=null;data=null;group.clearLayers();
+    sequence++;controller?.abort();controller=null;result=null;data=null;provenance=null;group.clearLayers();
     $('ensembleSummary').replaceChildren();$('ensembleMetadata').textContent='';
-    $('ensembleRun').disabled=false;$('ensembleClear').disabled=true;$('ensembleExport').disabled=true;
+    $('ensembleRun').disabled=Boolean(getOrigin().detection&&!getOrigin().detection.assumption);$('ensembleClear').disabled=true;$('ensembleExport').disabled=true;
     $('ensembleStatus').textContent='Konum veya girdiler değişti. Yeni başlangıç için senaryoları hesaplayın.';originLabel();
   }
   $('ensembleRun').addEventListener('click',async()=>{
+    if(getOrigin().detection&&!getOrigin().detection.assumption){sourceLabel();return;}
     const current=++sequence, origin=getOrigin();controller?.abort();controller=new AbortController();
     $('ensembleRun').disabled=true;group.clearLayers();result=null;data=null;$('ensembleSummary').replaceChildren();
     $('ensembleClear').disabled=true;$('ensembleExport').disabled=true;
@@ -99,13 +107,13 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
       if(current!==sequence)return;
       const regionalCoast=coast.regional ? coast.regional(fields.bounds) : coast;
       const computed=OdakEnsemble.simulate({...origin,...fields,coast:regionalCoast,radiusKm:.5});
-      data=fields;result=computed;
+      data=fields;result=computed;provenance=origin.detection?structuredClone(origin.detection):null;
       $('ensembleMetadata').textContent=`Model başlangıcı: ${data.startTime} · Verinin alınması: ${data.retrievedAt}. ${data.marineCells.length} farklı akıntı, ${data.windCells.length} farklı rüzgâr hücresi. ${data.notes}`;
       render(true);
     }catch(error){
       if(current!==sequence)return;
       $('ensembleStatus').textContent=error.name==='AbortError'||error.name==='TimeoutError'?'Veri isteği zaman aşımına uğradı. Tekrar deneyin.':'Senaryo oluşturulamadı: '+error.message;
-    }finally{if(current===sequence)$('ensembleRun').disabled=false;}
+    }finally{if(current===sequence)$('ensembleRun').disabled=Boolean(getOrigin().detection&&!getOrigin().detection.assumption);}
   });
   panel.querySelectorAll('[data-ensemble-hour]').forEach(button=>button.addEventListener('click',()=>{
     hour=Number(button.dataset.ensembleHour);
@@ -118,12 +126,15 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
     if(!result||!data)return;
     const output={schema_version:1,kind:'experimental_drift_sensitivity_scenarios',units:{coordinates:'degrees',time:'UTC',speed:'km/h'},
       start_time:data.startTime,retrieved_at:data.retrievedAt,field_sources:data.sources,bounds:data.bounds,
+      observation_source:provenance?.observation||null,
       assumptions:{initial_square_half_width_m:500,windage:[0,.01,.03],step_minutes:15,field_sampling:'nearest valid model cell within 25 km',
-        calibration:'Not validated against independent field trajectories; no statistical probabilities'},
+        calibration:'Not validated against independent field trajectories; no statistical probabilities',
+        current_start:provenance?.assumption||null,historical_tracking:false},
       scenarios:result.scenarios};
     const url=URL.createObjectURL(new Blob([JSON.stringify(output)],{type:'application/json'}));
     const a=document.createElement('a');a.href=url;a.download='odak-suruklenme-senaryolari.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   originLabel();
+  window.addEventListener('odak:language',sourceLabel);
   return {reset};
 };

@@ -1,6 +1,55 @@
 const http=require('http'),fs=require('fs'),path=require('path');const {analyze,validCoordinates}=require('./satellite.cjs'),observations=require('./observations.cjs');const root=__dirname,types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.png':'image/png','.json':'application/json; charset=utf-8'};const {compare}=require('./comparison.cjs');const port=Number(process.env.PELAGIC_PORT||8766);let busy=false;
 function json(res,status,obj){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}).end(JSON.stringify(obj))}
 const host = '127.0.0.1';
+function detectorStatus() {
+  try {
+    const value = require('./ml/detect-pretrained.cjs').status();
+    return {available:value.available === true, model_id:String(value.model_id || '').slice(0,120), validation_status:'research_only'};
+  } catch { return {available:false, model_id:null, validation_status:'research_only'}; }
+}
+async function handleDetection(req, res, url) {
+  if (req.method !== 'GET') {json(res,405,{code:'METHOD_NOT_ALLOWED',error:'Bu işlem desteklenmiyor.'});return;}
+  if (url.pathname === '/api/detection/status') {json(res,200,detectorStatus());return;}
+  const latText=url.searchParams.get('lat'),lonText=url.searchParams.get('lon');
+  const lat=Number(latText),lon=Number(lonText);
+  if (url.searchParams.getAll('lat').length!==1 || url.searchParams.getAll('lon').length!==1 ||
+      !latText?.trim() || !lonText?.trim() || !validCoordinates(lat,lon) || Math.abs(lat)>79) {
+    json(res,400,{code:'INVALID_COORDINATES',error:'Geçerli bir deniz koordinatı seçin.'});return;
+  }
+  if (busy) {json(res,429,{code:'ANALYSIS_BUSY',error:'Başka bir analiz devam ediyor. Tamamlanınca tekrar deneyin.'});return;}
+  if (!detectorStatus().available) {json(res,503,{code:'MODEL_UNAVAILABLE',error:'Araştırma tespit modeli bu bilgisayarda henüz hazır değil.'});return;}
+  busy=true;
+  const controller=new AbortController();
+  const timeout=AbortSignal.timeout(110000);
+  const timedOut=()=>controller.abort(new DOMException('Detection timed out','TimeoutError'));
+  const disconnected=()=>{if(!res.writableEnded)controller.abort(new DOMException('Client disconnected','AbortError'));};
+  timeout.addEventListener('abort',timedOut,{once:true});res.once('close',disconnected);
+  let onAbort;
+  // Keep the shared expensive-work lock until the actual worker settles, even if a client leaves.
+  const operation=Promise.resolve().then(()=>{
+    if(controller.signal.aborted)throw controller.signal.reason;
+    return require('./ml/detect-pretrained.cjs').detect(lat,lon,{signal:controller.signal});
+  });
+  operation.then(()=>{busy=false;},()=>{busy=false;});
+  try {
+    const result=await Promise.race([operation,new Promise((resolve,reject)=>{
+      onAbort=()=>reject(controller.signal.reason);controller.signal.addEventListener('abort',onAbort,{once:true});
+      if(controller.signal.aborted)onAbort();
+    })]);
+    if(!result || result.type!=='FeatureCollection' || !Array.isArray(result.features) || !result.metadata)throw Error('Invalid detector result');
+    if(!res.destroyed)json(res,200,result);
+  } catch(error) {
+    if(res.destroyed)return;
+    if(controller.signal.reason?.name==='TimeoutError' || error?.name==='TimeoutError' || /timed out/i.test(String(error?.message||'')))
+      json(res,504,{code:'DETECTION_TIMEOUT',error:'Tespit işlemi zaman aşımına uğradı. Tekrar deneyin.'});
+    else if(!detectorStatus().available)
+      json(res,503,{code:'MODEL_UNAVAILABLE',error:'Araştırma tespit modeli bu bilgisayarda henüz hazır değil.'});
+    else json(res,502,{code:'DETECTION_FAILED',error:'Uydu verisi veya model işlenemedi. Bağlantıyı ve sahne kapsamını kontrol edip tekrar deneyin.'});
+  } finally {
+    timeout.removeEventListener('abort',timedOut);res.removeListener('close',disconnected);
+    controller.signal.removeEventListener('abort',onAbort);
+  }
+}
 function allowObservationRequest(req, res, health = false) {
   const listeningPort = server.address().port;
   const allowedHosts = [`127.0.0.1:${listeningPort}`, `localhost:${listeningPort}`];
@@ -35,9 +84,13 @@ const server = http.createServer(async (req, res) => {
     if (!allowObservationRequest(req, res, true)) return;
     if (req.method !== 'GET') {json(res,405,{error:'Bu işlem desteklenmiyor.'});return;}
     if (req.headers.origin) {res.setHeader('Access-Control-Allow-Origin',req.headers.origin);res.setHeader('Vary','Origin');}
-    json(res,200,{service:'focus-local-api',schema_version:1,features:{satellite:true,observations:true}});return;
+    const detection=detectorStatus();
+    json(res,200,{service:'focus-local-api',schema_version:1,features:{satellite:true,observations:true,detection:detection.available},detection});return;
   }
   if (url.pathname.startsWith('/api/') && !allowObservationRequest(req, res)) return;
+  if (url.pathname==='/api/satellite/detection' || url.pathname==='/api/detection/status') {
+    await handleDetection(req,res,url);return;
+  }
   if(url.pathname==='/api/observations'||/^\/api\/observations\/[0-9a-f-]{36}$/.test(url.pathname)){const recordId=url.pathname.split('/')[3]||null;if (req.method === 'DELETE' && recordId) {
     try {
       json(res, 200, await observations.remove(recordId));

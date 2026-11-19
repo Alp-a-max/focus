@@ -297,6 +297,9 @@ Yakınlaştır|Zoom in
 Uzaklaştır|Zoom out
 `;
   const dictionary=new Map(entries.trim().split('\n').filter(Boolean).map(line=>{const i=line.indexOf('|');return[line.slice(0,i),line.slice(i+1)]}));
+  dictionary.set('Yapay zekâ adayı','AI candidate');
+  dictionary.set('Bu uydu adayı için güncel başlangıç varsayımı gerekli.','A current-start assumption is required for this satellite candidate.');
+  dictionary.set('Bu aday için kaynak bilgisi korunan çoklu senaryoyu kullanın.','Use the multi-particle scenarios that retain this candidate’s source information.');
   const extra=`
 Yayılım senaryoları|Dispersion scenarios
 Deneysel · 24 saat|Experimental · 24 hours

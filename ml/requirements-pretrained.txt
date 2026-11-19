@@ -1,0 +1,7 @@
+# Use a project environment to preserve existing user packages.
+-r requirements-l2a.txt
+torch==2.14.1
+segmentation-models-pytorch==0.6.0
+timm==1.0.31
+torchvision==0.29.2
+safetensors==0.8.0

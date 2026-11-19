@@ -1,6 +1,9 @@
 'use strict';
 /* Ordered, bounded STAC search. No unvalidated remote asset URLs are fetched here. */
-async function findScene(lat,lon,{before,signal,fetchImpl=fetch}={}) {
+async function findScene(lat,lon,{before,signal,fetchImpl=fetch,maxCloudCover=30,excludeSceneIds=[]}={}) {
+ if(!Number.isFinite(maxCloudCover)||maxCloudCover<0||maxCloudCover>100)throw Error('Sahne bulutluluk sınırı geçersiz.');
+ if(!Array.isArray(excludeSceneIds)||excludeSceneIds.length>64||excludeSceneIds.some(id=>typeof id!=='string'||!id||id.length>500))throw Error('Geçersiz sahne dışlama listesi.');
+ const excluded=new Set(excludeSceneIds);
  const until=before?new Date(before):new Date(),since=new Date(+until-45*86400000);
  if(!Number.isFinite(+until))throw Error('Görüntü arama tarihi geçersiz.');
  const params=new URLSearchParams({collections:'sentinel-2-l2a',bbox:[lon-.001,lat-.001,lon+.001,lat+.001].join(','),
@@ -16,8 +19,8 @@ async function findScene(lat,lon,{before,signal,fetchImpl=fetch}={}) {
   for(const scene of scenes) {
    const date=Date.parse(scene.properties.datetime);
    if(date>last)throw Error('Katalog zaman sıralaması doğrulanamadı.');last=date;
-   if(date<+since||date>=+until)continue;
-   if(Number.isFinite(scene.properties['eo:cloud_cover'])&&scene.properties['eo:cloud_cover']>=0&&scene.properties['eo:cloud_cover']<=30
+   if(date<+since||date>=+until||typeof scene.id!=='string'||excluded.has(scene.id))continue;
+   if(Number.isFinite(scene.properties['eo:cloud_cover'])&&scene.properties['eo:cloud_cover']>=0&&scene.properties['eo:cloud_cover']<=maxCloudCover
      &&['nir','rededge2','swir16','scl','visual'].every(k=>typeof scene.assets?.[k]?.href==='string'))return scene;
   }
   const next=data.links?.find(link=>link.rel==='next');

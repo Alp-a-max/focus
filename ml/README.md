@@ -69,7 +69,7 @@ Haritada CYGNSS bağımsız bir aç/kapat kontrolüne ve bölgeye git düğmesin
 
 Bilgi penceresinde 16 Ağustos 2018 12:00 UTC tarihi, yoğunluk, örnek sayısı, ortalama kapsamı ve NASA PO.DAAC DOI bağlantısı gösterilir. CYGNSS adet/km² değerleri, GPGP g/km² rasterından ve mikroplastik sınır çizgilerinden ayrı kontroller ve renk açıklamalarıyla sunulur. Katman yeniden açıldığında aynı yerel Leaflet nesnesi kullanılır. Hata halinde kontrol kapatılır ve yeniden deneme metni gösterilir. 8767 test yapılandırması mevcut sunucuyu kullanır, sunucu başlatma/durdurma adımı içermez. Testlerde kullanıcı bildirimi API'si sahte boş yanıtla karşılanır.
 
-Bu klasör deniz yüzeyindeki atık tespiti için **sınırlı bir fizibilite deneyi** içerir. Model sitedeki canlı uydu analizine bağlı değildir; çıktısı doğrulanmış atık tespiti, plastik türü veya atığın yaşı değildir.
+Bu bölümün küçük RF modeli deniz yüzeyindeki atık tespiti için **sınırlı bir fizibilite deneyi** içerir. Bu RF modeli sitedeki canlı uydu analizine bağlı değildir; çıktısı doğrulanmış atık tespiti, plastik türü veya atığın yaşı değildir.
 
 Veri kaynağı: Kikaki ve diğerleri, *MARIDA: A benchmark for Marine Debris detection from Sentinel-2 remote sensing data* (2022), [veri kümesi](https://doi.org/10.5281/zenodo.5151941), CC BY 4.0. İndirme, NTUA'nın [Source Cooperative kopyasını](https://source.coop/ntua/marida) kullanır. Veri ve üretilen model kaynak kod deposuna eklenmez.
 
@@ -85,3 +85,8 @@ Model 11 bantlı etiketli piksellerle ikili rastgele orman sınıflandırması y
 - MARIDA etiketleri zayıf denetimlidir; bağımsız saha doğrulaması olarak yorumlanamaz. Bu küçük alt kümenin sonuçları da tüm MARIDA test kümesinin sonuçları değildir.
 - MARIDA görüntüleri Rayleigh düzeltmeli veridir. Sitenin güncel Sentinel-2 L2A yüzey yansıması farklı bir veri dağılımıdır; eğitim çıktısını dönüştürme ve bağımsız doğrulama yapılmadan siteye bağlamak güvenilir değildir.
 - Daha fazla negatif sahne, bulut ve dalga örnekleri, tüm resmî test kümesinde değerlendirme, yerel sahalar ve bağımsız saha doğrulaması gereklidir. Model yalnızca tek piksel spektrumunu kullanır; mekânsal veya zamansal özellikleri öğrenmez.
+
+
+## Canlı L2A ile eşleşen araştırma çekirdeği
+
+Yayımlanmış 12 bantlı UNet++ modeliyle gerçek aday çıkarımı, ayrı araştırma API/harita akışına bağlandı. Küçük RF modeli bu servise bağlanmadı. Kurulum, veri sözleşmesi, kaynak atfı, pilotta görülen yanlış alarmlar ve doğrulama sınırları [L2A-CEKIRDEK.md](L2A-CEKIRDEK.md) içinde. Genel veya Karadeniz doğruluğu kanıtlanmış sayılmaz.

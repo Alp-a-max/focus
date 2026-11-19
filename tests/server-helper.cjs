@@ -4,12 +4,12 @@ const path = require('node:path');
 const {spawn} = require('node:child_process');
 const {once} = require('node:events');
 
-function launchServer(t, port = '0') {
+function launchServer(t, port = '0', options = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'odak-http-test-'));
-  const env = {...process.env, PELAGIC_DATA_DIR: dir, ODAK_CYGNSS_AUTO_UPDATE: '0'};
+  const env = {...process.env, ...options.env, PELAGIC_DATA_DIR: dir, ODAK_CYGNSS_AUTO_UPDATE: '0'};
   if (port === null) delete env.PELAGIC_PORT;
   else env.PELAGIC_PORT = String(port);
-  const child = spawn(process.execPath, ['server.cjs'], {
+  const child = spawn(process.execPath, [...(options.preload?['--require',options.preload]:[]),'server.cjs'], {
     cwd: path.join(__dirname, '..'), env, stdio: ['ignore', 'pipe', 'pipe']
   });
   let output = '';
