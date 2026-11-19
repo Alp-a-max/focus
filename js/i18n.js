@@ -3,6 +3,11 @@
 (()=>{
   'use strict';
   const entries=`
+Türkiye ve dünyadaki izleme noktalarını veya koordinatları arayın. Konum bulunması atık bulunduğunu göstermez.|Search monitoring points in Turkey and worldwide, or enter coordinates. Finding a location does not mean finding waste.
+Antalya, Mumbai, Cakarta veya 41.6, 30.9|Antalya, Mumbai, Jakarta or 41.6, 30.9
+Ortak uydu sonuçları küresel izleme ağında yayımlanır. Yeni isteğe bağlı tarama ve kişisel kayıtlar yerel çalışma alanındadır. Tarihli sürüklenme hesabı bu yayında kullanılabilir.|Shared satellite results are published in the global monitoring network. New on-demand scans and personal records are available in the local workspace. Dated drift calculations are available on this website.
+İzleme ağına git|Go to monitoring network
+
 Araştırma demosu · Tüm araçlar inceleme için açık.|Research demo · All tools are open for exploration.
 Nereden başlamak istersiniz?|Where would you like to start?
 Karadeniz, Antalya veya 41.6, 30.9|Black Sea, Antalya or 41.6, 30.9

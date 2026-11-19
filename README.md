@@ -8,7 +8,7 @@ Bu bir deneysel duyarlılık incelemesidir; olasılık veya doğrulanmış atık
 
 Harita odaklı çalışma alanında katmanlar, deniz koşulları, uydu analizi ve yerel bildirimler ayrı açılır alanlardadır. CYGNSS Kuzey Pasifik örneği 28 Ekim 2026 verisiyle doğrulandı. Aylık kontrol, yerel Earthdata yapılandırması ve doğrulama komutları [CYGNSS güncelleme belgesinde](tools/CYGNSS-GUNCELLEME.md) açıklanır. Bilimsel kapsam 25–30° K, 150–145° B bölgesi, yaklaşık 1° alan ve 30 günlük ortalamadır.
 
-ODAK, OpenStreetMap, NASA GIBS, Sentinel-2 ve Open-Meteo kullanan yerel sunuculu bir araştırma prototipidir. Doğrulanmış otomatik atık tespiti içermez.
+FOCUS, OpenStreetMap, NASA GIBS, Sentinel-2 ve Open-Meteo kullanan yerel sunuculu bir araştırma prototipidir. Doğrulanmış otomatik atık tespiti içermez.
 
 ## Çalıştırma
 
@@ -88,3 +88,9 @@ Sürüklenme bölümündeki **Alana Göre Tahmin Et**, seçilen konum çevresind
 ## Yapay zekâ ile tarihli atık adayları
 
 Çalışma alanındaki ayrı araştırma paneli, gerçek 12 bantlı Sentinel-2 L2A verisini yayımlanmış UNet++ modeline bağlar. Model bu bilgisayarda hazırlandı; başka kurulumlarda [ML çekirdek belgesindeki](ml/L2A-CEKIRDEK.md) ayrı ortam/ağırlık adımları gerekir. API ve arayüzün tarih/kaynak koruması, açık güncel başlangıç varsayımı ve kontrol komutları [tespit entegrasyon belgesinde](tools/TESPIT-ENTEGRASYON.md). Gözlem eskiyse bugünkü atık konumu sayılmaz; geçmişten bugüne gerçek takip yoktur. İki örnekli pilotta doğru tespitlerle birlikte yanlış alarmlar görüldü; yüksek yerel doğruluk veya satışa hazır bilimsel doğrulama iddiası yapılmaz. [Canva ürün kabul koşulları](tools/URUN-KABUL-KOSULLARI.md) ana geliştirme ölçütüdür.
+
+## Ortak çok bölgeli internet yayını ve tarihli hareket
+
+GitHub Pages çalışma alanı, sekiz uluslararası kıyı noktasındaki gerçek Sentinel-2 çıkarım sonuçlarını ortak yayın dosyasından okur. Beş açık okyanus gezinme merkezi ayrıca gösterilir; bunlar gözlem veya çöp adası sınırı değildir. Nokta başına yaklaşık 1 km² incelenir. Otomatik işin hedef kontrol aralığı altı saattir; uydu görüntüsünün çekim zamanı ayrıca korunur.
+
+Aday seçilince gerçek görüntü zamanından bugüne geçmiş akıntı/rüzgâr model alanlarıyla, ardından +24 saat için üç rüzgâr senaryosuyla tarihli sürüklenme hesabı yapılabilir. Bu, aynı atığın ardışık görüntülerde doğrulanmış takibi veya sahada kanıtlanmış güncel konumu değildir. Kapsam, gerçek ilk sonuçlar, kurulum ve gösterim sırası [küresel yayın belgesinde](tools/KURESEL-YAYIN.md).

@@ -36,6 +36,11 @@
     const link=document.createElement('a');link.className='ghost';link.id='serviceOpen';link.textContent='Tam çalışma alanını aç';
     const retry=document.createElement('button');retry.type='button';retry.textContent='Bağlantıyı kontrol et';retry.id='serviceRetry';
     box.append(message,link,retry);workspace.prepend(box);
+    if(!['127.0.0.1','localhost'].includes(location.hostname)){
+      document.body.classList.add('public-feed-mode');box.classList.add('public-feed-notice');box.hidden=false;link.hidden=true;
+      message.textContent='Ortak uydu sonuçları küresel izleme ağında yayımlanır. Yeni isteğe bağlı tarama ve kişisel kayıtlar yerel çalışma alanındadır. Tarihli sürüklenme hesabı bu yayında kullanılabilir.';
+      retry.textContent='İzleme ağına git';retry.onclick=()=>document.getElementById('monitorHeading')?.scrollIntoView({behavior:'smooth',block:'start'});return;
+    }
     async function update(){
       retry.disabled=true;
       const available=await health('/api/health');box.hidden=available;

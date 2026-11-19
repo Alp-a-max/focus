@@ -13,7 +13,7 @@
     {name:'Zonguldak Açıkları',lat:41.65,lon:31.8,aliases:'zonguldak'},
     {name:'Çanakkale Açıkları',lat:39.9,lon:25.8,aliases:'canakkale'},
     {name:'Bodrum Açıkları',lat:36.85,lon:27.45,aliases:'bodrum mugla'}
-  ];
+  ].concat([{"name": "Karayipler · Belize", "lat": 16.65, "lon": -88.05, "aliases": "Caribbean · Belize caribbean"}, {"name": "Endonezya · Cakarta", "lat": -5.95, "lon": 106.8, "aliases": "Indonesia · Jakarta indonesia"}, {"name": "Hindistan · Mumbai", "lat": 18.95, "lon": 72.72, "aliases": "India · Mumbai india"}, {"name": "Brezilya · Rio", "lat": -23.03, "lon": -43.08, "aliases": "Brazil · Rio brazil"}, {"name": "Güney Afrika · Cape Town", "lat": -33.95, "lon": 18.33, "aliases": "South Africa · Cape Town south-africa"}, {"name": "Avustralya · Sidney", "lat": -33.85, "lon": 151.35, "aliases": "Australia · Sydney australia"}, {"name": "Kuzey Pasifik", "lat": 32, "lon": -145, "aliases": "North Pacific north-pacific"}, {"name": "Güney Pasifik", "lat": -30, "lon": -110, "aliases": "South Pacific south-pacific"}, {"name": "Kuzey Atlantik", "lat": 30, "lon": -40, "aliases": "North Atlantic north-atlantic"}, {"name": "Güney Atlantik", "lat": -30, "lon": -15, "aliases": "South Atlantic south-atlantic"}, {"name": "Hint Okyanusu", "lat": -25, "lon": 80, "aliases": "Indian Ocean indian-ocean"}]);
   const normalize=value=>value.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i');
   function search(value) {
     const query=String(value).trim();if(!query||query.length>120)throw Error('Bir kıyı bölgesi veya enlem, boylam girin.');
@@ -23,7 +23,7 @@
   }
   function mount({select}) {
     const section=document.createElement('div');section.className='map-search';
-    section.innerHTML=`<form id="mapSearchForm"><label for="mapSearchInput">Nereden başlamak istersiniz?</label><div class="map-search-input"><input id="mapSearchInput" type="search" maxlength="120" placeholder="Karadeniz, Antalya veya 41.6, 30.9" autocomplete="off"><button type="submit">Konumu bul ↗</button></div></form><div class="map-search-results" id="mapSearchResults"></div><p id="mapSearchStatus" role="status">Türkiye kıyılarındaki başlangıç noktalarını veya koordinatları arayın. Konum bulunması atık bulunduğunu göstermez.</p><button type="button" id="mapSearchInspect">Seçili noktada uydu incelemesine geç →</button>`;
+    section.innerHTML=`<form id="mapSearchForm"><label for="mapSearchInput">Nereden başlamak istersiniz?</label><div class="map-search-input"><input id="mapSearchInput" type="search" maxlength="120" placeholder="Antalya, Mumbai, Cakarta veya 41.6, 30.9" autocomplete="off"><button type="submit">Konumu bul ↗</button></div></form><div class="map-search-results" id="mapSearchResults"></div><p id="mapSearchStatus" role="status">Türkiye ve dünyadaki izleme noktalarını veya koordinatları arayın. Konum bulunması atık bulunduğunu göstermez.</p><button type="button" id="mapSearchInspect">Seçili noktada uydu incelemesine geç →</button>`;
     document.querySelector('.map-wrap').before(section);
     const status=section.querySelector('#mapSearchStatus'),results=section.querySelector('#mapSearchResults');
     function choose(place){select(place.lat,place.lon,place.name);results.replaceChildren();status.textContent=place.name+' seçildi. Bu konumda atık olup olmadığı henüz bilinmiyor.';}

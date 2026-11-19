@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "description": "Navigation and bounded monitoring centres, not pollution detections or garbage-patch boundaries.",
+  "regions": [
+    {
+      "id": "black-sea",
+      "name_tr": "Karadeniz",
+      "name_en": "Black Sea",
+      "lat": 41.6,
+      "lon": 30.9,
+      "kind": "coastal"
+    },
+    {
+      "id": "mediterranean",
+      "name_tr": "Antalya Açıkları",
+      "name_en": "Offshore Antalya",
+      "lat": 36.45,
+      "lon": 31.3,
+      "kind": "coastal"
+    },
+    {
+      "id": "caribbean",
+      "name_tr": "Karayipler · Belize",
+      "name_en": "Caribbean · Belize",
+      "lat": 16.65,
+      "lon": -88.05,
+      "kind": "coastal"
+    },
+    {
+      "id": "indonesia",
+      "name_tr": "Endonezya · Cakarta",
+      "name_en": "Indonesia · Jakarta",
+      "lat": -5.95,
+      "lon": 106.8,
+      "kind": "coastal"
+    },
+    {
+      "id": "india",
+      "name_tr": "Hindistan · Mumbai",
+      "name_en": "India · Mumbai",
+      "lat": 18.95,
+      "lon": 72.72,
+      "kind": "coastal"
+    },
+    {
+      "id": "brazil",
+      "name_tr": "Brezilya · Rio",
+      "name_en": "Brazil · Rio",
+      "lat": -23.03,
+      "lon": -43.08,
+      "kind": "coastal"
+    },
+    {
+      "id": "south-africa",
+      "name_tr": "Güney Afrika · Cape Town",
+      "name_en": "South Africa · Cape Town",
+      "lat": -33.95,
+      "lon": 18.33,
+      "kind": "coastal"
+    },
+    {
+      "id": "australia",
+      "name_tr": "Avustralya · Sidney",
+      "name_en": "Australia · Sydney",
+      "lat": -33.85,
+      "lon": 151.35,
+      "kind": "coastal"
+    },
+    {
+      "id": "north-pacific",
+      "name_tr": "Kuzey Pasifik",
+      "name_en": "North Pacific",
+      "lat": 32,
+      "lon": -145,
+      "kind": "open_ocean"
+    },
+    {
+      "id": "south-pacific",
+      "name_tr": "Güney Pasifik",
+      "name_en": "South Pacific",
+      "lat": -30,
+      "lon": -110,
+      "kind": "open_ocean"
+    },
+    {
+      "id": "north-atlantic",
+      "name_tr": "Kuzey Atlantik",
+      "name_en": "North Atlantic",
+      "lat": 30,
+      "lon": -40,
+      "kind": "open_ocean"
+    },
+    {
+      "id": "south-atlantic",
+      "name_tr": "Güney Atlantik",
+      "name_en": "South Atlantic",
+      "lat": -30,
+      "lon": -15,
+      "kind": "open_ocean"
+    },
+    {
+      "id": "indian-ocean",
+      "name_tr": "Hint Okyanusu",
+      "name_en": "Indian Ocean",
+      "lat": -25,
+      "lon": 80,
+      "kind": "open_ocean"
+    }
+  ]
+}
