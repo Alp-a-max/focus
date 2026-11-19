@@ -39,9 +39,9 @@
       lon: point.lon + velocity[0] * hours / (DEG * Math.cos(point.lat * Math.PI / 180))};
   }
   function particle(input, start, windage) {
-    const points = [{...start, hour: 0}];
-    if (input.coast.pointOnLand(start.lat, start.lon)) return {points, state: 'land_start', stoppedAt: 0};
-    for (let index = 0; index < 24 / STEP; index++) {
+    const releaseHour=start.releaseHour??0,points = [{...start, hour: releaseHour}];
+    if (input.coast.pointOnLand(start.lat, start.lon)) return {points, state: 'land_start', stoppedAt: releaseHour};
+    for (let index = releaseHour / STEP; index < 24 / STEP; index++) {
       const hour = index * STEP, previous = points.at(-1);
       try {
         // Midpoint integration: both time and position are sampled again.
@@ -71,8 +71,10 @@
     if (input.coast.pointOnLand(input.lat, input.lon)) throw Error('Başlangıç kara maskesinde');
     const radiusKm = input.radiusKm ?? .5;
     if (!Number.isFinite(radiusKm) || radiusKm < 0 || radiusKm > 2) throw Error('Başlangıç yayılımı geçersiz');
-    const starts = [];
-    for (let y = -2; y <= 2; y++) for (let x = -2; x <= 2; x++) {
+    if(input.starts&&!Array.isArray(input.starts))throw Error('Geçersiz salım başlangıçları');
+    const starts = input.starts?input.starts.map(p=>({...p})):[];
+    if(input.starts&&(!starts.length||starts.length>60||starts.some(p=>!validPoint(p)||!within(p,input.bounds)||!Number.isInteger(p.releaseHour)||p.releaseHour<0||p.releaseHour>23)))throw Error('Geçersiz salım başlangıçları');
+    if(!input.starts)for (let y = -2; y <= 2; y++) for (let x = -2; x <= 2; x++) {
       starts.push({lat: input.lat + y * radiusKm / (2 * DEG),
         lon: input.lon + x * radiusKm / (2 * DEG * Math.cos(input.lat * Math.PI / 180))});
     }
@@ -81,8 +83,9 @@
   }
   function snapshot(scenario, hour) {
     if (![6,12,24].includes(hour)) throw Error('Geçersiz gösterim saati');
-    const counts = {active: 0, coast: 0, land_start: 0, missing: 0, outside: 0, coast_unknown: 0, invalid: 0};
+    const counts = {active: 0, coast: 0, land_start: 0, missing: 0, outside: 0, coast_unknown: 0, invalid: 0, unreleased:0};
     const points = scenario.particles.map((p, id) => {
+      if(p.points[0].hour>hour){counts.unreleased++;return {...p.points[0],id,state:'unreleased'};}
       const terminated = p.state !== 'complete' && p.stoppedAt <= hour;
       const state = terminated ? p.state : 'active';
       counts[state]++;

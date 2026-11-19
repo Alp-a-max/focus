@@ -43,10 +43,20 @@
     if (![...cells.values()].some(c => c.samples.some(s => s.speed !== null))) throw Error('Bu bölgede geçerli model vektörü yok.');
     return [...cells.values()];
   }
-  async function load(lat, lon, {signal, now=Date.now(), fetchImpl=fetch}={}) {
+  function normalizeWaves(raw,startTime){
+    const items=Array.isArray(raw)?raw:[raw],cells=new Map();
+    for(const item of items){
+      if(!item||!Number.isFinite(item.latitude)||!Number.isFinite(item.longitude)||item.utc_offset_seconds!==0||item.hourly_units?.wave_height!=='m'||item.hourly_units?.wave_direction!=='°'||item.hourly_units?.wave_period!=='s'||!Array.isArray(item.hourly?.time))throw Error('Dalga birimleri veya UTC zamanı doğrulanamadı.');
+      const indices=new Map();item.hourly.time.forEach((v,i)=>{const t=timestamp(v);if(!Number.isFinite(t)||indices.has(t))throw Error('Dalga saatleri geçersiz.');indices.set(t,i);});
+      const samples=Array.from({length:25},(_,h)=>{const i=indices.get(startTime+h*3600000),height=item.hourly.wave_height?.[i],direction=item.hourly.wave_direction?.[i],period=item.hourly.wave_period?.[i];return {height:Number.isFinite(height)&&height>=0?height:null,direction:Number.isFinite(direction)&&direction>=0&&direction<=360?direction:null,period:Number.isFinite(period)&&period>0?period:null};});
+      const key=item.latitude+','+item.longitude,cell={lat:item.latitude,lon:item.longitude,samples};if(cells.has(key)&&JSON.stringify(cells.get(key).samples)!==JSON.stringify(samples))throw Error('Dalga hücresi tutarsız.');cells.set(key,cell);
+    }
+    return [...cells.values()];
+  }
+  async function load(lat, lon, {signal, now=Date.now(), fetchImpl=fetch,includeWaves=false}={}) {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 79.5 || Math.abs(lon) > 178.5) throw Error('Konum model kapsamı dışında.');
     const startTime = Math.floor(now / 3600000) * 3600000;
-    const key = [lat.toFixed(4),lon.toFixed(4),startTime].join(':');
+    const key = [lat.toFixed(4),lon.toFixed(4),startTime,includeWaves].join(':');
     const saved = cache.get(key);
     if (saved && now - saved.at < 15 * 60000 && now >= saved.at) return saved.value;
     const points = [];
@@ -54,7 +64,7 @@
     const params = new URLSearchParams({latitude:points.map(p=>p[0].toFixed(4)).join(','),
       longitude:points.map(p=>p[1].toFixed(4)).join(','), timezone:'UTC', forecast_days:'3'});
     const urls = [
-      'https://marine-api.open-meteo.com/v1/marine?' + params + '&hourly=ocean_current_velocity,ocean_current_direction&cell_selection=nearest',
+      'https://marine-api.open-meteo.com/v1/marine?' + params + '&hourly=ocean_current_velocity,ocean_current_direction'+(includeWaves?',wave_height,wave_direction,wave_period':'')+'&cell_selection=nearest',
       'https://api.open-meteo.com/v1/forecast?' + params + '&hourly=wind_speed_10m,wind_direction_10m&wind_speed_unit=kmh'
     ];
     const timeout = AbortSignal.timeout(30000), combined = signal ? AbortSignal.any([signal,timeout]) : timeout;
@@ -66,12 +76,13 @@
     if (combined.aborted) throw Error('Model isteği iptal edildi.');
     const value = {startTime:new Date(startTime).toISOString(), retrievedAt:new Date().toISOString(),
       marineCells:normalize(raw[0],'current',startTime), windCells:normalize(raw[1],'wind',startTime),
+      ...(includeWaves?{waveCells:normalizeWaves(raw[0],startTime)}:{}),
       bounds:{minLat:lat-.2,maxLat:lat+.2,minLon:lon-.2,maxLon:lon+.2},
       sources:['Open-Meteo Marine (SMOC akıntı modeli)','Open-Meteo Weather'],
-      notes:'Saatlik model tahmini; en yakın model hücresi. Kaynak modelinin üretim zamanı API yanıtında doğrulanmadı.'};
+      notes:'Saatlik model tahmini; en yakın model hücresi. Sağlayıcı toplam deniz hızını Eulerian, dalga ve gelgit katkılarıyla tanımlar; ayrıca Stokes hızı eklenmez. Kaynak modelinin üretim zamanı API yanıtında doğrulanmadı.'};
     cache.set(key,{at:now,value});
     if (cache.size > 8) cache.delete(cache.keys().next().value);
     return value;
   }
-  return {load, normalize};
+  return {load, normalize,normalizeWaves};
 });

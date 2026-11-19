@@ -89,6 +89,10 @@ Sürüklenme bölümündeki **Alana Göre Tahmin Et**, seçilen konum çevresind
 
 Çalışma alanındaki ayrı araştırma paneli, gerçek 12 bantlı Sentinel-2 L2A verisini yayımlanmış UNet++ modeline bağlar. Model bu bilgisayarda hazırlandı; başka kurulumlarda [ML çekirdek belgesindeki](ml/L2A-CEKIRDEK.md) ayrı ortam/ağırlık adımları gerekir. API ve arayüzün tarih/kaynak koruması, açık güncel başlangıç varsayımı ve kontrol komutları [tespit entegrasyon belgesinde](tools/TESPIT-ENTEGRASYON.md). Gözlem eskiyse bugünkü atık konumu sayılmaz; geçmişten bugüne gerçek takip yoktur. İki örnekli pilotta doğru tespitlerle birlikte yanlış alarmlar görüldü; yüksek yerel doğruluk veya satışa hazır bilimsel doğrulama iddiası yapılmaz. [Canva ürün kabul koşulları](tools/URUN-KABUL-KOSULLARI.md) ana geliştirme ölçütüdür.
 
+## Birikimden kopan parçaların tahmini
+
+Haritadaki **Birikimden kopan parçalar nereye gider?** bölümü, seçilen küçük kopuş kesiminden tek seferde veya ilk altı saat boyunca ayrıldığı varsayılan sanal parçaları taşır. Üç rüzgâr etkisi senaryosu, 6/12/24 saatlik görünüm, kaynaklı JSON ve HTML raporu vardır. Dalga koşulları ayrıca gösterilir; sağlayıcının dalga katkılı toplam deniz hızına ek Stokes hızı eklenmez. Salım sayısı ve kopuş olayı varsayımdır. Kapsam ve gerçek veri denemesi [kopuş modeli belgesinde](tools/KOPUS-MODELI.md).
+
 ## Ortak çok bölgeli internet yayını ve tarihli hareket
 
 GitHub Pages çalışma alanı, sekiz uluslararası kıyı noktasındaki gerçek Sentinel-2 çıkarım sonuçlarını ortak yayın dosyasından okur. Beş açık okyanus gezinme merkezi ayrıca gösterilir; bunlar gözlem veya çöp adası sınırı değildir. Nokta başına yaklaşık 1 km² incelenir. Otomatik işin hedef kontrol aralığı altı saattir; uydu görüntüsünün çekim zamanı ayrıca korunur.

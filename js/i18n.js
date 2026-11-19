@@ -3,6 +3,30 @@
 (()=>{
   'use strict';
   const entries=`
+Birikimden kopan parçalar nereye gider?|Where do fragments released from an accumulation travel?
+Birikimin kenarındaki bir kopuş kesimini haritadan seçin. Bu kesimden ayrıldığı varsayılan sanal parçaların 6, 12 ve 24 saat sonraki yayılımını inceleyin.|Select a release section at the edge of an accumulation. Explore the spread of virtual fragments assumed to detach from this section after 6, 12 and 24 hours.
+Seçili harita noktasını kopuş kesimi yap|Use the selected map point as a release section
+Kesimin yarıçapı|Section radius
+Kopuş senaryosu|Release scenario
+Başlangıçta tek kopuş|Single release at the start
+İlk 6 saat boyunca her saat|Hourly during the first 6 hours
+Bu kesimden parçaların ayrıldığını varsayarak tahmin oluştur.|Create a forecast assuming fragments detach from this section.
+Kopan parçaların yayılımını hesapla|Calculate fragment spread
+Temizle / iptal et|Clear / cancel
+Senaryo verisini indir|Download scenario data
+Raporu indir|Download report
+Tahmin ufku|Forecast horizon
+Önce haritada deniz üzerinde bir kopuş kesimi seçin.|First select a release section at sea on the map.
+Model ve varsayımlar|Model and assumptions
+Girdiler değişti; yeni senaryo hesaplanabilir.|Inputs changed; calculate a new scenario.
+Kopuş kesiminin akıntı, rüzgâr ve dalga model alanları yükleniyor…|Loading current, wind and wave model fields for the release section…
+Seçili noktada kopuş tahmini oluştur →|Create a breakaway forecast at the selected point →
+Seçili noktada yapay zekâ adaylarını incele →|Inspect AI candidates at the selected point →
+Daire, sizin seçtiğiniz küçük kopuş kesimidir; çöp adasının ölçülmüş sınırı değildir. Tek kopuşta 25, altı saatlik salımda saatte 5 olmak üzere 30 sanal parçacık kullanılır. Parçacık sayısı gerçek çöp sayısı veya tonaj değildir. Kopuşun gerçekleşmesi, zamanı ve miktarı ölçülmüş bir kırılma modeliyle tahmin edilmez; senaryo olarak girilir.|The circle is your selected small release section, not a measured garbage-patch boundary. A single release uses 25 virtual particles; the six-hour release uses 5 per hour, 30 in total. Particle counts do not represent actual waste counts or tonnage. Detachment, timing and amount are scenario inputs rather than outputs of a measured fragmentation model.
+Üç senaryoda doğrudan rüzgâr etkisi %0, %1 ve %3 alınır. Saatlik toplam yüzey deniz hızı ve rüzgâr alanları, 15 dakikalık adımlarda konuma göre yeniden örneklenir. Dalga yüksekliği, yönü ve periyodu ayrıca gösterilir. Sağlayıcı deniz hızını dalga ve gelgit katkılarını da içeren ürün olarak tanımlar; dalga etkisini iki kez saymamak için buna ayrıca Stokes hızı eklenmez. Dalga katkısı bu üründen ayrı bir vektör olarak doğrulanamaz.|The three scenarios use 0%, 1% and 3% direct windage. Hourly total surface-current and wind fields are resampled by position at 15-minute steps. Wave height, direction and period are displayed separately. The provider describes the current product as including wave and tidal contributions; no additional Stokes velocity is added to avoid double counting. The wave contribution cannot be independently verified as a separate vector from this product.
+Kıyıda, eksik veride veya sorgu alanı dışında hesap durur. Son noktalar senaryo konumlarıdır. Yayılım bir olasılık yüzdesi veya bağımsız doğrulanmış gerçek takip değildir.|The calculation stops at the coast, missing data or the query-domain boundary. Endpoints are scenario positions. The spread is not a probability percentage or an independently validated observed track.
+Deniz ve dalga verisi tanımları|Current and wave data definitions
+Rüzgâr verisi|Wind data
 Türkiye ve dünyadaki izleme noktalarını veya koordinatları arayın. Konum bulunması atık bulunduğunu göstermez.|Search monitoring points in Turkey and worldwide, or enter coordinates. Finding a location does not mean finding waste.
 Antalya, Mumbai, Cakarta veya 41.6, 30.9|Antalya, Mumbai, Jakarta or 41.6, 30.9
 Ortak uydu sonuçları küresel izleme ağında yayımlanır. Yeni isteğe bağlı tarama ve kişisel kayıtlar yerel çalışma alanındadır. Tarihli sürüklenme hesabı bu yayında kullanılabilir.|Shared satellite results are published in the global monitoring network. New on-demand scans and personal records are available in the local workspace. Dated drift calculations are available on this website.
@@ -479,6 +503,7 @@ Görüntü arama tarihi geçersiz.|Invalid image search date.
     if(result===undefined&&/^(Model başlangıcı|\d+ saat ·|Senaryo oluşturulamadı:|Tahmin oluşturulamadı:|Alan tahmini oluşturulamadı:|\d{4}-.*Sahne bulutluluğu)/.test(clean)){
       result=clean;
       const clauses=[
+        ['Varsayılan kopuş merkezi:','Assumed release centre:'],[' · yarıçap ',' · radius '],['Gerçek birikim sınırı ölçümü değildir.','Not a measured accumulation boundary.'],['doğrudan rüzgâr etkisi','direct windage'],[' ilerliyor',' moving'],[' kıyıda durdu',' stopped at coast'],[' başlangıç karada',' land start'],[' veri eksik',' missing data'],[' alan dışında',' outside domain'],[' kıyı belirsiz',' coast uncertain'],[' hesap hatası',' calculation error'],[' henüz ayrılmadı',' not yet released'],['Kopuş merkezi yakınında +','Near release centre at +'],[' saat dalga modeli: yükseklik ','h wave model: height '],[' · geldiği yön ',' · from direction '],[' · periyot ',' · period '],['Ek bir dalga sürüklenme hızı uygulanmadı.','No additional wave-drift velocity was applied.'],['Bu kesime 25 km içinde dalga hücresi bulunamadı; dalga koşulları bilinmiyor.','No wave cell was found within 25 km; wave conditions are unknown.'],[' · senaryo başına ',' · per scenario '],[' sanal parçacık. Eksik veri veya kıyı nedeniyle duran parçalar belirtilir.',' virtual particles. Stops due to missing data or coast contact are shown.'],['Hesap tamamlanamadı:','Calculation did not complete:'],['Model servisi zaman aşımı.','Model service timeout.'],['bilinmiyor','unknown'],
         ['Model başlangıcı:','Model start:'],['Model başlangıcı','Model start'],['Verinin alınması:','Data retrieved:'],['farklı akıntı,','distinct current cells,'],['farklı rüzgâr hücresi.','distinct wind cells.'],
         ['Bazı parçacıkların hesabı tamamlanamadı; aşağıdaki sayıları ve son hesaplanan konumları inceleyin.','Some particles could not be fully calculated; inspect the counts and last calculated positions below.'],
         ['Tüm başlangıçlar için bu saate kadar hesap tamamlandı.','Calculations completed up to this hour for all starts.'],['Bu yayılım bir güven aralığı değildir.','This spread is not a confidence interval.'],['3 senaryo, toplam 75 parçacık.','3 scenarios, 75 particles in total.'],
