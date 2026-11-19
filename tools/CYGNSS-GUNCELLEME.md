@@ -1,4 +1,4 @@
-# CYGNSS bölgesel verisinin aylık kontrolü
+    # CYGNSS bölgesel verisinin aylık kontrolü
 
 ODAK yalnızca 25–30° K, 150–145° B Kuzey Pasifik örneğini yayınlar. Gösterim 0,25° hücre merkezleri üzerinden yapılır, etkin ortalama yaklaşık 1° alanı ve 30 günü kapsar. Yoğunluk adet/km² cinsindedir. GPGP 2018 kütle modeli kendi tarihi ve g/km² birimiyle ayrı kalır. `stddev_mp_samples` web varlığına aktarılmaz.
 
