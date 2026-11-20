@@ -3,6 +3,7 @@
 (()=>{
   'use strict';
   const entries=`
+Seçili konum karada. Deniz üzerinde bir nokta seçin.|This location is on land. Select a point at sea.
 Bölge seç|Choose a region
 Kopuşu hesapla|Calculate release
 Sonucu incele|Inspect the result
@@ -14,6 +15,8 @@ Haritada rüzgâr senaryosu|Windage displayed on map
 %3 — yüksek rüzgâr etkisi|3% — high windage
 Kaynağa dön|Return to source
 Tüm sonucu göster|Fit the full result
+Noktama dön|Back to my point
+Tüm rotayı göster|Show the full route
 Veri ve rapor indir|Download data and report
 Dalga koşulları|Wave conditions
 Seçili koordinat; atık tespiti değil|Selected coordinate; not a waste detection

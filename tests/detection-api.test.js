@@ -32,7 +32,7 @@ test('invalid coordinates and methods never call the model; real-shaped result p
   const r=await fetch(base+'/api/satellite/detection?lat=0&lon=0'),data=await r.json();
   assert.equal(r.status,200);assert.equal(data.type,'FeatureCollection');assert.equal(data.metadata.observed_at,'2026-10-22T08:58:00Z');assert.deepEqual(data.metadata.query,{lat:0,lon:0});
 });
-for(const [mode,status,code] of [['unavailable',503,'MODEL_UNAVAILABLE'],['provider',502,'DETECTION_FAILED'],['timeout',504,'DETECTION_TIMEOUT'],['inference-timeout',504,'DETECTION_TIMEOUT']]){
+for(const [mode,status,code] of [['unavailable',503,'MODEL_UNAVAILABLE'],['provider',502,'DETECTION_FAILED'],['no-scene',422,'NO_USABLE_SCENE'],['timeout',504,'DETECTION_TIMEOUT'],['inference-timeout',504,'DETECTION_TIMEOUT']]){
   test(`detector ${mode} gives safe actionable JSON and the server remains responsive`,async t=>{
     const server=start(t,mode),base=await server.ready(),r=await fetch(base+'/api/satellite/detection?lat=41&lon=30'),body=await r.json();
     assert.equal(r.status,status);assert.equal(body.code,code);assert.equal(JSON.stringify(body).includes('private-provider-debug-details'),false);

@@ -15,6 +15,7 @@ require.cache[detectorPath]={id:detectorPath,filename:detectorPath,loaded:true,e
   async detect(lat,lon,{signal}){
     log('started');
     if(mode==='provider')throw Error('private-provider-debug-details');
+    if(mode==='no-scene')throw Error('Son taranan uydu sahnelerinde yeterli açık su alanı bulunamadı. Başka bir bölge veya daha sonra tekrar deneyin.');
     if(mode==='inference-timeout')throw Error('Detector inference timed out');
     if(mode==='timeout')await pause(1000,signal);
     if(mode==='ignore-abort')await pause(150);

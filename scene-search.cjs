@@ -24,7 +24,7 @@ async function findScene(lat,lon,{before,signal,fetchImpl=fetch,maxCloudCover=30
      &&['nir','rededge2','swir16','scl','visual'].every(k=>typeof scene.assets?.[k]?.href==='string'))return scene;
   }
   const next=data.links?.find(link=>link.rel==='next');
-  if(!next)throw Error('Son 45 günde uygun bulutluluğa sahip Sentinel-2 sahnesi bulunamadı.');
+  if(!next)throw Object.assign(Error('Son 45 günde uygun bulutluluğa sahip Sentinel-2 sahnesi bulunamadı.'),{code:'NO_USABLE_SCENE'});
   const destination=new URL(next.href,url);
   if(destination.origin!=='https://earth-search.aws.element84.com'||destination.pathname!=='/v1/search'||(next.method&&next.method!=='GET'))throw Error('Katalog devam bağlantısı doğrulanamadı.');
   url=destination.href;

@@ -1,3 +1,4 @@
+const {openTool}=require('./workspace-helpers.cjs');
 const {test: base, expect} = require('@playwright/test');
 const {launchServer} = require('./server-helper.cjs');
 const fs = require('node:fs/promises');
@@ -22,7 +23,7 @@ async function open(page, request, local) {
   }
   await page.route('**/v1/{marine,forecast}?*', route => route.abort());
   await page.goto(local.base + '/platform.html#intelligence');
-  await page.locator('#recordsPanel > summary').click();
+  await openTool(page,'records');
   await expect(page.locator('#observationList > li')).toHaveCount(2);
   await expect(page.locator('.observation-marker')).toHaveCount(2);
 }
@@ -33,7 +34,7 @@ test('cancel and confirm deletion remove only the selected record, photo and map
   await first.getByRole('button', {name:'BİLDİRİMİ GÜNCELLE'}).click();
   let writes = 0;
   page.on('request', req => {if (req.method() === 'DELETE') writes++;});
-  page.once('dialog', dialog => dialog.dismiss());
+  await openTool(page,'records');page.once('dialog', dialog => dialog.dismiss());
   await first.getByRole('button', {name:'BİLDİRİMİ SİL', exact:true}).click();
   await expect(page.locator('#observationFeedback')).toContainText('iptal');
   expect(writes).toBe(0);
@@ -62,7 +63,7 @@ test('editing preserves a photo, explicit removal needs confirmation and prevent
   await expect(page.locator('#inspectionFeedback')).toContainText('korundu');
   await expect(first.locator('img')).toHaveAttribute('src', photo);
   const beforeCancel = mutations;
-  page.once('dialog', dialog => dialog.dismiss());
+  await openTool(page,'records');page.once('dialog', dialog => dialog.dismiss());
   await first.getByRole('button', {name:'YALNIZCA FOTOĞRAFI KALDIR'}).click();
   await expect(page.locator('#observationFeedback')).toContainText('iptal');
   expect(mutations).toBe(beforeCancel);
@@ -75,7 +76,7 @@ test('editing preserves a photo, explicit removal needs confirmation and prevent
   await expect(first.locator('img')).toHaveCount(0);
   await expect(page.locator('#inspectionStatus')).toHaveValue('unreviewed');
   await expect(page.locator('.observation-marker')).toHaveCount(2);
-  await page.locator('#inspectionStatus').selectOption('field_reported');
+  await openTool(page,'advanced');await page.locator('#inspectionStatus').selectOption('field_reported');
   await page.locator('#inspectionSave').click();
   await expect(page.locator('#inspectionFeedback')).toContainText('fotoğraf ve açıklama gerekli');
   const records = await (await request.get(local.base + '/api/observations')).json();

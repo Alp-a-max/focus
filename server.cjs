@@ -1,6 +1,7 @@
 const http=require('http'),fs=require('fs'),path=require('path');const {analyze,validCoordinates}=require('./satellite.cjs'),observations=require('./observations.cjs');const root=__dirname,types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.png':'image/png','.json':'application/json; charset=utf-8'};const {compare}=require('./comparison.cjs');const port=Number(process.env.PELAGIC_PORT||8766);let busy=false;
 function json(res,status,obj){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}).end(JSON.stringify(obj))}
 const host = '127.0.0.1';
+const {isSceneUnavailable}=require('./detection-errors.cjs');
 function detectorStatus() {
   try {
     const value = require('./ml/detect-pretrained.cjs').status();
@@ -40,7 +41,9 @@ async function handleDetection(req, res, url) {
     if(!res.destroyed)json(res,200,result);
   } catch(error) {
     if(res.destroyed)return;
-    if(controller.signal.reason?.name==='TimeoutError' || error?.name==='TimeoutError' || /timed out/i.test(String(error?.message||'')))
+    if(isSceneUnavailable(error))
+      json(res,422,{code:'NO_USABLE_SCENE',error:'Bu konumda son 45 gün için analize uygun Sentinel-2 görüntüsü bulunamadı. Başka bir bölge seçin; bu, atık olmadığı anlamına gelmez.'});
+    else if(controller.signal.reason?.name==='TimeoutError' || error?.name==='TimeoutError' || /timed out/i.test(String(error?.message||'')))
       json(res,504,{code:'DETECTION_TIMEOUT',error:'Tespit işlemi zaman aşımına uğradı. Tekrar deneyin.'});
     else if(!detectorStatus().available)
       json(res,503,{code:'MODEL_UNAVAILABLE',error:'Araştırma tespit modeli bu bilgisayarda henüz hazır değil.'});

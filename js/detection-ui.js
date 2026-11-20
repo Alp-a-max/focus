@@ -29,6 +29,7 @@ window.FocusDetectionUI = (()=>{
       DETECTION_TIMEOUT:words('Tespit işlemi zaman aşımına uğradı. Tekrar deneyin.','Detection timed out. Try again.'),
       INVALID_COORDINATES:words('Geçerli bir deniz koordinatı seçin.','Select valid coordinates at sea.'),
       INVALID_RESULT:words('Tespit yanıtı doğrulanamadı. Tekrar deneyin.','The detection response could not be verified. Try again.'),
+      NO_USABLE_SCENE:words('Bu konumda son 45 gün için analize uygun Sentinel-2 görüntüsü bulunamadı. Kıyıya yakın başka bir bölge seçin veya yayımlanmış bölge sonuçlarını açın. Görüntü bulunmaması, atık olmadığı anlamına gelmez.','No suitable Sentinel-2 image was found at this location within the last 45 days. Select another area near a coast or open published regional results. Missing imagery does not mean waste is absent.'),
       DETECTION_FAILED:words('Uydu verisi veya model işlenemedi. Tekrar deneyin.','Satellite data or model processing failed. Try again.'),
       SERVICE_UNAVAILABLE:words('Tespit servisine ulaşılamıyor. Tam çalışma alanını açın ve tekrar deneyin.','Cannot reach the detector. Open the full local workspace and try again.')
     });

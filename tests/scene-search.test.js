@@ -12,4 +12,5 @@ test('requests descending acquisition time and continues past cloudy first pages
 test('rejects foreign pagination and missing valid images without fetching arbitrary URLs',async()=>{
  await assert.rejects(findScene(36,31,{fetchImpl:async()=>({ok:true,json:async()=>({features:[],links:[{rel:'next',href:'https://foreign.example/secret'}]})})}),/devam bağlantısı/);
  await assert.rejects(findScene(36,31,{fetchImpl:async()=>({ok:true,json:async()=>({features:[],links:[]})})}),/uygun bulutluluğa/);
+ await assert.rejects(findScene(23.7331,-39.2782,{fetchImpl:async()=>({ok:true,json:async()=>({features:[],links:[]})})}),error=>error.code==='NO_USABLE_SCENE');
 });

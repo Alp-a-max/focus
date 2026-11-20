@@ -42,3 +42,6 @@ blob-report/
 /.nasa-check.cjs
 /.visual-check.cjs
 /.demo-tools/
+
+# graphify cache (graph.json/report stay shareable)
+graphify-out/cache/

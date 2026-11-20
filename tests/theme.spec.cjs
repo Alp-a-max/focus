@@ -33,7 +33,7 @@ for(const url of ['/','/platform.html?demo=1'])for(const width of [1440,390])tes
  if(url!=='/'){
   expect(await page.locator('#map').evaluate(el=>getComputedStyle(el).filter)).toBe('none');
   await expect(page.locator('.metric strong').first()).toHaveCSS('color','rgb(35, 76, 103)');
-  await expect(page.locator('#releaseOptions > summary')).toHaveCSS('color','rgb(69, 107, 131)');
+  await expect(page.locator('#releaseOptions > summary')).toHaveCSS('color','rgb(36, 75, 100)');
   await page.locator('.map-panel').screenshot({path:path.join(os.tmpdir(),`focus-theme-workspace-${width}-light.png`)});
  }else await page.screenshot({path:path.join(os.tmpdir(),`focus-theme-landing-${width}-light.png`)});
  await page.locator('#themeToggle').click();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');

@@ -1,3 +1,4 @@
+const {openTool}=require('./workspace-helpers.cjs');
 const {test,expect}=require('@playwright/test');
 
 test('five pricing cards stay in one readable desktop row, with a raised middle and a stacked mobile layout',async({page})=>{
@@ -63,7 +64,7 @@ test('public English changes plan language and takes the user to the full local 
  await page.goto('/');await page.getByRole('button',{name:'EN',exact:true}).click();
  await expect(page.locator('html')).toHaveAttribute('lang','en');await expect(page.locator('#planGrid')).toContainText('USD / month');
  await page.getByRole('link',{name:'Open demo ↗',exact:true}).click();
- await expect(page).toHaveURL(/\/platform\.html$/);await expect(page.locator('#experienceDialog')).toBeVisible();
+ await expect(page).toHaveURL(/\/platform\.html$/);await expect(page.locator('dialog[open]')).toHaveCount(0);
  await expect(page.locator('html')).toHaveAttribute('lang','en');
 });
 test('mobile public entry stays within the viewport with accessible navigation and cards',async({page})=>{
@@ -84,12 +85,12 @@ test('map search selects a known location, handles invalid input and exposes the
  await expect(page.locator('#mapSearchStatus')).toContainText('atık olup olmadığı henüz bilinmiyor');
  await page.locator('#mapSearchInput').fill('91,30');await page.locator('#mapSearchForm button').click();
  await expect(page.locator('#mapSearchStatus')).toContainText('model kapsamı dışında');
- await page.locator('#mapSearchInspect').click();await expect(page.locator('#analysisRun')).toBeVisible();
+ await openTool(page,'advanced');await expect(page.locator('#analysisRun')).toBeVisible();
 });
 test('HTML or missing service errors are human-readable for analysis and comparison',async({page})=>{
  await page.route('**/api/satellite/**',r=>r.fulfill({status:200,contentType:'text/html',body:'<!doctype html><html>offline</html>'}));
- await platform(page);await page.locator('#analysisRun').click();await expect(page.locator('#analysisStatus')).toContainText('İnceleme servisine ulaşılamıyor');
- await page.locator('#comparisonRun').click();await expect(page.locator('#comparisonStatus')).toContainText('İnceleme servisine ulaşılamıyor');
+ await platform(page);await openTool(page,'advanced');await page.locator('#analysisRun').click();await expect(page.locator('#analysisStatus')).toContainText('İnceleme servisine ulaşılamıyor');
+ await page.locator('#comparisonPanel > summary').click();await page.locator('#comparisonRun').click();await expect(page.locator('#comparisonStatus')).toContainText('İnceleme servisine ulaşılamıyor');
  await expect(page.locator('#comparisonStatus')).not.toContainText('Unexpected token');
 });
 test('legacy deep links still lead to the matching workspace section',async({page})=>{
@@ -101,11 +102,11 @@ test('full processing note translates before partial clauses and restores its or
  await platform(page);
  const note='Uydu fotoğrafı aynı sahnenin gerçek renk ürünüdür; yaklaşık 10 m çözünürlükte en fazla 3×3 km alan gösterir ve deniz için parlaklığı artırılmıştır. Kıyı ve bulut gölgesi hataları olabilir. FDI katmanı yaklaşık 1×1 km alanı 20 m çözünürlükte gösterir. Bulut, kara, sınıflandırılmamış alan ve görüntü kenarlarına yaklaşık 60 m güvenlik payı uygulanır; bazı etkiler maskelenemeyebilir. Atık tespiti değildir.';
  await page.route('**/api/satellite/analysis?*',r=>r.fulfill({json:{date:'2026-10-22T08:58:00Z',sceneId:'S2A_TEST',cloud:12.3,validPixels:1936,maskedPixels:564,width:50,height:50,min:-.01,max:.01,values:Array(2500).fill(.001),rgb:Array(7500).fill(50),bounds:[[41.59,30.89],[41.61,30.91]],note}}));
- await page.locator('#analysisRun').click();await expect(page.locator('#analysisStatus')).toContainText('Atık tespiti değildir.');
- await page.locator('#experienceOpen').click();await page.locator('[data-language=en]').click();await page.locator('#experienceStart').click();
+ await openTool(page,'advanced');await page.locator('#analysisRun').click();await expect(page.locator('#analysisStatus')).toContainText('Atık tespiti değildir.');
+ await page.keyboard.press('Escape');await page.locator('#experienceOpen').click();await openTool(page,'advanced');
  await expect(page.locator('#analysisStatus')).toContainText('The satellite photo is a true-colour product');
  await expect(page.locator('#analysisStatus')).not.toContainText('çözünürlük');
  await expect(page.locator('#scenePreview')).toHaveAttribute('alt','Approximate true-colour image of the analysed Sentinel-2 scene');
- await page.locator('#experienceOpen').click();await page.locator('[data-language=tr]').click();await page.locator('#experienceStart').click();
+ await page.keyboard.press('Escape');await page.locator('#experienceOpen').click();await openTool(page,'advanced');
  await expect(page.locator('#analysisStatus')).toContainText(note);
 });

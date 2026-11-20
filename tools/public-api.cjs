@@ -2,13 +2,14 @@
 // Only inference and dated public data are exposed. No filesystem or user-record routes.
 const http=require('node:http'),crypto=require('node:crypto');
 const detector=require('../ml/detect-pretrained.cjs'),contract=require('../js/detection-contract.js');
+const {isSceneUnavailable}=require('../detection-errors.cjs');
 function createApi({detect=detector.detect,status=detector.status,now=Date.now}={}){
  const jobs=new Map(),queue=[],rates=new Map(),cache=new Map();let active=false,dayStart=now(),daily=0;
  function reply(res,code,data){res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}
  function prune(){for(const [id,j] of jobs)if(now()-j.created>3600000&&j.state!=='running')jobs.delete(id);for(const [ip,r]of rates)if(now()-r.start>3600000)rates.delete(ip);for(const [k,c]of cache)if(now()-c.created>3600000)cache.delete(k);if(now()-dayStart>86400000){dayStart=now();daily=0;}}
  async function work(){if(active||!queue.length)return;active=true;const j=queue.shift();j.state='running';const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),185000);
   try{const result=contract.validate(await detect(j.lat,j.lon,{signal:controller.signal}));if(result.metadata.query?.lat!==j.lat||result.metadata.query?.lon!==j.lon)throw Error('SOURCE_MISMATCH');j.result=result;j.state='done';cache.set(j.key,{created:now(),result});}
-  catch{j.state='error';j.code=controller.signal.aborted?'DETECTION_TIMEOUT':'DETECTION_FAILED';}
+  catch(error){j.state='error';j.code=controller.signal.aborted?'DETECTION_TIMEOUT':isSceneUnavailable(error)?'NO_USABLE_SCENE':'DETECTION_FAILED';}
   finally{clearTimeout(timer);active=false;setImmediate(work);}
  }
  return http.createServer(async(req,res)=>{

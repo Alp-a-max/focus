@@ -25,10 +25,10 @@
     const section=document.createElement('div');section.className='map-search';
     section.innerHTML=`<form id="mapSearchForm"><label for="mapSearchInput">Nereden başlamak istersiniz?</label><div class="map-search-input"><input id="mapSearchInput" type="search" maxlength="120" placeholder="Antalya, Mumbai, Cakarta veya 41.6, 30.9" autocomplete="off"><button type="submit">Konumu bul ↗</button></div></form><div class="map-search-results" id="mapSearchResults"></div><p id="mapSearchStatus" role="status">Türkiye ve dünyadaki izleme noktalarını veya koordinatları arayın. Konum bulunması atık bulunduğunu göstermez.</p><button type="button" id="mapSearchInspect">Seçili noktada uydu incelemesine geç →</button>`;
     document.querySelector('.map-wrap').before(section);
-    const status=section.querySelector('#mapSearchStatus'),results=section.querySelector('#mapSearchResults');
-    function choose(place){select(place.lat,place.lon,place.name);results.replaceChildren();status.textContent=place.name+' seçildi. Bu konumda atık olup olmadığı henüz bilinmiyor.';}
+    const status=section.querySelector('#mapSearchStatus'),results=section.querySelector('#mapSearchResults');section.dataset.searchState='idle';
+    function choose(place){select(place.lat,place.lon,place.name);results.replaceChildren();section.dataset.searchState='selected';status.textContent=place.name+' seçildi. Bu konumda atık olup olmadığı henüz bilinmiyor.';}
     section.querySelector('form').addEventListener('submit',event=>{
-      event.preventDefault();results.replaceChildren();
+      event.preventDefault();results.replaceChildren();section.dataset.searchState='feedback';
       try {const found=search(section.querySelector('input').value);if(!found.length){status.textContent='Bu ad için kayıt yok. Enlem, boylam girerek devam edebilirsiniz.';return;}
         if(found.length===1){choose(found[0]);return;}
         status.textContent=found.length+' başlangıç noktası bulundu. Birini seçin.';

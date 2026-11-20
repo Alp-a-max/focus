@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const {openTool}=require('./workspace-helpers.cjs');
 const fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
 require('./experience-fixture.cjs')(test);
 function sample(lat=36.45,lon=31.3,{empty=false,scene='S2_TEST_20261022',model='test-unetpp12'}={}){
@@ -25,11 +26,11 @@ async function setup(page){
       current_units:{[sk]:'km/h',[dk]:'°'},hourly_units:{[sk]:'km/h',[dk]:'°'},hourly:{time,[sk]:time.map(()=>marine?1:10),[dk]:time.map(()=>marine?90:180)}}));
     return route.fulfill({json:data.length===1?data[0]:data});
   });
-  await page.goto('/platform.html#intelligence');
+  await page.goto('/platform.html#intelligence');await openTool(page,'satellite');
   await expect(page.locator('#detectionRun')).toBeVisible();return ()=>fields;
 }
 const routeSample=page=>page.route('**/api/satellite/detection?*',r=>{const u=new URL(r.request().url());return r.fulfill({json:sample(+u.searchParams.get('lat'),+u.searchParams.get('lon'))})});
-async function downloadJson(page,selector){const pending=page.waitForEvent('download');await page.locator(selector).click();const download=await pending;return JSON.parse(await fs.readFile(await download.path(),'utf8'))}
+async function downloadJson(page,selector){if(selector==='#detectionExport')await openTool(page,'satellite');const pending=page.waitForEvent('download');await page.locator(selector).click();const download=await pending;return JSON.parse(await fs.readFile(await download.path(),'utf8'))}
 
 test('dated candidates require explicit current-start assumption; scenario and GeoJSON retain provenance',async({page})=>{
   await routeSample(page);const fields=await setup(page);
@@ -55,7 +56,7 @@ test('dated candidates require explicit current-start assumption; scenario and G
   expect(forecast.observation_source.geometry.coordinates).toEqual([31.310000000000002,36.46]);
   expect(forecast.assumptions.current_start).toEqual(geojson.metadata.forecast_assumption);
   expect(forecast.assumptions.historical_tracking).toBe(false);expect(forecast.start_time).not.toBe(forecast.observation_source.observed_at);
-  await page.locator('#detectionAssume').uncheck();await expect(page.locator('#ensembleRun')).toBeDisabled();await expect(page.locator('.ensemble-particle')).toHaveCount(0);
+  await openTool(page,'satellite');await page.locator('#detectionAssume').uncheck();await expect(page.locator('#ensembleRun')).toBeDisabled();await expect(page.locator('.ensemble-particle')).toHaveCount(0);
   await expect(page.locator('#ensembleExport')).toBeDisabled();
 });
 test('empty and masked results are not presented as a clean sea; layer clear and location changes work independently',async({page})=>{
@@ -67,11 +68,11 @@ test('empty and masked results are not presented as a clean sea; layer clear and
   empty=false;await page.locator('#detectionRun').click();await expect(page.locator('.detection-candidate')).toHaveCount(2);
   await page.locator('#detectionClear').click();await expect(page.locator('.detection-candidate')).toHaveCount(0);await expect(page.locator('#detectionExport')).toBeDisabled();
   await page.locator('#detectionRun').click();await expect(page.locator('.detection-candidate')).toHaveCount(2);
-  await page.locator('#detectionList button').first().click();await page.locator('button[data-name="Karadeniz"]').click();
+  await page.locator('#detectionList button').first().click();await openTool(page,'conditions');await page.locator('button[data-name="Karadeniz"]').click();
   await expect(page.locator('#detectionList button')).toHaveCount(0);await expect(page.locator('#ensembleObservation')).not.toBeVisible();
   await expect(page.locator('#detectionOrigin')).toContainText('41.6000');
 });
-for(const [code,status,copy] of [['MODEL_UNAVAILABLE',503,'henüz hazır değil'],['ANALYSIS_BUSY',429,'Başka bir analiz'],['DETECTION_TIMEOUT',504,'zaman aşımına'],['DETECTION_FAILED',502,'işlenemedi'],['HTML',200,'Tam çalışma alanını'],['JSON',200,'doğrulanamadı'],['INVALID',200,'doğrulanamadı']]){
+for(const [code,status,copy] of [['MODEL_UNAVAILABLE',503,'hazır değil'],['ANALYSIS_BUSY',429,'Başka bir analiz'],['DETECTION_TIMEOUT',504,'zaman aşımına'],['DETECTION_FAILED',502,'işlenemedi'],['NO_USABLE_SCENE',422,'uygun Sentinel-2 görüntüsü bulunamadı'],['HTML',200,'Tam çalışma alanını'],['JSON',200,'doğrulanamadı'],['INVALID',200,'doğrulanamadı']]){
   test(`failure ${code} is understandable and can be retried without fake candidates`,async({page})=>{
     let fail=true;await page.route('**/api/satellite/detection?*',r=>{
       if(!fail)return r.fulfill({json:sample()});
@@ -93,7 +94,7 @@ test('cancelled and obsolete responses cannot replace a later location or clear 
     await r.fulfill({json:data}).catch(()=>{});
   });await setup(page);await page.locator('#detectionRun').click();await start;
   await expect(page.locator('#detectionRun')).toBeDisabled();await page.locator('#detectionClear').click();
-  await page.locator('button[data-name="Karadeniz"]').click();await page.locator('#detectionRun').click();
+  await openTool(page,'conditions');await page.locator('button[data-name="Karadeniz"]').click();await openTool(page,'satellite');await page.locator('#detectionRun').click();
   await expect(page.locator('#detectionDates')).toContainText('NEW_SCENE');release();
   await page.waitForTimeout(100);await expect(page.locator('#detectionDates')).not.toContainText('OLD_SCENE');
   await expect(page.locator('.detection-candidate')).toHaveCount(2);await expect(page.locator('#detectionRun')).toBeEnabled();
@@ -108,7 +109,7 @@ test('English, keyboard access, remote text safety and 390px layout',async({page
   await page.locator('#detectionList button').first().focus();await page.keyboard.press('Enter');
   await expect(page.locator('#detectionAssume')).toBeFocused();await expect(page.locator('#ensembleRun')).toBeDisabled();
   await expect(page.locator('#predictionText')).toContainText('A current-start assumption is required');
-  await page.locator('.detection-candidate').nth(1).click({force:true});await expect(page.locator('#detectionSelected')).toContainText('36.46000');
+  await page.locator('#detectionList button').nth(1).click();await expect(page.locator('#detectionSelected')).toContainText('36.46000');
   await page.locator('#detectionNotesTitle').click();await expect(page.locator('#detectionLimit')).toContainText('not calibrated plastic probabilities');
   await expect(page.locator('#detectionSource')).toContainText('"max_score": 0.8');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

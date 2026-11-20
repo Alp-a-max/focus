@@ -1,0 +1,109 @@
+/* Opening splash, getting-started tour, start-point marker, locate button and small workspace polish. */
+
+/* ---------- Splash ---------- */
+.focus-splash{position:fixed;inset:0;z-index:5000;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,#12263a 0%,#070c12 62%);color:#e7f3fc;cursor:pointer;transition:opacity .55s ease,visibility .55s}
+.focus-splash.is-leaving{opacity:0;visibility:hidden}
+.focus-splash-inner{display:flex;flex-direction:column;align-items:center;gap:22px;padding:24px;text-align:center}
+.focus-radar{position:relative;width:132px;height:132px;border-radius:50%;border:1px solid #5fa9d455;background:radial-gradient(circle,#0f2233 0 58%,transparent 59%);box-shadow:0 0 60px #2d86c033 inset,0 0 80px #2d86c022}
+.focus-radar::before,.focus-radar::after{content:"";position:absolute;inset:22px;border-radius:50%;border:1px solid #5fa9d440}
+.focus-radar::after{inset:46px}
+.focus-radar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#79d7ff00 0deg,#79d7ff00 280deg,#79d7ff66 350deg,#b9ecff 360deg);animation:focus-spin 1.6s linear infinite;-webkit-mask:radial-gradient(circle,#000 0 70%,transparent 71%);mask:radial-gradient(circle,#000 0 70%,transparent 71%)}
+.focus-radar-dot{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#ffc27d;box-shadow:0 0 0 6px #ffc27d33}
+.focus-radar-blip{position:absolute;width:6px;height:6px;border-radius:50%;background:#57d7ad;animation:focus-blip 1.6s ease-in-out infinite}
+.focus-radar-blip:nth-child(3){left:30%;top:28%;animation-delay:.3s}.focus-radar-blip:nth-child(4){left:68%;top:62%;animation-delay:.9s}
+.focus-splash-logo{font:700 34px/1 'Space Grotesk',Manrope,system-ui,sans-serif;letter-spacing:-.05em;margin:0}
+.focus-splash-logo i{display:inline-block;width:9px;height:9px;margin-left:6px;border-radius:50%;background:#79d7ff;vertical-align:middle}
+.focus-splash-tag{margin:-10px 0 0;font:500 11px/1.6 'DM Mono',ui-monospace,monospace;letter-spacing:.18em;color:#8fb6cf;text-transform:uppercase}
+.focus-splash-bar{width:180px;height:3px;border-radius:3px;background:#1d3446;overflow:hidden}
+.focus-splash-bar span{display:block;width:40%;height:100%;border-radius:3px;background:linear-gradient(90deg,#79d7ff,#57d7ad);animation:focus-bar 1.2s ease-in-out infinite}
+.focus-splash-status{min-height:1.6em;margin:0;font:500 13px/1.6 Manrope,system-ui,sans-serif;color:#a9c4d6}
+@keyframes focus-spin{to{transform:rotate(360deg)}}
+@keyframes focus-blip{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+@keyframes focus-bar{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
+
+/* ---------- Tour ---------- */
+.focus-tour{position:fixed;inset:0;z-index:4000;pointer-events:auto;animation:focus-fade .25s ease}
+.focus-tour.is-leaving{opacity:0;transition:opacity .2s}
+.focus-tour-spot{position:fixed;border-radius:14px;box-shadow:0 0 0 2px #79d7ff,0 0 0 9999px #030a12cc;transition:all .35s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.focus-tour.is-center .focus-tour-spot{left:50%;top:50%;width:0;height:0;box-shadow:0 0 0 9999px #030a12d9}
+.focus-tour-card{position:fixed;width:min(360px,calc(100vw - 32px));padding:20px 20px 16px;border:1px solid #5f88a3;border-radius:18px;background:#111d29;color:#e7f3fc;box-shadow:0 24px 70px #000a;transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)}
+.focus-tour.is-center .focus-tour-card{left:50%!important;top:50%!important;transform:translate(-50%,-50%);width:min(420px,calc(100vw - 32px))!important}
+.focus-tour-count{margin:0 0 6px;font:500 11px/1.4 'DM Mono',ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#79d7ff}
+.focus-tour-card h2{margin:0 0 8px;font:600 20px/1.3 'Space Grotesk',Manrope,sans-serif;letter-spacing:-.03em}
+.focus-tour-text{margin:0;font:14px/1.65 Manrope,system-ui,sans-serif;color:#c3d7e5}
+.focus-tour-dots{display:flex;gap:5px;margin:16px 0 12px}.focus-tour-dots i{width:6px;height:6px;border-radius:6px;background:#3b5568;transition:width .25s}.focus-tour-dots i.on{width:18px;background:#79d7ff}
+.focus-tour-actions{display:flex;align-items:center;gap:8px}.focus-tour-actions span{flex:1}
+.focus-tour-actions button{min-height:42px;padding:9px 14px;border-radius:10px;border:1px solid #4d6b80;background:#182a38;color:#dceefa;font:600 13px Manrope,system-ui,sans-serif;cursor:pointer}
+.focus-tour-actions [data-tour=skip]{border-color:transparent;background:none;color:#93adbf;padding-inline:4px}
+.focus-tour-actions .primary{background:#dff4ff;color:#0b1a26;border-color:#dff4ff}
+.focus-tour-actions button:focus-visible{outline:2px solid #79d7ff;outline-offset:2px}
+@keyframes focus-fade{from{opacity:0}}
+@media(max-width:640px){.focus-tour-card{left:12px!important;right:12px;bottom:max(12px,env(safe-area-inset-bottom,0px));top:auto!important;width:auto!important;transform:none!important}.focus-tour.is-center .focus-tour-card{left:12px!important;right:12px;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom,0px))}}
+
+/* Header replay button */
+.focus-tour-open{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 14px;border:1px solid #496174;background:#182936;color:#dceefa;border-radius:11px;font:600 14px Manrope,sans-serif;cursor:pointer}
+.focus-tour-open span{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#79d7ff;color:#0b1a26;font:700 12px Manrope,sans-serif}
+.focus-tour-open em{font-style:normal}
+@media(max-width:760px){.focus-tour-open{padding:10px;min-width:44px;justify-content:center}.focus-tour-open em{display:none}}
+
+/* ---------- Start-point marker & locate button ---------- */
+.release-pin{pointer-events:none}
+.release-pin-dot{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ffb35c;border:2px solid #fff;box-shadow:0 2px 8px #0008}
+.release-pin-pulse{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:#ffb35c55;animation:release-pulse 1.8s ease-out infinite}
+@keyframes release-pulse{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.6);opacity:0}}
+.release-locate-box{margin:0 0 14px 14px!important}
+.release-locate{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:10px 16px 10px 12px;border:1px solid #ffc27d;border-radius:999px;background:#13212df2;color:#fff2e2;font:700 14px Manrope,system-ui,sans-serif;box-shadow:0 8px 24px #0007;cursor:pointer;animation:focus-fade .25s ease}
+.release-locate-arrow{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#ffb35c;color:#1a1206;font-size:14px;font-weight:800;transition:transform .2s}
+.release-locate:hover{background:#1c2f3e}.release-locate:focus-visible{outline:2px solid #79d7ff;outline-offset:3px}
+
+/* Legend: one caveat line instead of a caveat on every row */
+.release-key.monitor{width:10px;height:10px;border-radius:50%;background:#a4adbd;border:2px solid #a4adbdaa;box-sizing:border-box}
+.release-legend-note{margin:6px 0 0;padding-top:6px;border-top:1px solid #b0cad533;font-size:11px;color:#a9c4d6}
+
+/* ---------- Step indicator: progress, not buttons ---------- */
+.simple-control .release-steps{display:flex;gap:0;margin:12px 0;counter-reset:steps}
+.simple-control .release-steps li{position:relative;flex:1;border:0;background:none!important;padding:22px 2px 0!important;font:600 11px/1.3 Manrope,sans-serif!important;color:#7f98ab;text-align:center}
+.simple-control .release-steps li:before{display:grid!important;place-items:center;content:counter(steps)!important;position:absolute;left:50%;top:0;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:#22384a;color:#9fb8ca;font:700 10px Manrope,sans-serif;z-index:1}
+.simple-control .release-steps li:after{content:"";position:absolute;top:9px;left:calc(50% + 12px);right:calc(-50% + 12px);height:2px;background:#2b4558}
+.simple-control .release-steps li:last-child:after{display:none}
+.simple-control .release-steps li[aria-current=step]{color:#e3f7ff}
+.simple-control .release-steps li[aria-current=step]:before{background:#79d7ff;color:#0b1a26;box-shadow:0 0 0 4px #79d7ff33}
+
+/* ---------- Visible AI entry point ---------- */
+.simple-ai-scan{display:flex;align-items:center;gap:12px;width:calc(100% - 36px);margin:0 18px 18px;padding:12px 14px;border:1px solid #4f7a93;border-radius:12px;background:linear-gradient(135deg,#173246,#14283a);color:#e3f4ff;text-align:left;cursor:pointer}
+.simple-ai-scan>span:first-child{font-size:22px}
+.simple-ai-scan strong{display:block;font:700 14px/1.4 Manrope,sans-serif}
+.simple-ai-scan small{display:block;font:12px/1.4 Manrope,sans-serif;color:#9dbbd0}
+.simple-ai-scan:hover{border-color:#79d7ff}.simple-ai-scan:focus-visible{outline:2px solid #79d7ff;outline-offset:2px}
+
+@media(max-width:760px){.simple-control .simple-ai-scan{order:3;width:100%;margin:0}.simple-control .release-steps{margin:6px 0}.simple-control .release-steps li{padding-top:19px!important;font-size:10px!important;line-height:1.2!important}}
+
+/* ---------- Disabled controls: hidden on the map bar, clearly inactive elsewhere ---------- */
+.simple-app .simple-map-actions button:disabled{display:none}
+.simple-app .simple-map-actions:not(:has(button:not(:disabled))){display:none}
+.simple-app .simple-map-actions button{font-family:Manrope,sans-serif!important;font-weight:600}
+.simple-tools button:disabled,.simple-control button:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- Tools dialog: one type scale ---------- */
+.simple-tools .simple-tool-section :is(h2,h3){font-family:Manrope,sans-serif;letter-spacing:-.01em}
+.simple-tools .simple-tool-section h2{font-size:18px!important;line-height:1.35}
+.simple-tools .simple-tool-section h3{font-size:15px!important;line-height:1.4}
+.simple-tools .simple-tool-section :is(p,label,li){font-size:13.5px;line-height:1.65}
+
+/* ---------- Light theme ---------- */
+:root[data-theme=light] .focus-tour-card{background:#fff;color:#1a354a;border-color:#9fb9ca}
+:root[data-theme=light] .focus-tour-text{color:#3c5a70}
+:root[data-theme=light] .focus-tour-actions button{background:#edf5fa;color:#264e69;border-color:#9bb7ca}
+:root[data-theme=light] .focus-tour-actions .primary{background:#1a4a68;color:#fff;border-color:#1a4a68}
+:root[data-theme=light] .focus-tour-open{background:#edf5fa;color:#264e69;border-color:#9bb7ca}
+:root[data-theme=light] .simple-ai-scan{background:linear-gradient(135deg,#e6f2fa,#f4f9fc);color:#173a52;border-color:#9bb7ca}
+:root[data-theme=light] .simple-ai-scan small{color:#4c697e}
+:root[data-theme=light] .simple-control .release-steps li{color:#5d788c}
+:root[data-theme=light] .simple-control .release-steps li[aria-current=step]{color:#173a52}
+:root[data-theme=light] .simple-control .release-steps li:before{background:#dbe8f0;color:#4c697e}
+:root[data-theme=light] .simple-control .release-steps li:after{background:#c9dae5}
+
+@media (prefers-reduced-motion: reduce){
+ .focus-radar-sweep,.focus-radar-blip,.focus-splash-bar span,.release-pin-pulse{animation:none}
+ .focus-tour-spot,.focus-tour-card{transition:none}
+}
