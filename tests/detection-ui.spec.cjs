@@ -116,7 +116,7 @@ test('English, keyboard access, remote text safety and 390px layout',async({page
   expect((await page.locator('#detectionRun').boundingBox()).height).toBeGreaterThanOrEqual(44);
   await page.locator('#detectionPanel').screenshot({path:path.join(os.tmpdir(),'focus-detection-mobile.png')});
   await page.setViewportSize({width:1440,height:960});await page.locator('#detectionPanel').screenshot({path:path.join(os.tmpdir(),'focus-detection-desktop.png')});
-  await page.evaluate(()=>window.OdakI18n.setLanguage('tr'));await expect(page.locator('#detectionHeading')).toContainText('Yapay zekâ');
+  await page.evaluate(()=>window.OdakI18n.setLanguage('tr'));await expect(page.locator('#detectionHeading')).toContainText('Sentinel-2 atık adayları');
   await expect(page.locator('#predictionText')).toContainText('güncel başlangıç varsayımı gerekli');
   expect(requests).toBe(1);expect(await page.evaluate(()=>window.pwned)).toBeUndefined();
 });

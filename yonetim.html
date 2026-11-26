@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en-text="Admin | FOCUS">Yönetim | FOCUS</title>
+<meta name="description" content="FOCUS abonelik yönetimi.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f2d3f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261127">
+<link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
+<script src="js/site.js?v=20261127"></script>
+<script src="js/focus-api.js?v=20261127" defer></script>
+<script src="js/account-pages.js?v=20261127" defer></script>
+</head>
+<body data-page="admin">
+<a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
+<header class="top">
+ <div class="wrap">
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img src="assets/focus-mark.svg" alt="" width="26" height="26">FOCUS</a>
+  <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
+   <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="index.html#paketler" data-en="Plans">Paketler</a>
+  </nav>
+  <div class="top-actions">
+   <button class="icon-btn" type="button" data-lang-toggle>EN</button>
+   <button class="icon-btn" type="button" data-theme-toggle></button>
+   <a class="btn ghost small" href="giris.html" data-account-link data-en="Sign in">Giriş yap</a>
+   <a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a>
+  </div>
+ </div>
+</header>
+<main id="main">
+<div class="page"><div class="wrap">
+ <h1 style="font-size:40px" data-en="Subscription requests">Abonelik talepleri</h1>
+ <p class="alert" id="adminState" role="alert" data-en="Loading…">Yükleniyor…</p>
+ <div id="adminBody" hidden>
+  <p class="muted" style="margin-top:12px" data-en="Approve a request only after the transfer with that reference code has arrived.">Bir talebi, o referans koduyla gelen ödemeyi hesapta gördükten sonra onaylayın.</p>
+  <div class="seg" role="group" aria-label="Filtre" data-en-aria-label="Filter" style="margin:12px 0 18px">
+   <button type="button" data-filter="pending" aria-pressed="true" data-en="Pending">Bekleyen</button>
+   <button type="button" data-filter="active" aria-pressed="false" data-en="Active">Etkin</button>
+   <button type="button" data-filter="all" aria-pressed="false" data-en="All">Tümü</button>
+  </div>
+  <div class="table-scroll"><table class="admin-table">
+   <thead><tr><th data-en="Reference">Referans</th><th data-en="User">Kullanıcı</th><th data-en="Plan">Paket</th><th data-en="Amount">Tutar</th><th data-en="Requested">Talep</th><th data-en="Status">Durum</th><th><span class="sr" data-en="Actions">İşlemler</span></th></tr></thead>
+   <tbody id="adminRows"></tbody>
+  </table></div>
+  <p id="adminEmpty" class="muted" hidden data-en="No requests in this list.">Bu listede talep yok.</p>
+ </div>
+</div></div>
+</main>
+<footer class="foot">
+ <div class="wrap">
+  <p data-en="Data: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth and OpenStreetMap contributors.">Veri: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth ve OpenStreetMap katkıcıları.</p>
+  <nav aria-label="Alt bağlantılar" data-en-aria-label="Footer links">
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="gizlilik.html" data-en="Privacy">Gizlilik</a>
+   <a href="platform.html" data-en="Map">Harita</a>
+  </nav>
+ </div>
+</footer>
+</body>
+</html>

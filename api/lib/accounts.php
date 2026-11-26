@@ -1,0 +1,351 @@
+<?php
+declare(strict_types=1);
+defined('FOCUS_API') || exit;
+
+/**
+ * Hesap, abonelik ve kota kuralları. Tüm haklar burada, sunucuda hesaplanır;
+ * tarayıcıdaki hiçbir değer (localStorage, gizli alan vb.) hak sayılmaz.
+ */
+final class FocusAccounts
+{
+    public const MAX_FAILED_LOGINS = 5;
+    private const COMMON_PASSWORDS = ['1234567890', '12345678910', 'qwertyuiop', 'password123', 'sifre12345', 'parola1234', '1q2w3e4r5t', 'qwerty1234', 'abcdefghij', 'focus12345', 'galatasaray', 'fenerbahce', 'besiktas1903', 'trabzonspor'];
+    // Var olmayan kullanıcıda da aynı sürede yanıt vermek için kullanılan sabit özet.
+    private const DUMMY_HASH = '$2y$12$HvC6Fpq6/nn4MV7SYgihq.ijo83w4t.5MVJjng/2jqcklIiTdCJYy';
+
+    public function __construct(private PDO $db)
+    {
+    }
+
+    // ---------- Doğrulama ----------
+
+    public static function cleanEmail(mixed $email): string
+    {
+        $email = is_string($email) ? mb_strtolower(trim($email)) : '';
+        if ($email === '' || strlen($email) > 190 || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            throw new FocusError('invalid_email', 422, 'Geçerli bir e-posta adresi girin.', 'email');
+        }
+        return $email;
+    }
+
+    public static function cleanText(mixed $value, int $min, int $max, string $field, string $label): string
+    {
+        $value = is_string($value) ? trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $value) ?? '') : '';
+        $len = mb_strlen($value);
+        if ($len < $min || $len > $max) {
+            throw new FocusError('invalid_' . $field, 422, $min > 0 ? "$label $min–$max karakter olmalı." : "$label en çok $max karakter olabilir.", $field);
+        }
+        return $value;
+    }
+
+    public static function checkPassword(mixed $password, string $email): string
+    {
+        if (!is_string($password) || strlen($password) < 10 || strlen($password) > 128) {
+            throw new FocusError('weak_password', 422, 'Şifre 10–128 karakter olmalı.', 'password');
+        }
+        $lower = mb_strtolower($password);
+        $local = explode('@', $email)[0];
+        if (in_array($lower, self::COMMON_PASSWORDS, true) || count(array_unique(mb_str_split($password))) < 5
+            || (strlen($local) >= 4 && str_contains($lower, $local))) {
+            throw new FocusError('weak_password', 422, 'Bu şifre kolay tahmin edilir. E-postanızı veya tekrar eden karakterleri içermeyen bir şifre seçin.', 'password');
+        }
+        return $password;
+    }
+
+    // ---------- Kayıt ve giriş ----------
+
+    public function register(mixed $email, mixed $name, mixed $organization, mixed $password): int
+    {
+        $email = self::cleanEmail($email);
+        $name = self::cleanText($name, 2, 80, 'name', 'Ad soyad');
+        $organization = self::cleanText($organization ?? '', 0, 120, 'organization', 'Kurum adı');
+        $password = self::checkPassword($password, $email);
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        try {
+            $this->db->prepare('INSERT INTO users (email, name, organization, password_hash, created_at) VALUES (?, ?, ?, ?, ?)')
+                ->execute([$email, $name, $organization, $hash, FocusCore::now()]);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw new FocusError('email_taken', 409, 'Bu e-postayla zaten bir hesap var. Giriş yapmayı deneyin.', 'email');
+            }
+            throw $e;
+        }
+        $id = (int)$this->db->lastInsertId();
+        FocusCore::audit($id, 'register');
+        return $id;
+    }
+
+    /** Başarılıysa kullanıcı satırını döndürür. Hata mesajı hangi alanın yanlış olduğunu söylemez. */
+    public function login(mixed $email, mixed $password): array
+    {
+        $generic = new FocusError('bad_credentials', 401, 'E-posta veya şifre hatalı.');
+        try {
+            $email = self::cleanEmail($email);
+        } catch (FocusError) {
+            throw $generic;
+        }
+        if (!is_string($password) || $password === '' || strlen($password) > 128) {
+            throw $generic;
+        }
+        $stmt = $this->db->prepare('SELECT * FROM users WHERE email = ?');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+        if (!$user) {
+            password_verify($password, self::DUMMY_HASH);
+            throw $generic;
+        }
+        if ($user['locked_until'] !== null && strtotime($user['locked_until'] . ' UTC') > time()) {
+            throw new FocusError('locked', 423, 'Çok sayıda hatalı deneme nedeniyle hesap geçici olarak kilitlendi. 15 dakika sonra tekrar deneyin.');
+        }
+        if (!password_verify($password, $user['password_hash'])) {
+            $fails = (int)$user['failed_logins'] + 1;
+            $lock = $fails >= self::MAX_FAILED_LOGINS ? gmdate('Y-m-d H:i:s', time() + 900) : null;
+            $this->db->prepare('UPDATE users SET failed_logins = ?, locked_until = ? WHERE id = ?')
+                ->execute([$lock ? 0 : $fails, $lock, $user['id']]);
+            FocusCore::audit((int)$user['id'], $lock ? 'login_locked' : 'login_failed');
+            throw $generic;
+        }
+        $rehash = password_needs_rehash($user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : $user['password_hash'];
+        $this->db->prepare('UPDATE users SET failed_logins = 0, locked_until = NULL, last_login_at = ?, password_hash = ? WHERE id = ?')
+            ->execute([FocusCore::now(), $rehash, $user['id']]);
+        FocusCore::audit((int)$user['id'], 'login');
+        return $user;
+    }
+
+    public function user(int $id): ?array
+    {
+        $stmt = $this->db->prepare('SELECT id, email, name, organization, role, session_version, created_at FROM users WHERE id = ?');
+        $stmt->execute([$id]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public function changePassword(int $userId, mixed $current, mixed $new): void
+    {
+        $stmt = $this->db->prepare('SELECT email, password_hash FROM users WHERE id = ?');
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+        if (!$row || !is_string($current) || !password_verify($current, $row['password_hash'])) {
+            throw new FocusError('bad_credentials', 401, 'Mevcut şifre hatalı.', 'current');
+        }
+        $new = self::checkPassword($new, $row['email']);
+        // Oturum sürümü artar: diğer cihazlardaki oturumlar kapanır.
+        $this->db->prepare('UPDATE users SET password_hash = ?, session_version = session_version + 1 WHERE id = ?')
+            ->execute([password_hash($new, PASSWORD_DEFAULT), $userId]);
+        FocusCore::audit($userId, 'password_changed');
+    }
+
+    public function deleteAccount(int $userId, mixed $password): void
+    {
+        $stmt = $this->db->prepare('SELECT password_hash FROM users WHERE id = ?');
+        $stmt->execute([$userId]);
+        $hash = $stmt->fetchColumn();
+        if (!$hash || !is_string($password) || !password_verify($password, $hash)) {
+            throw new FocusError('bad_credentials', 401, 'Şifre hatalı.', 'password');
+        }
+        $this->db->prepare('DELETE FROM users WHERE id = ?')->execute([$userId]);
+        FocusCore::audit(null, 'account_deleted', 'user#' . $userId);
+    }
+
+    // ---------- Abonelik ----------
+
+    /** Süresi geçmiş abonelikleri kapatır (cron gerekmez; her okumada çalışır). */
+    private function expire(int $userId): void
+    {
+        $this->db->prepare("UPDATE subscriptions SET status = 'expired' WHERE user_id = ? AND status = 'active' AND period_end <= ?")
+            ->execute([$userId, FocusCore::now()]);
+    }
+
+    public function activeSubscription(int $userId): ?array
+    {
+        $this->expire($userId);
+        $stmt = $this->db->prepare("SELECT * FROM subscriptions WHERE user_id = ? AND status = 'active' ORDER BY period_end DESC LIMIT 1");
+        $stmt->execute([$userId]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public function pendingSubscription(int $userId): ?array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM subscriptions WHERE user_id = ? AND status = 'pending' ORDER BY id DESC LIMIT 1");
+        $stmt->execute([$userId]);
+        return $stmt->fetch() ?: null;
+    }
+
+    public function requestSubscription(int $userId, mixed $planId, mixed $billing): array
+    {
+        $plan = is_string($planId) ? FocusPlans::get($planId) : null;
+        if (!$plan || !$plan['paid'] || !in_array($billing, ['month', 'year'], true)) {
+            throw new FocusError('invalid_plan', 422, 'Geçerli bir paket ve ödeme dönemi seçin.');
+        }
+        if ($this->pendingSubscription($userId)) {
+            throw new FocusError('pending_exists', 409, 'Onay bekleyen bir talebiniz var. Önce onu iptal edin.');
+        }
+        $active = $this->activeSubscription($userId);
+        if ($active && $active['plan_id'] === $plan['id'] && !$active['cancel_at_period_end']) {
+            throw new FocusError('already_active', 409, 'Bu paket zaten etkin.');
+        }
+        $reference = 'FOC-' . strtoupper(substr(bin2hex(random_bytes(5)), 0, 8));
+        $this->db->prepare("INSERT INTO subscriptions (user_id, plan_id, billing, status, reference, amount_cents, created_at) VALUES (?, ?, ?, 'pending', ?, ?, ?)")
+            ->execute([$userId, $plan['id'], $billing, $reference, FocusPlans::price($plan['id'], $billing), FocusCore::now()]);
+        FocusCore::audit($userId, 'subscription_requested', $plan['id'] . '/' . $billing . ' ' . $reference);
+        return $this->pendingSubscription($userId);
+    }
+
+    public function cancelPending(int $userId): void
+    {
+        $stmt = $this->db->prepare("UPDATE subscriptions SET status = 'cancelled', decided_at = ? WHERE user_id = ? AND status = 'pending'");
+        $stmt->execute([FocusCore::now(), $userId]);
+        if ($stmt->rowCount() === 0) {
+            throw new FocusError('not_found', 404, 'İptal edilecek bekleyen talep yok.');
+        }
+        FocusCore::audit($userId, 'subscription_request_cancelled');
+    }
+
+    /** Etkin aboneliği dönem sonunda bitirir; kalan süre kullanılabilir. */
+    public function cancelActive(int $userId): void
+    {
+        $active = $this->activeSubscription($userId);
+        if (!$active) {
+            throw new FocusError('not_found', 404, 'Etkin ücretli abonelik yok.');
+        }
+        $this->db->prepare('UPDATE subscriptions SET cancel_at_period_end = 1 WHERE id = ?')->execute([$active['id']]);
+        FocusCore::audit($userId, 'subscription_cancelled', (string)$active['reference']);
+    }
+
+    // ---------- Kota ----------
+
+    /** Kullanıcının geçerli paketini ve kalan hakkını hesaplar. */
+    public function entitlement(int $userId): array
+    {
+        $active = $this->activeSubscription($userId);
+        $plan = $active ? FocusPlans::get($active['plan_id']) : FocusPlans::get('free');
+        $tz = FocusCore::timezone();
+        if ($active) {
+            $start = new DateTimeImmutable($active['period_start'], new DateTimeZone('UTC'));
+            $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+            $months = 0;
+            while ($start->modify('+' . ($months + 1) . ' month') <= $now) {
+                $months++;
+            }
+            $windowStart = $start->modify('+' . $months . ' month');
+            $windowEnd = $start->modify('+' . ($months + 1) . ' month');
+            $limit = (int)$plan['monthly'];
+            $unit = 'month';
+        } else {
+            $localMidnight = new DateTimeImmutable('today', $tz);
+            $windowStart = $localMidnight->setTimezone(new DateTimeZone('UTC'));
+            $windowEnd = $localMidnight->modify('+1 day')->setTimezone(new DateTimeZone('UTC'));
+            $limit = (int)$plan['daily'];
+            $unit = 'day';
+        }
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM usage_events WHERE user_id = ? AND created_at >= ? AND created_at < ?');
+        $stmt->execute([$userId, $windowStart->format('Y-m-d H:i:s'), $windowEnd->format('Y-m-d H:i:s')]);
+        $used = (int)$stmt->fetchColumn();
+        return [
+            'plan' => $plan['id'],
+            'plan_name' => $plan['name'],
+            'max_hours' => $plan['max_hours'],
+            'limit' => $limit,
+            'used' => $used,
+            'remaining' => max(0, $limit - $used),
+            'period' => $unit,
+            'resets_at' => $windowEnd->format(DATE_ATOM),
+            'subscription' => $active ? [
+                'reference' => $active['reference'],
+                'billing' => $active['billing'],
+                'period_end' => (new DateTimeImmutable($active['period_end'], new DateTimeZone('UTC')))->format(DATE_ATOM),
+                'cancel_at_period_end' => (bool)$active['cancel_at_period_end'],
+            ] : null,
+        ];
+    }
+
+    /**
+     * Bir tahmin hakkı kullanır. Aynı request_id ile tekrar çağrılırsa ikinci kez düşmez.
+     * Kullanıcı satırı kilitlenir; eşzamanlı isteklerle kota aşılamaz.
+     */
+    public function consume(int $userId, mixed $hours, mixed $requestId): array
+    {
+        if (!is_int($hours) || !in_array($hours, FocusPlans::ENGINE_HORIZONS, true)) {
+            throw new FocusError('invalid_hours', 422, 'Tahmin ufku 6, 12 veya 24 saat olmalı.');
+        }
+        if (!is_string($requestId) || !preg_match('/^[a-f0-9]{32}$/', $requestId)) {
+            throw new FocusError('invalid_request', 422, 'Geçersiz istek kimliği.');
+        }
+        $this->db->beginTransaction();
+        try {
+            $this->db->prepare('SELECT id FROM users WHERE id = ? FOR UPDATE')->execute([$userId]);
+            $dup = $this->db->prepare('SELECT 1 FROM usage_events WHERE user_id = ? AND request_id = ?');
+            $dup->execute([$userId, $requestId]);
+            if ($dup->fetchColumn()) {
+                $this->db->commit();
+                return ['allowed' => true, 'repeated' => true] + $this->entitlement($userId);
+            }
+            $e = $this->entitlement($userId);
+            if ($hours > $e['max_hours']) {
+                throw new FocusError('horizon_not_included', 403, $e['plan_name'] . " paketi en çok {$e['max_hours']} saatlik tahmin içerir. Daha uzun ufuk için paketinizi yükseltin.");
+            }
+            if ($e['remaining'] <= 0) {
+                throw new FocusError('quota_exhausted', 403, $e['period'] === 'day'
+                    ? 'Bugünkü ücretsiz tahmin hakkınız bitti. Yarın yenilenir ya da paketinizi yükseltebilirsiniz.'
+                    : 'Bu ayki tahmin hakkınız bitti. Bir sonraki dönemde yenilenir.');
+            }
+            $this->db->prepare('INSERT INTO usage_events (user_id, request_id, hours, plan_id, created_at) VALUES (?, ?, ?, ?, ?)')
+                ->execute([$userId, $requestId, $hours, $e['plan'], FocusCore::now()]);
+            $this->db->commit();
+        } catch (Throwable $t) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $t;
+        }
+        return ['allowed' => true, 'repeated' => false] + $this->entitlement($userId);
+    }
+
+    // ---------- Yönetici ----------
+
+    public function listSubscriptions(string $status): array
+    {
+        if (!in_array($status, ['pending', 'active', 'all'], true)) {
+            throw new FocusError('invalid_filter', 422, 'Geçersiz filtre.');
+        }
+        $sql = 'SELECT s.id, s.plan_id, s.billing, s.status, s.reference, s.amount_cents, s.period_start, s.period_end, s.cancel_at_period_end, s.created_at, u.email, u.name, u.organization
+                FROM subscriptions s JOIN users u ON u.id = s.user_id';
+        $sql .= $status === 'all' ? ' ORDER BY s.id DESC LIMIT 200' : ' WHERE s.status = ? ORDER BY s.id DESC LIMIT 200';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($status === 'all' ? [] : [$status]);
+        return $stmt->fetchAll();
+    }
+
+    public function decide(int $adminId, mixed $subscriptionId, mixed $decision): void
+    {
+        if (!is_int($subscriptionId) || !in_array($decision, ['approve', 'reject'], true)) {
+            throw new FocusError('invalid_request', 422, 'Geçersiz karar.');
+        }
+        $this->db->beginTransaction();
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM subscriptions WHERE id = ? AND status = 'pending' FOR UPDATE");
+            $stmt->execute([$subscriptionId]);
+            $sub = $stmt->fetch();
+            if (!$sub) {
+                throw new FocusError('not_found', 404, 'Bekleyen talep bulunamadı; başka bir yönetici karar vermiş olabilir.');
+            }
+            $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+            if ($decision === 'approve') {
+                $this->db->prepare("UPDATE subscriptions SET status = 'expired', period_end = ? WHERE user_id = ? AND status = 'active'")
+                    ->execute([$now->format('Y-m-d H:i:s'), $sub['user_id']]);
+                $end = $now->modify($sub['billing'] === 'year' ? '+1 year' : '+1 month');
+                $this->db->prepare("UPDATE subscriptions SET status = 'active', period_start = ?, period_end = ?, decided_at = ?, decided_by = ? WHERE id = ?")
+                    ->execute([$now->format('Y-m-d H:i:s'), $end->format('Y-m-d H:i:s'), $now->format('Y-m-d H:i:s'), $adminId, $sub['id']]);
+            } else {
+                $this->db->prepare("UPDATE subscriptions SET status = 'rejected', decided_at = ?, decided_by = ? WHERE id = ?")
+                    ->execute([$now->format('Y-m-d H:i:s'), $adminId, $sub['id']]);
+            }
+            $this->db->commit();
+        } catch (Throwable $t) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            throw $t;
+        }
+        FocusCore::audit($adminId, 'subscription_' . $decision, (string)$sub['reference']);
+    }
+}

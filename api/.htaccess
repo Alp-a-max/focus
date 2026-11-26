@@ -1,0 +1,13 @@
+# FOCUS API: yalnızca index.php dışarıdan çağrılabilir.
+Options -Indexes
+<IfModule mod_authz_core.c>
+  <FilesMatch "\.(sql|md|sample\.php)$|^config\.php$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "\.(sql|md|sample\.php)$|^config\.php$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>

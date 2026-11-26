@@ -36,7 +36,7 @@
       }catch(error){status.textContent=error.message;}
     });
     const release=document.createElement('button');release.type='button';release.id='mapSearchBreakaway';release.textContent='Seçili noktada kopuş tahmini oluştur →';section.append(release);release.onclick=()=>{document.getElementById('releaseUse')?.click();document.getElementById('releasePanel')?.scrollIntoView({block:'start'});};
-    const published=!['127.0.0.1','localhost'].includes(location.hostname);if(published)section.querySelector('#mapSearchInspect').textContent='Seçili noktada yapay zekâ adaylarını incele →';
+    const published=!['127.0.0.1','localhost'].includes(location.hostname);if(published)section.querySelector('#mapSearchInspect').textContent='Seçili noktada uydu adaylarını incele';
     section.querySelector('#mapSearchInspect').addEventListener('click',()=>{
       document.getElementById(published?'detectionPanel':'analysisPanel').open=true;
       const button=document.getElementById(published?'detectionRun':'analysisRun');button.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});

@@ -45,3 +45,8 @@ blob-report/
 
 # graphify cache (graph.json/report stay shareable)
 graphify-out/cache/
+
+# FOCUS hesap sistemi gizli yapılandırma ve paket çıktısı
+api/config.php
+focus-config.php
+dist/

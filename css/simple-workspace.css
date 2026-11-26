@@ -49,3 +49,11 @@
 }
 .simple-control #releaseExample{flex:1;width:auto}.simple-control .release-controls:has(#releaseRun){flex-wrap:nowrap}.simple-control .release-controls:has(#releaseRun)>button{min-width:0}
 .simple-control .map-search-results:empty{margin:0}.simple-tool-section>.map-legend{position:static;max-width:none;width:auto;margin:16px 0;padding:14px;font-size:11px}
+/* Hesap bağlantısı ve tahmin kapısı (js/account-gate.js) */
+.focus-account-chip{display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;border:1px solid #496174;border-radius:11px;color:#dceefa;background:transparent;font:600 14px Manrope,sans-serif;text-decoration:none;white-space:nowrap}
+.focus-account-chip:hover{background:#182936}.focus-account-chip:focus-visible{outline:2px solid #9fdaff;outline-offset:3px}
+html[data-theme=light] .focus-account-chip{color:#1d3c52;border-color:#92acbf}html[data-theme=light] .focus-account-chip:hover{background:#e1edf5}
+.focus-gate-notice{margin-top:12px;padding:10px 12px;border-radius:10px;border:1px solid #4d6a80;font-size:14px;line-height:1.45;color:inherit}
+.focus-gate-notice[data-kind=warn]{border-color:#c9a14a}.focus-gate-notice[data-kind=bad]{border-color:#d36a6a}
+.focus-gate-notice a{color:inherit;font-weight:700}
+@media (max-width:600px){.focus-account-chip{padding:10px;font-size:13px}}

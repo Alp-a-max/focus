@@ -7,7 +7,7 @@ function candidateNeedsAssumption(){return Boolean(candidateContext&&!candidateC
 function candidateForecastMessage(){return candidateNeedsAssumption()?'Bu uydu adayı için güncel başlangıç varsayımı gerekli.':'Bu aday için kaynak bilgisi korunan çoklu senaryoyu kullanın.';}
 function chooseDetection(context){
  const [b,a]=context.observation.geometry.coordinates;
- select(a,b,'Yapay zekâ adayı',false,structuredClone(context));tracking?.setSource(context);
+ select(a,b,'Uydu modeli adayı',false,structuredClone(context));tracking?.setSource(context);
 }
 function assumeDetection(context){
  chooseDetection(context);location.hash='laboratory';

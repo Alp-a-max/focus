@@ -3,7 +3,7 @@
  'use strict';
  const centsPerForecastHour=5,annualPaidMonths=10,annualFreeMonths=2;
  const plans=Object.freeze([
-  {id:'free',name:{tr:'Ücretsiz',en:'Free'},maxHours:3,dailyForecasts:5,monthlyCents:0,annualCents:0},
+  {id:'free',name:{tr:'Ücretsiz',en:'Free'},maxHours:24,dailyForecasts:5,monthlyCents:0,annualCents:0},
   {id:'payg',name:{tr:'Kullandıkça öde',en:'Pay as you go'},maxHours:72,centsPerForecastHour},
   ...[
    ['starter','Başlangıç','Starter',24,100,6900],
