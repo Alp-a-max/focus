@@ -1,8 +1,8 @@
 /* Shared presentation preference; does not change data, models or memberships. */
 (()=>{
  'use strict';
- const key='focus-theme';let theme='dark',button;
- try{if(localStorage.getItem(key)==='light')theme='light';}catch{}
+ const key='focus-theme';let theme=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark',button;
+ try{const saved=localStorage.getItem(key);if(saved==='light'||saved==='dark')theme=saved;}catch{}
  function label(){
   if(!button)return;
   const en=document.documentElement.lang==='en';

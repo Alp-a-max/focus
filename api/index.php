@@ -7,9 +7,16 @@ declare(strict_types=1);
  * Her POST için: aynı kaynak (Origin) + X-CSRF-Token + application/json zorunludur.
  */
 
+// Hata ayrıntısı asla yanıta karışmasın (JSON bozulur, bilgi sızar); yalnızca sunucu loguna yazılır.
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 const FOCUS_API = true;
 require __DIR__ . '/lib/core.php';
 require __DIR__ . '/lib/plans.php';
+require __DIR__ . '/lib/settings.php';
+require __DIR__ . '/lib/mailer.php';
+require __DIR__ . '/lib/google.php';
 require __DIR__ . '/lib/accounts.php';
 
 const SESSION_IDLE = 14 * 86400;
@@ -41,8 +48,8 @@ function input(): array
     if (!str_starts_with($type, 'application/json')) {
         throw new FocusError('bad_content_type', 415, 'İstek JSON olmalı.');
     }
-    $raw = file_get_contents('php://input', false, null, 0, 8193);
-    if ($raw === false || strlen($raw) > 8192) {
+    $raw = file_get_contents('php://input', false, null, 0, 16385);
+    if ($raw === false || strlen($raw) > 16384) {
         throw new FocusError('too_large', 413, 'İstek çok büyük.');
     }
     $data = json_decode($raw, true, 8);
@@ -131,14 +138,33 @@ function requireUser(?array $user): array
     return $user;
 }
 
+function requireAdmin(?array $user): array
+{
+    $user = requireUser($user);
+    if ($user['role'] !== 'admin') {
+        throw new FocusError('forbidden', 403, 'Bu sayfa yalnızca yöneticiler içindir.');
+    }
+    return $user;
+}
+
 function publicUser(array $user): array
 {
-    return ['email' => $user['email'], 'name' => $user['name'], 'organization' => $user['organization'], 'admin' => $user['role'] === 'admin', 'since' => $user['created_at']];
+    return [
+        'email' => $user['email'],
+        'name' => $user['name'],
+        'organization' => $user['organization'],
+        'admin' => $user['role'] === 'admin',
+        'since' => $user['created_at'],
+        'verified' => $user['email_verified_at'] !== null,
+        'google' => (bool)$user['google'],
+        'has_password' => (bool)$user['has_password'],
+    ];
 }
 
 function sessionPayload(FocusAccounts $accounts, ?array $user, array $config): array
 {
     $pending = $user ? $accounts->pendingSubscription((int)$user['id']) : null;
+    $settings = $accounts->settings();
     return [
         'ok' => true,
         'csrf' => $_SESSION['csrf'] ?? null,
@@ -146,16 +172,33 @@ function sessionPayload(FocusAccounts $accounts, ?array $user, array $config): a
         'entitlement' => $user ? $accounts->entitlement((int)$user['id']) : null,
         'pending' => $pending ? ['plan' => $pending['plan_id'], 'billing' => $pending['billing'], 'reference' => $pending['reference'], 'amount_cents' => (int)$pending['amount_cents'], 'created_at' => $pending['created_at']] : null,
         'payment_note' => $user ? (string)($config['payment_note'] ?? '') : null,
-        'plans' => array_values(FocusPlans::all()),
+        'settings' => $settings->publicView(),
+        'needs_setup' => $accounts->adminCount() === 0,
+        'plans' => array_values(array_filter(FocusPlans::all(), static fn($p) => $p['id'] !== 'admin')),
     ];
+}
+
+/** Kayıttan sonra doğrulama kodunu gönderir; gönderim hatası kaydı geri almaz, kullanıcı tekrar isteyebilir. */
+function sendFirstCode(FocusAccounts $accounts, int $userId): ?string
+{
+    if (!$accounts->settings()->verificationOn()) {
+        return null;
+    }
+    try {
+        $accounts->issueCode($userId);
+        return 'code_sent';
+    } catch (FocusError $e) {
+        return 'code_send_failed';
+    }
 }
 
 try {
     $config = FocusCore::config();
     $action = is_string($_GET['a'] ?? null) ? $_GET['a'] : '';
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-    $posts = ['register', 'login', 'logout', 'subscribe', 'cancel_request', 'cancel_subscription', 'consume', 'password', 'delete_account', 'admin_decide'];
-    $gets = ['session', 'admin_list'];
+    $posts = ['register', 'login', 'google', 'logout', 'verify_email', 'resend_code', 'subscribe', 'cancel_request', 'cancel_subscription',
+        'consume', 'password', 'delete_account', 'setup_admin', 'admin_decide', 'admin_user_update', 'admin_settings_save', 'admin_test_mail'];
+    $gets = ['session', 'admin_list', 'admin_users', 'admin_settings'];
     if (!in_array($action, array_merge($posts, $gets), true)) {
         throw new FocusError('unknown_action', 404, 'Bilinmeyen işlem.');
     }
@@ -199,7 +242,8 @@ try {
             FocusCore::rateLimit('register', FocusCore::clientIp(), 5, 3600);
             $id = $accounts->register($body['email'] ?? null, $body['name'] ?? null, $body['organization'] ?? '', $body['password'] ?? null);
             signIn($accounts->user($id));
-            respond(sessionPayload($accounts, $accounts->user($id), $config), 201);
+            $mail = sendFirstCode($accounts, $id);
+            respond(sessionPayload($accounts, $accounts->user($id), $config) + ['mail' => $mail], 201);
 
         case 'login':
             FocusCore::rateLimit('login-ip', FocusCore::clientIp(), 20, 900);
@@ -210,12 +254,31 @@ try {
             signIn($row);
             respond(sessionPayload($accounts, $accounts->user((int)$row['id']), $config));
 
+        case 'google':
+            FocusCore::rateLimit('google', FocusCore::clientIp(), 20, 900);
+            $claims = FocusGoogle::verify($body['credential'] ?? null, $accounts->settings()->get('google_client_id'));
+            $row = $accounts->googleLogin($claims);
+            signIn($row);
+            respond(sessionPayload($accounts, $accounts->user((int)$row['id']), $config));
+
         case 'logout':
             if ($user) {
                 FocusCore::audit((int)$user['id'], 'logout');
             }
             signOut();
             respond(['ok' => true]);
+
+        case 'verify_email':
+            $user = requireUser($user);
+            FocusCore::rateLimit('verify', (string)$user['id'], 10, 900);
+            $accounts->verifyCode((int)$user['id'], $body['code'] ?? null);
+            respond(sessionPayload($accounts, $accounts->user((int)$user['id']), $config));
+
+        case 'resend_code':
+            $user = requireUser($user);
+            FocusCore::rateLimit('resend', (string)$user['id'], 5, 3600);
+            $accounts->issueCode((int)$user['id']);
+            respond(['ok' => true, 'mail' => 'code_sent']);
 
         case 'subscribe':
             $user = requireUser($user);
@@ -235,7 +298,7 @@ try {
 
         case 'consume':
             $user = requireUser($user);
-            FocusCore::rateLimit('consume', (string)$user['id'], 60, 3600);
+            FocusCore::rateLimit('consume', (string)$user['id'], 120, 3600);
             respond(['ok' => true] + $accounts->consume((int)$user['id'], $body['hours'] ?? null, $body['request_id'] ?? null));
 
         case 'password':
@@ -252,20 +315,112 @@ try {
             signOut();
             respond(['ok' => true]);
 
+        case 'setup_admin':
+            FocusCore::rateLimit('setup', FocusCore::clientIp(), 5, 3600);
+            $id = $accounts->setupAdmin($body['token'] ?? null, $body['email'] ?? null, $body['name'] ?? 'Yönetici', $body['password'] ?? null);
+            signIn($accounts->user($id));
+            respond(sessionPayload($accounts, $accounts->user($id), $config), 201);
+
         case 'admin_list':
-            $user = requireUser($user);
-            if ($user['role'] !== 'admin') {
-                throw new FocusError('forbidden', 403, 'Bu sayfa yalnızca yöneticiler içindir.');
-            }
+            requireAdmin($user);
             respond(['ok' => true, 'items' => $accounts->listSubscriptions(is_string($_GET['status'] ?? null) ? $_GET['status'] : 'pending')]);
 
         case 'admin_decide':
-            $user = requireUser($user);
-            if ($user['role'] !== 'admin') {
-                throw new FocusError('forbidden', 403, 'Bu işlem yalnızca yöneticiler içindir.');
-            }
-            $accounts->decide((int)$user['id'], $body['id'] ?? null, $body['decision'] ?? null);
+            $admin = requireAdmin($user);
+            $accounts->decide((int)$admin['id'], $body['id'] ?? null, $body['decision'] ?? null);
             respond(['ok' => true, 'items' => $accounts->listSubscriptions('pending')]);
+
+        case 'admin_users':
+            requireAdmin($user);
+            respond(['ok' => true, 'items' => $accounts->listUsers()]);
+
+        case 'admin_user_update':
+            $admin = requireAdmin($user);
+            $accounts->adminUpdateUser((int)$admin['id'], $body['id'] ?? null, $body['action'] ?? null, $body['value'] ?? null);
+            respond(['ok' => true, 'items' => $accounts->listUsers()]);
+
+        case 'admin_settings':
+            requireAdmin($user);
+            respond(['ok' => true, 'settings' => $accounts->settings()->forAdmin()]);
+
+        case 'admin_settings_save':
+            $admin = requireAdmin($user);
+            $s = $body['settings'] ?? null;
+            if (!is_array($s)) {
+                throw new FocusError('invalid_request', 422, 'Ayarlar okunamadı.');
+            }
+            $clean = [];
+            $text = static function ($v, int $max, string $label): string {
+                if (!is_string($v) || mb_strlen($v) > $max) {
+                    throw new FocusError('invalid_value', 422, "$label en çok $max karakter olabilir.");
+                }
+                return trim($v);
+            };
+            if (array_key_exists('trial_hours', $s)) {
+                if (!is_int($s['trial_hours']) || $s['trial_hours'] < 1 || $s['trial_hours'] > 8760) {
+                    throw new FocusError('invalid_value', 422, 'Deneme süresi 1–8760 saat olmalı.');
+                }
+                $clean['trial_hours'] = (string)$s['trial_hours'];
+            }
+            foreach (['subscriptions_enabled', 'verification_required'] as $flag) {
+                if (array_key_exists($flag, $s)) {
+                    $clean[$flag] = $s[$flag] === true ? '1' : '0';
+                }
+            }
+            if (array_key_exists('google_client_id', $s)) {
+                $v = $text($s['google_client_id'], 200, 'Google istemci kimliği');
+                if ($v !== '' && !preg_match('/^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$/', $v)) {
+                    throw new FocusError('invalid_value', 422, 'Google istemci kimliği "...apps.googleusercontent.com" ile bitmeli.');
+                }
+                $clean['google_client_id'] = $v;
+            }
+            if (array_key_exists('smtp_host', $s)) {
+                $v = $text($s['smtp_host'], 120, 'SMTP sunucusu');
+                if (!preg_match('/^[a-z0-9.-]+$/i', $v)) {
+                    throw new FocusError('invalid_value', 422, 'SMTP sunucusu geçersiz.');
+                }
+                $clean['smtp_host'] = $v;
+            }
+            if (array_key_exists('smtp_port', $s)) {
+                if (!in_array($s['smtp_port'], [465, 587], true)) {
+                    throw new FocusError('invalid_value', 422, 'SMTP portu 465 veya 587 olmalı.');
+                }
+                $clean['smtp_port'] = (string)$s['smtp_port'];
+            }
+            foreach (['smtp_user' => 'Gmail adresi', 'mail_from' => 'Gönderen adres'] as $k => $label) {
+                if (array_key_exists($k, $s)) {
+                    $v = $text($s[$k], 190, $label);
+                    if ($v !== '' && filter_var($v, FILTER_VALIDATE_EMAIL) === false) {
+                        throw new FocusError('invalid_value', 422, "$label geçersiz.");
+                    }
+                    $clean[$k] = $v;
+                }
+            }
+            if (isset($s['smtp_pass']) && $s['smtp_pass'] !== '') {
+                $clean['smtp_pass'] = str_replace(' ', '', $text($s['smtp_pass'], 200, 'Uygulama şifresi'));
+            }
+            if (array_key_exists('mail_from_name', $s)) {
+                $clean['mail_from_name'] = $text($s['mail_from_name'], 80, 'Gönderen adı');
+            }
+            if (array_key_exists('mail_subject', $s)) {
+                $clean['mail_subject'] = $text($s['mail_subject'], 150, 'Konu');
+            }
+            if (array_key_exists('mail_body', $s)) {
+                $v = $text($s['mail_body'], 4000, 'E-posta metni');
+                if (!str_contains($v, '{kod}')) {
+                    throw new FocusError('invalid_value', 422, 'E-posta metni {kod} ifadesini içermeli.');
+                }
+                $clean['mail_body'] = $v;
+            }
+            $accounts->settings()->set($clean);
+            FocusCore::audit((int)$admin['id'], 'settings_saved', implode(',', array_keys($clean)));
+            respond(['ok' => true, 'settings' => $accounts->settings()->forAdmin()]);
+
+        case 'admin_test_mail':
+            $admin = requireAdmin($user);
+            FocusCore::rateLimit('testmail', (string)$admin['id'], 5, 3600);
+            (new FocusMailer($accounts->settings()))->sendCode($admin['email'], $admin['name'], '123456');
+            respond(['ok' => true, 'sent_to' => $admin['email']]);
     }
 } catch (FocusError $e) {
     fail($e);

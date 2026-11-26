@@ -6,14 +6,18 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(190) NOT NULL,
   name VARCHAR(80) NOT NULL,
   organization VARCHAR(120) NOT NULL DEFAULT '',
-  password_hash VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NULL,
+  google_sub VARCHAR(64) NULL,
+  email_verified_at DATETIME NULL,
+  trial_until DATETIME NULL,
   role ENUM('user','admin') NOT NULL DEFAULT 'user',
   failed_logins SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   locked_until DATETIME NULL,
   session_version INT UNSIGNED NOT NULL DEFAULT 1,
   created_at DATETIME NOT NULL,
   last_login_at DATETIME NULL,
-  UNIQUE KEY uq_users_email (email)
+  UNIQUE KEY uq_users_email (email),
+  UNIQUE KEY uq_users_google (google_sub)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS subscriptions (
@@ -65,5 +69,19 @@ CREATE TABLE IF NOT EXISTS audit_log (
   KEY idx_audit_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- İlk yönetici: önce sitede normal kayıt olun, sonra phpMyAdmin > SQL sekmesinde:
--- UPDATE users SET role = 'admin' WHERE email = 'sizin-adresiniz@ornek.com';
+CREATE TABLE IF NOT EXISTS settings (
+  k VARCHAR(64) NOT NULL PRIMARY KEY,
+  v TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS email_codes (
+  user_id INT UNSIGNED NOT NULL PRIMARY KEY,
+  code_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  sent_at DATETIME NOT NULL,
+  CONSTRAINT fk_codes_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- İlk yönetici hesabı sitede kurulur: yonetim.html sayfası, yapılandırmadaki setup_token ile
+-- yönetici oluşturma formunu açar. Yönetici var olduktan sonra bu form kapanır.

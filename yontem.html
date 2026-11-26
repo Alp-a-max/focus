@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title data-en-text="Method | FOCUS">Yöntem | FOCUS</title>
-<meta name="description" content="FOCUS sürüklenme modeli: denklemler, veri kaynakları, sayısal doğrulama ve kaynakça.">
-<meta name="theme-color" content="#0f2d3f">
+<meta name="description" content="FOCUS sürüklenme modeli: formüller, değerler ve kaynaklar.">
+<meta name="theme-color" content="#0b2342">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css?v=20261127">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
 <link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
-<script src="js/site.js?v=20261127"></script>
-<script src="js/focus-api.js?v=20261127" defer></script>
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
 </head>
 <body>
 <a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
 <header class="top">
  <div class="wrap">
-  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img src="assets/focus-mark.svg" alt="" width="26" height="26">FOCUS</a>
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
   <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
    <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
    <a href="yontem.html" aria-current="page" data-en="Method">Yöntem</a>
@@ -35,72 +35,59 @@
 <main id="main">
 <div class="page"><div class="wrap prose">
  <h1 data-en="Method">Yöntem</h1>
- <p class="lead" style="margin-top:16px" data-en="How FOCUS computes a drift forecast, which data it uses, how the numerical scheme was checked and where its limits are. Each claim points to a published source or to code you can run.">FOCUS'un bir sürüklenme tahminini nasıl hesapladığı, hangi veriyi kullandığı, sayısal yöntemin nasıl sınandığı ve sınırlarının nerede olduğu. Her iddia yayımlanmış bir kaynağa ya da çalıştırabileceğiniz koda dayanır.</p>
- <nav class="toc" aria-label="İçindekiler" data-en-aria-label="Contents">
-  <a href="#model" data-en="1. Drift model">1. Sürüklenme modeli</a>
-  <a href="#veri" data-en="2. Data">2. Veri</a>
-  <a href="#sayisal" data-en="3. Numerical scheme and verification">3. Sayısal yöntem ve doğrulama</a>
-  <a href="#uydu" data-en="4. Satellite layer (research)">4. Uydu katmanı (araştırma)</a>
-  <a href="#sinirlar" data-en="5. Limits">5. Sınırlar</a>
-  <a href="#uretim" data-en="6. Reproduce the results">6. Sonuçları yeniden üretin</a>
-  <a href="#kaynakca" data-en="References">Kaynakça</a>
- </nav>
+ <p class="lead" style="margin-top:14px" data-en="The formulas FOCUS uses, the values in them and where each value comes from.">FOCUS'un kullandığı formüller, içindeki değerler ve her değerin kaynağı.</p>
 
- <h2 id="model" data-en="1. Drift model">1. Sürüklenme modeli</h2>
- <p data-en="FOCUS uses the Lagrangian approach common to oil-spill, search-and-rescue and marine-debris studies: instead of a concentration field, it follows many virtual particles (Dagestad et al., 2018; van Sebille et al., 2020). Each particle moves with the surface current plus a fraction of the 10 m wind:">FOCUS, petrol yayılımı, arama-kurtarma ve deniz atığı çalışmalarında yaygın olan Lagrange yaklaşımını kullanır: bir yoğunluk alanı yerine çok sayıda sanal parçacığı izler (Dagestad vd., 2018; van Sebille vd., 2020). Her parçacık yüzey akıntısıyla ve 10 m rüzgârının bir oranıyla hareket eder:</p>
+ <h2 data-en="1. Drift equation">1. Sürüklenme denklemi</h2>
+ <p data-en="Each particle is moved by the surface current plus a share of the 10 m wind (Lagrangian approach; Dagestad et al., 2018; van Sebille et al., 2020):">Her parçacık, yüzey akıntısı ve 10 m rüzgârının bir payıyla taşınır (Lagrange yaklaşımı; Dagestad vd., 2018; van Sebille vd., 2020):</p>
  <p class="equation"><var>d</var><b>x</b>/<var>dt</var> = <b>u</b><sub>c</sub>(<b>x</b>, <var>t</var>) + <var>α</var> · <b>u</b><sub>10</sub>(<b>x</b>, <var>t</var>)</p>
- <p data-en="The wind fraction α (windage or leeway) depends on how much of the object sits above water. Field measurements give values from below 1% for submerged items to a few percent for high-floating objects (Breivik et al., 2011). Because the type of debris is usually unknown, FOCUS runs three scenarios, α = 0%, 1% and 3%, and shows the spread between them rather than a single answer.">Rüzgâr katkı oranı α (windage, leeway), nesnenin ne kadarının su üstünde kaldığına bağlıdır. Saha ölçümleri, suya gömülü nesneler için %1'in altından yüksekte yüzen nesneler için birkaç yüzdeye kadar değerler verir (Breivik vd., 2011). Atığın türü çoğunlukla bilinmediği için FOCUS üç senaryo çalıştırır, α = %0, %1 ve %3, ve tek bir cevap yerine aralarındaki yayılımı gösterir.</p>
- <p data-en="The release is 25 particles on a 5 × 5 grid spread over about 0.5 km around the chosen point. This represents uncertainty in the starting position; it is not a probability distribution. Particles that cross the coastline (Natural Earth 1:50m) stop there.">Bırakma, seçilen nokta çevresinde yaklaşık 0,5 km'ye yayılmış 5 × 5 ızgaradaki 25 parçacıktır. Bu, başlangıç konumundaki belirsizliği temsil eder; bir olasılık dağılımı değildir. Kıyı çizgisini (Natural Earth 1:50m) geçen parçacık orada durur.</p>
+ <p data-en="Displacement is converted to degrees on a sphere:">Yer değiştirme küre üzerinde dereceye çevrilir:</p>
+ <p class="equation">Δ<var>φ</var> = <var>v</var>·Δ<var>t</var> / 111,32 km &nbsp;&nbsp; Δ<var>λ</var> = <var>u</var>·Δ<var>t</var> / (111,32 km · cos <var>φ</var>)</p>
 
- <h2 id="veri" data-en="2. Data">2. Veri</h2>
- <ul>
-  <li data-en="&lt;b&gt;Surface current:&lt;/b&gt; Open-Meteo Marine API, from Météo-France's SMOC product (about 1/12°, roughly 8 km, hourly). SMOC already combines ocean circulation, tides and wave-induced Stokes drift, so FOCUS does not add Stokes drift again."><b>Yüzey akıntısı:</b> Open-Meteo Marine API; Météo-France SMOC ürünü (yaklaşık 1/12°, ~8 km, saatlik). SMOC okyanus dolaşımını, gelgiti ve dalga kaynaklı Stokes sürüklenmesini birleştirir; bu yüzden FOCUS ayrıca Stokes eklemez.</li>
-  <li data-en="&lt;b&gt;Wind:&lt;/b&gt; Open-Meteo forecast API, 10 m wind, hourly. Wind direction is converted from where it blows from to where it pushes."><b>Rüzgâr:</b> Open-Meteo tahmin API'si, 10 m rüzgârı, saatlik. Rüzgâr yönü geldiği yönden ittiği yöne çevrilir.</li>
-  <li data-en="&lt;b&gt;Space:&lt;/b&gt; currents and wind are queried at a 3 × 3 grid around the point; each step uses the nearest valid model cell. A forecast is cancelled if the nearest cell is more than 25 km away or hours are missing."><b>Mekân:</b> akıntı ve rüzgâr, nokta çevresindeki 3 × 3 ızgarada sorgulanır; her adım en yakın geçerli model hücresini kullanır. En yakın hücre 25 km'den uzaksa ya da saat eksikse tahmin iptal edilir.</li>
-  <li data-en="&lt;b&gt;Time:&lt;/b&gt; hourly vectors are interpolated linearly to 15-minute steps. All times are UTC."><b>Zaman:</b> saatlik vektörler 15 dakikalık adımlara doğrusal enterpolasyonla taşınır. Tüm zamanlar UTC'dir.</li>
- </ul>
-
- <h2 id="sayisal" data-en="3. Numerical scheme and verification">3. Sayısal yöntem ve doğrulama</h2>
- <p data-en="The browser engine advances particles with the explicit midpoint method (second-order Runge–Kutta) in 15-minute steps. To check it, we wrote an independent Python reference with classical fourth-order Runge–Kutta and compared both against flows whose exact answer is known. The double gyre is a standard test flow for Lagrangian transport (Shadden et al., 2005), scaled here to 100 × 50 km with speeds up to 1.6 km/h.">Tarayıcıdaki motor, parçacıkları 15 dakikalık adımlarla açık orta nokta yöntemiyle (ikinci derece Runge–Kutta) ilerletir. Bunu sınamak için klasik dördüncü derece Runge–Kutta kullanan bağımsız bir Python referansı yazdık ve ikisini kesin cevabı bilinen akışlara karşı karşılaştırdık. Çift girdap, Lagrange taşınımı için standart bir test akışıdır (Shadden vd., 2005); burada 100 × 50 km'ye ve en çok 1,6 km/sa hıza ölçeklendi.</p>
+ <h2 data-en="2. Values and sources">2. Değerler ve kaynakları</h2>
  <div class="table-scroll"><table class="validation">
-  <caption class="sr" data-en="Position error after the given time, kilometres">Verilen süre sonundaki konum hatası, kilometre</caption>
-  <thead><tr><th scope="col" data-en="Test flow (exact answer known)">Test akışı (kesin cevap bilinir)</th><th scope="col" data-en="Duration">Süre</th><th scope="col" data-en="Single-point (Euler)">Tek nokta (Euler)</th><th scope="col" data-en="FOCUS engine (midpoint)">FOCUS motoru (orta nokta)</th><th scope="col" data-en="Reference (RK4)">Referans (RK4)</th></tr></thead>
+  <thead><tr><th scope="col" data-en="Quantity">Büyüklük</th><th scope="col" data-en="Value">Değer</th><th scope="col" data-en="Source">Kaynak</th></tr></thead>
   <tbody>
-   <tr><td data-en="Uniform current + wind">Sabit akıntı + rüzgâr</td><td class="num" data-en="24 h">24 sa</td><td class="num">&lt; 0,03 km</td><td class="num">&lt; 0,03 km</td><td class="num">&lt; 0,03 km</td></tr>
-   <tr><td data-en="Tide-like current (12.42 h)">Gelgit benzeri akıntı (12,42 sa)</td><td class="num" data-en="24 h">24 sa</td><td class="num">0,001 km</td><td class="num">0,001 km</td><td class="num">&lt; 0,001 km</td></tr>
-   <tr><td data-en="Rotating eddy, r = 10 km, 24 h period">Dönen girdap, r = 10 km, 24 sa periyot</td><td class="num" data-en="24 h">24 sa</td><td class="num">2,28 km</td><td class="num">0,04 km</td><td class="num">&lt; 0,001 km</td></tr>
-   <tr><td data-en="Rotating eddy, r = 10 km, 12 h period">Dönen girdap, r = 10 km, 12 sa periyot</td><td class="num" data-en="12 h">12 sa</td><td class="num">5,05 km</td><td class="num">0,18 km</td><td class="num">&lt; 0,001 km</td></tr>
-   <tr><td data-en="Double gyre, 25 particles (mean / max)">Çift girdap, 25 parçacık (ort. / en büyük)</td><td class="num" data-en="24 h">24 sa</td><td class="num">17,4 / 85,5 km</td><td class="num">0,22 / 1,50 km</td><td class="num">&lt; 0,002 km</td></tr>
+   <tr><td data-en="Surface current u&lt;sub&gt;c&lt;/sub&gt;">Yüzey akıntısı u<sub>c</sub></td><td data-en="hourly, 1/12° (≈ 8 km); includes tide and Stokes drift">saatlik, 1/12° (≈ 8 km); gelgit ve Stokes sürüklenmesi dahil</td><td>Météo-France SMOC, Open-Meteo Marine API</td></tr>
+   <tr><td data-en="Wind u&lt;sub&gt;10&lt;/sub&gt;">Rüzgâr u<sub>10</sub></td><td data-en="hourly, 10 m above sea; direction turned 180° (from → towards)">saatlik, deniz üstü 10 m; yön 180° çevrilir (geliş → gidiş)</td><td>Open-Meteo Forecast API</td></tr>
+   <tr><td data-en="Wind share α">Rüzgâr payı α</td><td>0 · 0,01 · 0,03</td><td>Breivik vd., 2011; van Sebille vd., 2020</td></tr>
+   <tr><td data-en="Time step Δt">Zaman adımı Δt</td><td data-en="15 min">15 dk</td><td data-en="FOCUS; error in section 3">FOCUS; hata 3. bölümde</td></tr>
+   <tr><td data-en="Particles">Parçacık</td><td data-en="25 (5 × 5 grid, radius 0.5 km)">25 (5 × 5 ızgara, 0,5 km yarıçap)</td><td>FOCUS</td></tr>
+   <tr><td data-en="Time interpolation">Zaman enterpolasyonu</td><td><var>u</var>(<var>t</var>) = (1 − <var>f</var>)·<var>u</var><sub>i</sub> + <var>f</var>·<var>u</var><sub>i+1</sub></td><td data-en="linear between hourly values">saatlik değerler arası doğrusal</td></tr>
+   <tr><td data-en="Model cell">Model hücresi</td><td data-en="nearest valid cell, at most 25 km">en yakın geçerli hücre, en çok 25 km</td><td data-en="3 × 3 query grid">3 × 3 sorgu ızgarası</td></tr>
+   <tr><td data-en="Coastline">Kıyı çizgisi</td><td data-en="1:50 m scale">1:50 m ölçek</td><td>Natural Earth</td></tr>
+   <tr><td data-en="Degree length">Derece uzunluğu</td><td>1° = 111,32 km</td><td data-en="WGS84 equatorial radius, 2πa/360">WGS84 ekvator yarıçapı, 2πa/360</td></tr>
   </tbody>
  </table></div>
- <p data-en="What this shows: the main engine's numerical error stays well below the 8 km grid of the current model, so in practice the uncertainty comes from the input data and the windage assumption, not from the integration. A first-order step (Euler) drifts outward in rotating flows; FOCUS uses it only in the single-point legacy view, where velocity does not vary in space and the two methods agree. The values are from &lt;code&gt;model/validate.py&lt;/code&gt; and are stored in &lt;a href=&quot;assets/model-validation.json&quot;&gt;assets/model-validation.json&lt;/a&gt;.">Bu ne gösteriyor: ana motorun sayısal hatası, akıntı modelinin 8 km'lik ızgarasının çok altında kalıyor; yani pratikte belirsizlik entegrasyondan değil, girdi verisinden ve rüzgâr katkısı varsayımından geliyor. Birinci derece adım (Euler) dönen akışlarda dışa doğru kayar; FOCUS onu yalnızca hızın mekânda değişmediği tek nokta görünümünde kullanır, orada iki yöntem aynı sonucu verir. Değerler <code>model/validate.py</code> çıktısıdır ve <a href="assets/model-validation.json">assets/model-validation.json</a> dosyasında saklanır.</p>
- <p data-en="This checks the numerical method only. Forecast skill against real drifters (for example the NOAA Global Drifter Program, used for debris pathways by Maximenko et al., 2012) has not been measured yet and is the next validation step.">Bu yalnızca sayısal yöntemi sınar. Gerçek sürüklenen şamandıralara karşı tahmin başarısı (ör. Maximenko vd., 2012'nin atık yollarını çıkarırken kullandığı NOAA Küresel Şamandıra Programı) henüz ölçülmedi; sıradaki doğrulama adımı budur.</p>
 
- <h2 id="uydu" data-en="4. Satellite layer (research)">4. Uydu katmanı (araştırma)</h2>
- <p data-en="Floating debris can be seen in Sentinel-2 imagery when patches are large enough. FOCUS offers two research views: the Floating Debris Index, which compares the near-infrared band with a baseline from neighbouring bands (Biermann et al., 2020), and a published segmentation model trained on the MARIDA benchmark of labelled Sentinel-2 scenes (Kikaki et al., 2022). Foam, algae, ships and wave glint are known confusers.">Yüzen atık, yamalar yeterince büyükse Sentinel-2 görüntülerinde seçilebilir. FOCUS iki araştırma görünümü sunar: yakın kızılötesi bandı komşu bantlardan çizilen bir taban çizgisiyle karşılaştıran Yüzen Atık İndeksi (FDI; Biermann vd., 2020) ve etiketli Sentinel-2 sahnelerinden oluşan MARIDA veri setiyle eğitilmiş yayımlanmış bir segmentasyon modeli (Kikaki vd., 2022). Köpük, alg, gemi ve dalga parlaması bilinen karıştırıcılardır.</p>
- <p data-en="In a two-scene pilot the model found 27 true and 25 false positives on one labelled scene, with no misses, and no false positives on a foam control scene. Two scenes cannot support any claim about general accuracy. The open-ocean context layers use the Great Pacific Garbage Patch model of Lebreton et al. (2018) and CYGNSS-based microplastic estimates (Evans &amp; Ruf, 2022).">İki sahnelik pilotta model, etiketli bir sahnede 27 doğru ve 25 yanlış pozitif buldu, kaçırma olmadı; köpük kontrol sahnesinde yanlış pozitif vermedi. İki sahne genel doğruluk hakkında bir iddiayı desteklemez. Açık okyanus bağlam katmanları, Lebreton vd. (2018) Büyük Pasifik Çöp Alanı modelini ve CYGNSS tabanlı mikroplastik tahminlerini (Evans ve Ruf, 2022) kullanır.</p>
+ <h2 data-en="3. Numerical solution and its error">3. Sayısal çözüm ve hatası</h2>
+ <p data-en="The equation is solved with the midpoint method (second-order Runge–Kutta):">Denklem orta nokta yöntemiyle (2. derece Runge–Kutta) çözülür:</p>
+ <p class="equation"><b>x</b>* = <b>x</b><sub>n</sub> + (Δ<var>t</var>/2)·<b>u</b>(<b>x</b><sub>n</sub>, <var>t</var><sub>n</sub>)<br><b>x</b><sub>n+1</sub> = <b>x</b><sub>n</sub> + Δ<var>t</var>·<b>u</b>(<b>x</b>*, <var>t</var><sub>n</sub> + Δ<var>t</var>/2)</p>
+ <p data-en="We measured its error on flows with a known exact answer, including the double-gyre test flow (Shadden et al., 2005), against a fourth-order Runge–Kutta reference:">Hatayı, kesin cevabı bilinen akışlarda ve çift girdap test akışında (Shadden vd., 2005) 4. derece Runge–Kutta referansına karşı ölçtük:</p>
+ <div class="table-scroll"><table class="validation">
+  <thead><tr><th scope="col" data-en="Test flow">Test akışı</th><th scope="col" data-en="Duration">Süre</th><th scope="col" data-en="FOCUS error">FOCUS hatası</th></tr></thead>
+  <tbody>
+   <tr><td data-en="Uniform current + wind">Sabit akıntı + rüzgâr</td><td class="num" data-en="24 h">24 sa</td><td class="num">&lt; 0,03 km</td></tr>
+   <tr><td data-en="Tide-like current (12.42 h)">Gelgit benzeri akıntı (12,42 sa)</td><td class="num" data-en="24 h">24 sa</td><td class="num">0,001 km</td></tr>
+   <tr><td data-en="Rotating eddy, r = 10 km, 24 h period">Dönen girdap, r = 10 km, 24 sa periyot</td><td class="num" data-en="24 h">24 sa</td><td class="num">0,04 km</td></tr>
+   <tr><td data-en="Rotating eddy, r = 10 km, 12 h period">Dönen girdap, r = 10 km, 12 sa periyot</td><td class="num" data-en="12 h">12 sa</td><td class="num">0,18 km</td></tr>
+   <tr><td data-en="Double gyre, 25 particles (mean / max)">Çift girdap, 25 parçacık (ort. / en büyük)</td><td class="num" data-en="24 h">24 sa</td><td class="num">0,22 / 1,50 km</td></tr>
+  </tbody>
+ </table></div>
+ <p data-en="The numerical error stays far below the 8 km current grid.">Sayısal hata, 8 km'lik akıntı ızgarasının çok altında kalır.</p>
 
- <h2 id="sinirlar" data-en="5. Limits">5. Sınırlar</h2>
- <ul>
-  <li data-en="The starting point is the user's assumption; FOCUS does not confirm that debris is there.">Başlangıç noktası kullanıcının varsayımıdır; FOCUS atığın orada olduğunu doğrulamaz.</li>
-  <li data-en="An 8 km current grid cannot resolve harbours, small bays or river plumes.">8 km'lik akıntı ızgarası liman, küçük koy ve nehir ağızlarını çözemez.</li>
-  <li data-en="Three windage scenarios show sensitivity, not a confidence interval.">Üç rüzgâr senaryosu duyarlılığı gösterir, bir güven aralığı değildir.</li>
-  <li data-en="Beaching, sinking, fragmentation and turbulent diffusion are not modelled.">Kıyıya vurup geri dönme, batma, parçalanma ve türbülanslı yayılma modellenmez.</li>
-  <li data-en="Forecast inputs are model output, not observations; their own errors pass into the drift.">Girdiler gözlem değil model çıktısıdır; kendi hataları sürüklenmeye geçer.</li>
- </ul>
+ <h2 data-en="4. Satellite layer">4. Uydu katmanı</h2>
+ <p data-en="Floating debris in Sentinel-2 imagery is screened with the Floating Debris Index (Biermann et al., 2020):">Sentinel-2 görüntüsünde yüzen atık, Yüzen Atık İndeksi ile taranır (Biermann vd., 2020):</p>
+ <p class="equation">FDI = <var>R</var><sub>NIR</sub> − [<var>R</var><sub>RE2</sub> + (<var>R</var><sub>SWIR1</sub> − <var>R</var><sub>RE2</sub>) · (<var>λ</var><sub>NIR</sub> − <var>λ</var><sub>RED</sub>)/(<var>λ</var><sub>SWIR1</sub> − <var>λ</var><sub>RED</sub>) · 10]</p>
+ <p data-en="Bands B08, B06, B11; λ = 842, 665 and 1610 nm. Debris candidates come from a segmentation model trained on the MARIDA dataset of labelled Sentinel-2 scenes (Kikaki et al., 2022). The garbage-patch layer uses the mass-density model of Lebreton et al. (2018).">Bantlar B08, B06, B11; λ = 842, 665 ve 1610 nm. Atık adayları, etiketli Sentinel-2 sahnelerinden oluşan MARIDA veri setiyle eğitilmiş bir segmentasyon modelinden gelir (Kikaki vd., 2022). Çöp adası katmanı Lebreton vd. (2018) kütle yoğunluğu modelini kullanır.</p>
 
- <h2 id="uretim" data-en="6. Reproduce the results">6. Sonuçları yeniden üretin</h2>
- <p data-en="The Python reference uses only the standard library:">Python referansı yalnızca standart kütüphaneyi kullanır:</p>
- <pre class="equation" style="font:14px/1.6 ui-monospace,Consolas,monospace;white-space:pre-wrap">python -m unittest discover -s model
-python model/validate.py
-python model/focus_drift.py forecast --lat 36.4 --lon 30.9 --hours 24 &gt; rota.geojson</pre>
+ <h2 data-en="5. Scope">5. Kapsam</h2>
+ <p data-en="The forecast starts from the point you choose and runs up to 24 hours. Accuracy depends on the current and wind forecasts; at 8 km grid size, harbours and small bays are not resolved. Comparison with real drifter tracks (NOAA Global Drifter Program; Maximenko et al., 2012) is the next validation step.">Tahmin, seçtiğiniz noktadan başlar ve 24 saate kadar sürer. Doğruluk akıntı ve rüzgâr tahminine bağlıdır; 8 km ızgarada liman ve küçük koylar ayrışmaz. Gerçek şamandıra izleriyle karşılaştırma (NOAA Küresel Şamandıra Programı; Maximenko vd., 2012) sıradaki doğrulama adımıdır.</p>
 
  <h2 id="kaynakca" data-en="References">Kaynakça</h2>
  <ol class="refs">
   <li>Biermann, L., Clewley, D., Martinez-Vicente, V. ve Topouzelis, K. (2020). Finding plastic patches in coastal waters using optical satellite data. <i>Scientific Reports</i>, 10, 5364.</li>
   <li>Breivik, Ø., Allen, A. A., Maisondieu, C. ve Roth, J. C. (2011). Wind-induced drift of objects at sea: The leeway field method. <i>Applied Ocean Research</i>, 33(2), 100–109.</li>
   <li>Dagestad, K.-F., Röhrs, J., Breivik, Ø. ve Ådlandsvik, B. (2018). OpenDrift v1.0: a generic framework for trajectory modelling. <i>Geoscientific Model Development</i>, 11, 1405–1420.</li>
-  <li>Evans, M. C. ve Ruf, C. S. (2022). Toward the detection and imaging of ocean microplastics with a spaceborne radar. <i>IEEE Transactions on Geoscience and Remote Sensing</i>, 60, 4202709.</li>
   <li>Kikaki, K., Kakogeorgiou, I., Mikeli, P., Raitsos, D. E. ve Karantzalos, K. (2022). MARIDA: A benchmark for Marine Debris detection from Sentinel-2 remote sensing data. <i>PLoS ONE</i>, 17(1), e0262247.</li>
   <li>Lebreton, L. vd. (2018). Evidence that the Great Pacific Garbage Patch is rapidly accumulating plastic. <i>Scientific Reports</i>, 8, 4666.</li>
   <li>Maximenko, N., Hafner, J. ve Niiler, P. (2012). Pathways of marine debris derived from trajectories of Lagrangian drifters. <i>Marine Pollution Bulletin</i>, 65(1–3), 51–62.</li>

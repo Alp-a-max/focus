@@ -4,7 +4,7 @@
  const $=id=>document.getElementById(id),tr=(a,b)=>window.OdakI18n?.language==='en'?b:a;
  const params=new URLSearchParams(location.search),forced=params.get('intro')==='1',automated=navigator.webdriver&&!forced;
  const store={get(k){try{return localStorage.getItem(k);}catch{return null;}},set(k,v){try{localStorage.setItem(k,v);}catch{}}};
- const TOUR_KEY='focus-tour-v1';
+ const TOUR_KEY='focus-tour-v2';
 
  // ---- Splash ----
  const splash=$('focusSplash');
@@ -22,14 +22,11 @@
 
  // ---- Tour ----
  const steps=[
-  {title:['FOCUS\'a hoş geldin','Welcome to FOCUS'],text:['Denizde bir noktadan bırakılan nesnenin akıntı ve rüzgârla 6, 12 ve 24 saat içinde nereye sürükleneceğini tahmin eder. 30 saniyelik turla nasıl kullanılacağını göstereyim.','It forecasts where an object released at sea drifts with currents and wind over 6, 12 and 24 hours. Let me show you how it works in 30 seconds.']},
-  {target:()=>document.querySelector('.map-search'),title:['1 · Yeri bul','1 · Find a place'],text:['Bir bölge adı (ör. Antalya) ya da koordinat yaz ve Bul\'a bas.','Type an area name (e.g. Antalya) or coordinates and press Find.']},
-  {target:()=>$('map'),title:['…ya da haritaya dokun','…or tap the map'],text:['Denizde bir noktaya dokun. Seçtiğin nokta yanıp sönen turuncu işaretle haritada kalır, kaybolmaz.','Tap a point at sea. Your point stays on the map with a pulsing orange marker.']},
-  {target:()=>$('releaseRun'),title:['2 · Tahmini başlat','2 · Start the forecast'],text:['Bunun bir model senaryosu olduğunu onayla ve Tahmini başlat\'a bas. Harita seçtiğin bölgeye yumuşakça yakınlaşır.','Confirm it is a model scenario and press Start forecast. The map glides smoothly to your area.']},
-  {target:()=>$('releaseExample'),title:['Denemek mi istiyorsun?','Just want to try it?'],text:['Örnek tahmini göster, Antalya açıklarında hazır bir tahmini tek tıkla çalıştırır.','Show an example forecast runs a ready-made forecast off Antalya in one click.']},
-  {target:()=>$('simpleAiScan'),title:['Uydudan atık ara','Scan satellites for debris'],text:['MARIDA veri setiyle eğitilmiş yayımlanmış bir segmentasyon modeli, Sentinel-2 görüntüsünde olası atık piksellerini işaretler. Adaylar doğrulanmamıştır.','A published segmentation model trained on the MARIDA dataset marks possible debris pixels in Sentinel-2 imagery. Candidates are not verified.']},
-  {target:()=>$('simpleToolsOpen'),title:['Tüm araçlar','All tools'],text:['Harita katmanları, deniz koşulları, raporlar ve kayıtlar burada.','Map layers, sea conditions, reports and records live here.']},
-  {target:()=>$('focusTourOpen'),title:['Hazırsın!','You are ready!'],text:['Haritada noktanı kaybedersen sol alttaki "Noktama dön" butonu seni geri götürür. Bu turu istediğin zaman buradan tekrar açabilirsin.','If you lose your point, the "Back to my point" button at the bottom left brings you back. You can replay this tour here anytime.']}
+  {title:['FOCUS’a hoş geldin','Welcome to FOCUS'],text:['Denizdeki atığın 6, 12 ve 24 saat sonra nerede olacağını gerçek akıntı ve rüzgâr verisiyle hesaplar.','It calculates where debris at sea will be after 6, 12 and 24 hours, using real current and wind data.']},
+  {target:()=>document.querySelector('.map-search'),title:['1. Yeri bul','1. Find a place'],text:['Bölge adı ya da koordinat yaz. Haritaya dokunarak da seçebilirsin.','Type a place or coordinates, or tap the map.']},
+  {target:()=>$('releaseRun'),title:['2. Tahmini başlat','2. Start the forecast'],text:['Sonuç haritada 6, 12 ve 24 saatlik konumlarla çizilir.','The result is drawn on the map at 6, 12 and 24 hours.']},
+  {target:()=>$('simpleToolsOpen'),title:['3. Katmanlar ve kaynaklar','3. Layers and sources'],text:['Uydu görüntüsü, deniz koşulları ve çöp adaları burada.','Satellite imagery, sea conditions and garbage patches are here.']},
+  {target:()=>$('focusTourOpen'),title:['Hazırsın','You are ready'],text:['Bu turu buradan tekrar açabilirsin.','You can replay this tour from here.']}
  ];
  let layer,spot,card,index=0,opener=null;
  const visible=el=>el&&el.isConnected&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';

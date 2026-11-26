@@ -6,21 +6,22 @@
 <title data-en-text="Sign in | FOCUS">Giriş yap | FOCUS</title>
 <meta name="description" content="FOCUS hesabınıza giriş yapın.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0f2d3f">
+<meta name="theme-color" content="#0b2342">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css?v=20261127">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
 <link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
-<script src="js/site.js?v=20261127"></script>
-<script src="js/focus-api.js?v=20261127" defer></script>
-<script src="js/account-pages.js?v=20261127" defer></script>
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/account-pages.js?v=20261128" defer></script>
+<script src="js/google-signin.js?v=20261128" defer></script>
 </head>
 <body data-page="login">
 <a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
 <header class="top">
  <div class="wrap">
-  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img src="assets/focus-mark.svg" alt="" width="26" height="26">FOCUS</a>
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
   <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
    <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
    <a href="yontem.html" data-en="Method">Yöntem</a>
@@ -36,7 +37,8 @@
 </header>
 <main id="main">
 <div class="page"><div class="wrap narrow">
- <h1 style="font-size:40px" data-en="Sign in">Giriş yap</h1>
+ <h1 style="font-size:36px" data-en="Sign in">Giriş yap</h1>
+ <div id="googleSignIn" hidden style="margin-top:24px"><div class="g-button"></div><p class="alert" role="alert"></p><p class="muted small" style="margin:14px 0 0" data-en="or with email">veya e-postayla</p></div>
  <form class="form" id="loginForm" novalidate>
   <p class="alert" role="alert" tabindex="-1"></p>
   <div class="field"><label for="email" data-en="Email">E-posta</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="190"></div>

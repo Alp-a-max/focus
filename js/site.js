@@ -11,7 +11,7 @@
 
  // Dil: TR metin HTML'de, EN karşılığı data-en özniteliğinde.
  let lang=store.get('focus-public-language')==='en'?'en':'tr';
- const attrs=['placeholder','aria-label','title','content'];
+ const attrs=['placeholder','aria-label','title','content','alt'];
  function applyLanguage(){
   root.lang=lang;
   document.querySelectorAll('[data-en]').forEach(el=>{

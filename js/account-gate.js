@@ -22,7 +22,7 @@
   if(!a){a=document.createElement('a');a.id='focusAccountChip';a.className='focus-account-chip';a.setAttribute('translate','no');host.prepend(a)}
   if(session?.user){
    const e=session.entitlement;a.href='hesap.html';
-   a.textContent=tr(`${e.remaining} tahmin hakkı`,`${e.remaining} forecasts left`);
+   a.textContent=e.plan==='none'?tr('Paket seç','Choose a plan'):tr(`${e.remaining} tahmin hakkı`,`${e.remaining} forecasts left`);
    a.title=tr(`${session.user.name}: hesabım`,`${session.user.name}: my account`);
   }else{a.href='giris.html?next=platform.html';a.textContent=tr('Giriş yap','Sign in');a.removeAttribute('title')}
  }
@@ -49,7 +49,7 @@
   ev.stopImmediatePropagation();ev.preventDefault();
   if(busy)return;
   if(!session?.user){
-   notice([tr('Gerçek tahmin için ücretsiz bir hesap gerekir (günde 5 tahmin). ','A free account is needed for live forecasts (5 a day). '),{href:'kayit.html?next=platform.html',text:tr('Hesap aç','Create account')},' · ',{href:'giris.html?next=platform.html',text:tr('Giriş yap','Sign in')},tr('. Hesapsız denemek için "Örnek tahmini göster"i kullanın.','. To try without an account, use "Show example forecast".')],'warn');
+   notice([tr('Tahmin için ücretsiz deneme hesabı gerekir. ','Forecasts need a free trial account. '),{href:'kayit.html?next=platform.html',text:tr('Denemeyi başlat','Start free trial')},' · ',{href:'giris.html?next=platform.html',text:tr('Giriş yap','Sign in')},tr('. Hesapsız denemek için "Antalya açığında dene"yi kullanın.','. To try without an account, use "Try off Antalya".')],'warn');
    return;
   }
   const retry=/Tekrar dene|Try again/.test(btn.textContent||'');
@@ -61,8 +61,8 @@
    allowOnce=true;btn.click();
   }catch(e){
    if(e.code==='auth_required'){session=null;chip()}
-   const upgrade=e.code==='quota_exhausted'||e.code==='horizon_not_included';
-   notice(upgrade?[e.message+' ',{href:'hesap.html',text:tr('Paketleri gör','See plans')}]:[e.message],'bad');
+   const upgrade=['quota_exhausted','horizon_not_included','trial_ended','email_unverified'].includes(e.code);
+   notice(upgrade?[e.message+' ',{href:'hesap.html',text:tr('Hesabım','My account')}]:[e.message],'bad');
   }finally{busy=false}
  }
 

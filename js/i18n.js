@@ -4,6 +4,8 @@
   'use strict';
   const entries=`
 Seçili konum karada. Deniz üzerinde bir nokta seçin.|This location is on land. Select a point at sea.
+Sürükleyerek gez, iki parmakla yakınlaştır; nokta seçmek için dokun.|Drag to explore, pinch to zoom; tap to pick a point.
+Nokta seçmek için haritaya tıkla; sürükleyerek gez, tekerlek veya + / − ile yakınlaştır.|Click to pick a point; drag to explore, scroll or use + / − to zoom.
 Bölge seç|Choose a region
 Kopuşu hesapla|Calculate release
 Sonucu incele|Inspect the result
@@ -19,7 +21,7 @@ Noktama dön|Back to my point
 Tüm rotayı göster|Show the full route
 Veri ve rapor indir|Download data and report
 Dalga koşulları|Wave conditions
-Seçili koordinat; atık tespiti değil|Selected coordinate; not a waste detection
+Seçili koordinat|Selected coordinate
 Birikimden kopan parçalar nereye gider?|Where do fragments released from an accumulation travel?
 Birikimin kenarındaki bir kopuş kesimini haritadan seçin. Bu kesimden ayrıldığı varsayılan sanal parçaların 6, 12 ve 24 saat sonraki yayılımını inceleyin.|Select a release section at the edge of an accumulation. Explore the spread of virtual fragments assumed to detach from this section after 6, 12 and 24 hours.
 Seçili harita noktasını kopuş kesimi yap|Use the selected map point as a release section

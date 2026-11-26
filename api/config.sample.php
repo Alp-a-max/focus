@@ -16,6 +16,10 @@ return [
     // PowerShell: -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 48 | % {[char]$_})
     'app_secret' => 'DEGISTIRIN_EN_AZ_32_KARAKTER_RASTGELE_DEGER',
 
+    // Yönetici hesabını ilk kez oluşturmak için kurulum anahtarı (en az 24 rastgele karakter).
+    // yonetim.html bu anahtarla yalnızca BİR KEZ yönetici oluşturur; sonra form kapanır.
+    'setup_token' => 'DEGISTIRIN_EN_AZ_24_KARAKTER_KURULUM_ANAHTARI',
+
     // Sitenin tam adresi (sonunda / olmadan). İstek kaynağı (Origin) bu adresle doğrulanır.
     'site_origin' => 'https://focusocean.xo.je',
 

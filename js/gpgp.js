@@ -43,6 +43,13 @@ window.OdakGpgp = function (map) {
     const conversion = document.createElement('p');
     conversion.textContent = 'Shapefile → GeoJSON biçim dönüşümü. Özgün WGS84 çizgileri korunmuştur.';
     content.append(conversion);
+    if (window.FocusPatchInfo) {
+      const more = document.createElement('button');
+      more.type = 'button';
+      more.textContent = 'Fotoğraf ve Wikipedia bilgisi';
+      more.addEventListener('click', () => { map.closePopup(); window.FocusPatchInfo.open(map, {id: 'north-pacific', lat: 32, lon: -145}); });
+      content.append(more);
+    }
     return content;
   }
 

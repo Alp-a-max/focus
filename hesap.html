@@ -4,23 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title data-en-text="My account | FOCUS">Hesabım | FOCUS</title>
-<meta name="description" content="FOCUS hesap, paket ve kota bilgileri.">
+<meta name="description" content="FOCUS hesap ve paket bilgileri.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0f2d3f">
+<meta name="theme-color" content="#0b2342">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css?v=20261127">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
 <link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
-<script src="js/site.js?v=20261127"></script>
-<script src="js/focus-api.js?v=20261127" defer></script>
-<script src="js/account-pages.js?v=20261127" defer></script>
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/account-pages.js?v=20261128" defer></script>
 </head>
 <body data-page="account">
 <a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
 <header class="top">
  <div class="wrap">
-  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img src="assets/focus-mark.svg" alt="" width="26" height="26">FOCUS</a>
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
   <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
    <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
    <a href="yontem.html" data-en="Method">Yöntem</a>
@@ -38,8 +38,18 @@
 <div class="page"><div class="wrap" style="max-width:760px">
  <p class="alert" id="accountState" data-en="Loading…">Yükleniyor…</p>
  <div id="accountBody" hidden>
-  <h1 style="font-size:40px" id="who"></h1>
+  <h1 style="font-size:36px" id="who"></h1>
   <div class="row" style="margin-top:12px"><a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a><a class="btn ghost small" href="yonetim.html" id="adminLink" hidden data-en="Admin">Yönetim</a><button class="btn ghost small" type="button" id="logout" data-en="Sign out">Çıkış yap</button></div>
+
+  <div class="panel" id="verifyPanel" hidden>
+   <h2 data-en="Verify your email">E-postanı doğrula</h2>
+   <p class="small" id="verifyText"></p>
+   <form class="form" id="verifyForm" novalidate style="margin-top:8px">
+    <p class="alert" role="alert" tabindex="-1"></p>
+    <div class="field" style="max-width:220px"><label for="code" data-en="6-digit code">6 haneli kod</label><input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required></div>
+    <div class="row" style="margin-top:0"><button class="btn" type="submit" data-en="Verify">Doğrula</button><button class="btn ghost" type="button" id="resendCode" data-en="Send a new code">Yeni kod gönder</button></div>
+   </form>
+  </div>
 
   <div class="panel">
    <h2 data-en="Your plan">Paketiniz</h2>
@@ -61,10 +71,10 @@
   </div>
 
   <form class="panel form" id="requestForm" novalidate>
-   <h2 data-en="Upgrade">Paketi yükselt</h2>
+   <h2 data-en="Choose a plan">Paket seç</h2>
    <p class="alert" role="alert" tabindex="-1"></p>
-   <div class="field"><label for="reqPlan" data-en="Plan">Paket</label><select id="reqPlan" name="plan"><option value="starter" data-en="Starter: 100 forecasts a month, up to 24 h">Başlangıç: ayda 100 tahmin, 24 saate kadar</option><option value="professional" data-en="Professional: 200 forecasts a month">Profesyonel: ayda 200 tahmin</option><option value="enterprise" data-en="Institutional: 500 forecasts a month">Kurumsal: ayda 500 tahmin</option></select></div>
-   <div class="field"><label for="reqBilling" data-en="Billing">Ödeme dönemi</label><select id="reqBilling" name="billing"><option value="month" data-en="Monthly">Aylık</option><option value="year" data-en="Yearly (2 months free)">Yıllık (2 ay ücretsiz)</option></select><p class="hint"><span data-en="Amount">Tutar</span>: <b id="reqPrice"></b></p></div>
+   <div class="field"><label for="reqPlan" data-en="Plan">Paket</label><select id="reqPlan" name="plan"><option value="team" data-en="Team: 500 forecasts a month, up to 24 h">Ekip: ayda 500 tahmin, 24 saate kadar</option><option value="institution" data-en="Institution: 2,000 forecasts a month, up to 72 h">Kurum: ayda 2.000 tahmin, 72 saate kadar</option></select></div>
+   <div class="field"><label for="reqBilling" data-en="Billing">Ödeme dönemi</label><select id="reqBilling" name="billing"><option value="month" data-en="Monthly">Aylık</option><option value="year" data-en="Yearly (2 months free)">Yıllık (2 ay bedava)</option></select><p class="hint"><span data-en="Amount">Tutar</span>: <b id="reqPrice"></b></p></div>
    <button class="btn" type="submit" data-en="Send request">Talep gönder</button>
    <p class="small muted" style="margin:0" data-en="You get a reference code for the bank transfer. Nothing is charged automatically.">Havale/EFT için bir referans kodu alırsınız. Otomatik ödeme alınmaz.</p>
   </form>
@@ -75,9 +85,9 @@
   </div>
 
   <form class="panel form" id="passwordForm" novalidate>
-   <h2 data-en="Change password">Şifreyi değiştir</h2>
+   <h2 id="pwTitle" data-en="Change password">Şifreyi değiştir</h2>
    <p class="alert" role="status" tabindex="-1"></p>
-   <div class="field"><label for="current" data-en="Current password">Mevcut şifre</label><input id="current" name="current" type="password" autocomplete="current-password" required></div>
+   <div class="field" id="currentField"><label for="current" data-en="Current password">Mevcut şifre</label><input id="current" name="current" type="password" autocomplete="current-password" required></div>
    <div class="field"><label for="new" data-en="New password">Yeni şifre</label><input id="new" name="new" type="password" autocomplete="new-password" required minlength="10"></div>
    <button class="btn ghost" type="submit" data-en="Change password">Şifreyi değiştir</button>
   </form>
@@ -87,7 +97,7 @@
    <form class="form" id="deleteForm" novalidate>
     <p class="small" style="margin:0" data-en="Your account, subscription records and usage history are deleted permanently.">Hesabınız, abonelik kayıtlarınız ve kullanım geçmişiniz kalıcı olarak silinir.</p>
     <p class="alert" role="alert" tabindex="-1"></p>
-    <div class="field"><label for="delPassword" data-en="Password">Şifre</label><input id="delPassword" name="password" type="password" autocomplete="current-password" required></div>
+    <div class="field"><label for="delPassword" id="delLabel" data-en="Password">Şifre</label><input id="delPassword" name="password" type="password" autocomplete="current-password" required></div>
     <button class="btn danger" type="submit" data-en="Delete my account permanently">Hesabımı kalıcı olarak sil</button>
    </form>
   </details>

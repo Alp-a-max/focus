@@ -4,20 +4,26 @@ defined('FOCUS_API') || exit;
 
 /**
  * Sunucu tarafı paket tanımları. Hak ve fiyatın tek yetkili kaynağı burasıdır;
- * js/plans.js yalnızca gösterim içindir ve bu değerlerle aynı tutulmalıdır.
- * Tutarlar USD sent cinsinden tam sayıdır. Yıllık ödeme = 10 aylık ücret.
+ * sayfalardaki fiyatlar bu değerlerle aynı tutulmalıdır.
+ * Tutarlar Türk lirası kuruş cinsinden tam sayıdır. Yıllık ödeme = 10 aylık ücret.
+ * Yeni hesaplar ücretsiz deneme alır; süresi yönetici panelinden ayarlanır (varsayılan 24 saat).
  */
 final class FocusPlans
 {
     public const ENGINE_HORIZONS = [6, 12, 24];
+    public const CURRENCY = 'TRY';
 
     public static function all(): array
     {
         return [
-            'free' => ['id' => 'free', 'name' => 'Ücretsiz', 'max_hours' => 24, 'daily' => 5, 'monthly' => null, 'month_cents' => 0, 'paid' => false],
-            'starter' => ['id' => 'starter', 'name' => 'Başlangıç', 'max_hours' => 24, 'daily' => null, 'monthly' => 100, 'month_cents' => 6900, 'paid' => true],
-            'professional' => ['id' => 'professional', 'name' => 'Profesyonel', 'max_hours' => 48, 'daily' => null, 'monthly' => 200, 'month_cents' => 27900, 'paid' => true],
-            'enterprise' => ['id' => 'enterprise', 'name' => 'Kurumsal', 'max_hours' => 72, 'daily' => null, 'monthly' => 500, 'month_cents' => 99900, 'paid' => true],
+            'trial' => ['id' => 'trial', 'name' => 'Ücretsiz deneme', 'max_hours' => 24, 'daily' => 10, 'monthly' => null, 'month_cents' => 0, 'paid' => false],
+            // Kullandıkça öde: aylık ücret yok, tahmin başına ödeme (ödeme altyapısı açılınca satın alınır).
+            'payg' => ['id' => 'payg', 'name' => 'Kullandıkça öde', 'max_hours' => 24, 'daily' => null, 'monthly' => null, 'month_cents' => 0, 'per_forecast_cents' => 500, 'paid' => false],
+            'team' => ['id' => 'team', 'name' => 'Ekip', 'max_hours' => 24, 'daily' => null, 'monthly' => 500, 'month_cents' => 44900, 'paid' => true],
+            // Kurum: 72 saate kadar ufuk hakkı; çalışan motor bugün 24 saate kadar hesaplar.
+            'institution' => ['id' => 'institution', 'name' => 'Kurum', 'max_hours' => 72, 'daily' => null, 'monthly' => 2000, 'month_cents' => 129900, 'paid' => true],
+            // Yönetici hesabı: en üst paket, satılmaz.
+            'admin' => ['id' => 'admin', 'name' => 'Yönetici (Kurum)', 'max_hours' => 72, 'daily' => null, 'monthly' => 100000, 'month_cents' => 0, 'paid' => false],
         ];
     }
 

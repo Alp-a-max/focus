@@ -3,24 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-en-text="FOCUS: where will marine debris drift?">FOCUS: Denizdeki atık nereye sürüklenecek?</title>
-<meta name="description" content="FOCUS, denizde seçilen bir noktadan bırakılan atığın 6, 12 ve 24 saatlik olası yolunu akıntı ve rüzgâr modelleriyle hesaplayan araştırma platformudur." data-en-content="FOCUS estimates the 6, 12 and 24-hour drift of marine debris from a chosen point using ocean current and wind models.">
-<meta name="theme-color" content="#0f2d3f">
+<title data-en-text="FOCUS: forecast where marine debris drifts">FOCUS: Denizdeki atığın rotasını önceden görün</title>
+<meta name="description" content="FOCUS, denizde seçilen bir noktadaki atığın 6, 12 ve 24 saatlik rotasını gerçek akıntı ve rüzgâr verisiyle hesaplar." data-en-content="FOCUS calculates the 6, 12 and 24-hour route of debris at sea from real current and wind data.">
+<meta name="theme-color" content="#0b2342">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css?v=20261127">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
 <link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
-<script src="js/site.js?v=20261127"></script>
-<script src="js/focus-api.js?v=20261127" defer></script>
-<script src="js/hero-flow.js?v=20261127" defer></script>
-<script src="js/plans-table.js?v=20261127" defer></script>
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/plans-table.js?v=20261128" defer></script>
+<script src="js/hero-photos.js?v=20261128" defer></script>
 </head>
 <body>
 <a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
 <header class="top">
  <div class="wrap">
-  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img src="assets/focus-mark.svg" alt="" width="26" height="26">FOCUS</a>
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
   <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
    <a href="#nasil" data-en="How it works">Nasıl çalışır</a>
    <a href="yontem.html" data-en="Method">Yöntem</a>
@@ -40,115 +40,102 @@
  <section class="hero">
   <div class="wrap hero-grid">
    <div>
-    <h1 data-en="Where will marine debris drift next?">Denizdeki atık nereye sürüklenecek?</h1>
-    <p class="lead" data-en="Pick a point at sea. FOCUS moves virtual particles with forecast ocean currents and wind and shows where debris may be after 6, 12 and 24 hours, so field teams know where to look.">Denizde bir nokta seçin. FOCUS, sanal parçacıkları akıntı ve rüzgâr tahminleriyle taşır; atığın 6, 12 ve 24 saat sonra nerede olabileceğini gösterir. Saha ekipleri nereye bakacağını bilir.</p>
+    <h1 data-en="See where marine debris will drift">Denizdeki atığın rotasını önceden görün</h1>
+    <p class="lead" data-en="Pick a point at sea. FOCUS calculates its 6, 12 and 24-hour route from real current and wind data.">Denizde bir nokta seçin. FOCUS, gerçek akıntı ve rüzgâr verisiyle 6, 12 ve 24 saatlik rotasını hesaplar.</p>
     <div class="hero-actions">
-     <a class="btn" href="platform.html" data-en="Make a forecast on the map">Haritada tahmin yap</a>
-     <a class="btn ghost" href="yontem.html" data-en="Read the method">Yöntemi okuyun</a>
+     <a class="btn" href="platform.html" data-en="Open the map">Haritayı aç</a>
+     <a class="btn ghost" href="kayit.html" data-en="Try it free">Ücretsiz dene</a>
     </div>
    </div>
-   <figure class="figure">
-    <div class="figure-frame">
-     <canvas id="flowCanvas" role="img" aria-label="Çift girdap akışında bir noktadan bırakılan sanal parçacıkların zamanla yayılışını gösteren canlandırma" data-en-aria-label="Animation of virtual particles released from one point spreading in a double-gyre flow"></canvas>
-    </div>
-    <div class="figure-tools">
-     <span id="windLabel" data-en="Wind contribution">Rüzgâr katkısı</span>
-     <span class="seg" role="group" aria-labelledby="windLabel">
-      <button type="button" data-windage="0" aria-pressed="false">%0</button>
-      <button type="button" data-windage="0.01" aria-pressed="true">%1</button>
-      <button type="button" data-windage="0.03" aria-pressed="false">%3</button>
-     </span>
-     <button class="btn ghost small" type="button" id="flowRestart" data-en="Release again">Yeniden bırak</button>
-     <output id="flowStatus" aria-live="off"></output>
-    </div>
-    <figcaption data-en="&lt;b&gt;Figure 1.&lt;/b&gt; 320 virtual particles released from one point in the double-gyre test flow (Shadden et al., 2005). Click the figure to move the release point. A stronger wind contribution pushes the cloud to the boundary sooner. Illustrative only, not real ocean data."><b>Şekil 1.</b> Çift girdap test akışında (Shadden vd., 2005) bir noktadan bırakılan 320 sanal parçacık. Bırakma noktasını değiştirmek için şekle tıklayın. Rüzgâr katkısı arttıkça bulut kenara daha çabuk ulaşır. Gösterim amaçlıdır, gerçek deniz verisi değildir.</figcaption>
+   <figure class="sat-card" id="heroFigure">
+    <img id="heroPhoto" alt="" width="1280" height="853" referrerpolicy="no-referrer">
+    <figcaption id="heroCaption"></figcaption>
    </figure>
   </div>
  </section>
 
  <section id="nasil">
   <div class="wrap">
-   <div class="section-head">
-    <h2 data-en="A forecast in three steps">Üç adımda tahmin</h2>
-   </div>
+   <div class="section-head"><h2 data-en="How it works">Nasıl çalışır</h2></div>
    <ol class="steps">
-    <li>
-     <h3 data-en="Choose the point">Noktayı seçin</h3>
-     <p data-en="Tap the sea on the map or type coordinates. This point is the assumed starting position of the debris.">Haritada denize dokunun ya da koordinat yazın. Bu nokta, atığın varsayılan başlangıç konumudur.</p>
-    </li>
-    <li>
-     <h3 data-en="Run the scenarios">Senaryoları hesaplayın</h3>
-     <p data-en="FOCUS fetches hourly current and wind forecasts for the area and moves 25 virtual particles with 0%, 1% and 3% wind contribution.">FOCUS bölgenin saatlik akıntı ve rüzgâr tahminlerini alır; 25 sanal parçacığı %0, %1 ve %3 rüzgâr katkısıyla taşır.</p>
-    </li>
-    <li>
-     <h3 data-en="Use the result">Sonucu kullanın</h3>
-     <p data-en="See the likely area after 6, 12 and 24 hours. Download the data and the report to share with the field team.">6, 12 ve 24 saat sonraki olası alanı haritada görün. Veriyi ve raporu indirip saha ekibiyle paylaşın.</p>
-    </li>
+    <li><h3 data-en="Pick a point">Noktayı seçin</h3><p data-en="Tap the sea on the map or type coordinates.">Haritada denize dokunun ya da koordinat yazın.</p></li>
+    <li><h3 data-en="Calculate">Hesaplayın</h3><p data-en="Hourly current and wind forecasts come from Open-Meteo.">Saatlik akıntı ve rüzgâr tahmini Open-Meteo'dan alınır.</p></li>
+    <li><h3 data-en="See the route">Rotayı görün</h3><p data-en="Positions at 6, 12 and 24 hours appear on the map; download the report.">6, 12 ve 24 saatlik konumlar haritada; raporu indirin.</p></li>
    </ol>
   </div>
  </section>
 
- <section id="yontem">
+ <section id="hesap">
   <div class="wrap method">
    <div>
-    <h2 data-en="Known physics, stated assumptions">Bilinen fizik, açık varsayımlar</h2>
-    <p class="lead" style="margin-top:14px" data-en="Each particle moves with the surface current plus a small fraction of the wind. This Lagrangian approach is the standard in oil-spill and debris drift modelling.">Her parçacık, yüzey akıntısı ile rüzgârın küçük bir oranının toplamı kadar hareket eder. Bu Lagrange yaklaşımı, petrol ve atık sürüklenme modellerinde standarttır.</p>
-    <p class="equation" aria-label="d x bölü d t eşittir u c artı alfa çarpı u 10"><var>d</var><b>x</b>/<var>dt</var> = <b>u</b><sub>c</sub>(<b>x</b>, <var>t</var>) + <var>α</var> · <b>u</b><sub>10</sub>(<b>x</b>, <var>t</var>)</p>
-    <dl class="terms">
-     <dt>x</dt><dd data-en="particle position (latitude, longitude)">parçacık konumu (enlem, boylam)</dd>
-     <dt>u<sub>c</sub></dt><dd data-en="surface current, Open-Meteo Marine (Météo-France SMOC model)">yüzey akıntısı, Open-Meteo Marine (Météo-France SMOC modeli)</dd>
-     <dt>u<sub>10</sub></dt><dd data-en="wind at 10 m, Open-Meteo forecast">10 m rüzgârı, Open-Meteo tahmini</dd>
-     <dt>α</dt><dd data-en="wind contribution (windage), 0–3% depending on how high the object floats">rüzgâr katkı oranı; nesnenin sudan ne kadar yükseldiğine göre %0–3</dd>
-    </dl>
-    <p style="margin-top:24px"><a href="yontem.html" data-en="Full method, data sources and references">Yöntemin tamamı, veri kaynakları ve kaynakça</a></p>
+    <h2 data-en="The calculation">Hesaplama</h2>
+    <p class="lead" style="margin:14px 0 22px" data-en="Each particle moves with the surface current plus a share of the wind.">Her parçacık yüzey akıntısıyla ve rüzgârın bir payıyla hareket eder.</p>
+    <p class="equation" aria-label="d x bölü d t eşittir u c artı alfa çarpı u 10"><var>d</var><b>x</b>/<var>dt</var> = <b>u</b><sub>c</sub> + <var>α</var>·<b>u</b><sub>10</sub></p>
+    <p><a href="yontem.html" data-en="Formulas, values and sources">Formüller, değerler ve kaynaklar</a></p>
    </div>
-   <div>
-    <h3 data-en="What FOCUS does not do">FOCUS'un yapmadıkları</h3>
-    <ul class="limits">
-     <li data-en="&lt;b&gt;It does not confirm debris is there.&lt;/b&gt; The starting point is your assumption."><b>Atığın orada olduğunu doğrulamaz.</b> Başlangıç noktası sizin varsayımınızdır.</li>
-     <li data-en="&lt;b&gt;It does not give an exact route.&lt;/b&gt; Three scenarios show a plausible spread, not a probability."><b>Kesin rota vermez.</b> Üç senaryo olası yayılımı gösterir; bir olasılık değeri değildir.</li>
-     <li data-en="&lt;b&gt;It cannot resolve harbours and small bays.&lt;/b&gt; The current model grid is about 8 km."><b>Liman ve küçük koyları ayırt edemez.</b> Akıntı modelinin ızgarası yaklaşık 8 km'dir.</li>
-     <li data-en="&lt;b&gt;Satellite debris detection is still research.&lt;/b&gt; Candidates are unverified and not for decisions on their own."><b>Uydudan atık tespiti araştırma aşamasındadır.</b> Adaylar doğrulanmamıştır, tek başına karar için kullanılmamalıdır.</li>
-    </ul>
-   </div>
+   <ul class="badges">
+    <li><span class="badge-dot">15<small>dk</small></span><span data-en="time step">zaman adımı</span></li>
+    <li><span class="badge-dot">0–3<small>%</small></span><span data-en="wind share α">rüzgâr payı α</span></li>
+    <li><span class="badge-dot">8<small>km</small></span><span data-en="current grid">akıntı ızgarası</span></li>
+   </ul>
   </div>
  </section>
 
  <section id="paketler">
   <div class="wrap">
-   <div class="section-head">
-    <h2 data-en="Plans">Paketler</h2>
-    <p data-en="One forecast is one starting point with all three wind scenarios. Paid plans are activated after bank transfer is confirmed.">Bir tahmin, tek başlangıç noktası ve üç rüzgâr senaryosunun tamamıdır. Ücretli paketler, havale/EFT ödemesi onaylandıktan sonra etkinleşir.</p>
+   <div class="section-head"><h2 data-en="Plans">Paketler</h2></div>
+   <div class="trial">
+    <div><h3 id="trialTitle" data-en="Free trial">Ücretsiz deneme</h3><p data-en="Every feature, 10 forecasts a day. No card needed.">Tüm özellikler, günde 10 tahmin. Kart gerekmez.</p></div>
+    <a class="btn" href="kayit.html" data-en="Start free trial">Denemeyi başlat</a>
    </div>
    <div class="seg billing-toggle" role="group" aria-label="Ödeme dönemi" data-en-aria-label="Billing period">
     <button type="button" data-billing="month" aria-pressed="true" data-en="Monthly">Aylık</button>
-    <button type="button" data-billing="year" aria-pressed="false" data-en="Yearly, 2 months free">Yıllık, 2 ay ücretsiz</button>
+    <button type="button" data-billing="year" aria-pressed="false" data-en="Yearly, 2 months free">Yıllık, 2 ay bedava</button>
    </div>
-   <div class="table-scroll">
-    <table class="plans-table">
-     <thead><tr><th scope="col" data-en="Plan">Paket</th><th scope="col" data-en="Price (USD)">Fiyat (USD)</th><th scope="col" data-en="Forecast horizon">Tahmin ufku</th><th scope="col" data-en="Forecasts">Tahmin hakkı</th><th scope="col"><span class="sr" data-en="Action">İşlem</span></th></tr></thead>
-     <tbody>
-      <tr data-plan="free"><th scope="row" data-en="Free">Ücretsiz</th><td class="num price" data-month="$0" data-year="$0">$0</td><td class="num" data-en="up to 24 hours">24 saate kadar</td><td class="num" data-en="5 per day">Günde 5</td><td><a class="btn ghost small" href="kayit.html" data-en="Create free account">Ücretsiz hesap aç</a></td></tr>
-      <tr data-plan="starter"><th scope="row" data-en="Starter">Başlangıç</th><td class="num price" data-month="$69 / ay" data-year="$690 / yıl" data-month-en="$69 / month" data-year-en="$690 / year">$69 / ay</td><td class="num" data-en="up to 24 hours">24 saate kadar</td><td class="num" data-en="100 per month">Ayda 100</td><td><a class="btn ghost small" href="hesap.html?plan=starter" data-en="Choose">Seç</a></td></tr>
-      <tr data-plan="professional"><th scope="row" data-en="Professional">Profesyonel</th><td class="num price" data-month="$279 / ay" data-year="$2.790 / yıl" data-month-en="$279 / month" data-year-en="$2,790 / year">$279 / ay</td><td class="num" data-en="up to 48 hours*">48 saate kadar*</td><td class="num" data-en="200 per month">Ayda 200</td><td><a class="btn ghost small" href="hesap.html?plan=professional" data-en="Choose">Seç</a></td></tr>
-      <tr data-plan="enterprise"><th scope="row" data-en="Institutional">Kurumsal</th><td class="num price" data-month="$999 / ay" data-year="$9.990 / yıl" data-month-en="$999 / month" data-year-en="$9,990 / year">$999 / ay</td><td class="num" data-en="up to 72 hours*">72 saate kadar*</td><td class="num" data-en="500 per month">Ayda 500</td><td><a class="btn ghost small" href="hesap.html?plan=enterprise" data-en="Choose">Seç</a></td></tr>
-     </tbody>
-    </table>
+   <div class="plan-grid">
+    <article class="plan" data-plan="payg">
+     <h3 data-en="Pay as you go">Kullandıkça öde</h3>
+     <p class="price fixed"><span class="amount" data-en="TRY 5">5 TL</span> <small data-en="/ forecast">/ tahmin</small></p>
+     <ul><li data-en="No monthly fee">Aylık ücret yok</li><li data-en="Up to 24 hours">24 saate kadar</li><li data-en="Report and data download">Rapor ve veri indirme</li></ul>
+     <a class="btn ghost plan-cta" href="hesap.html?plan=payg" data-en="Choose">Seç</a>
+    </article>
+    <article class="plan featured" data-plan="team">
+     <h3 data-en="Team">Ekip</h3>
+     <p class="price" data-month="449 TL" data-year="4.490 TL" data-month-en="TRY 449" data-year-en="TRY 4,490"><span class="amount">449 TL</span> <small class="per" data-month="/ ay" data-year="/ yıl" data-month-en="/ month" data-year-en="/ year">/ ay</small></p>
+     <ul><li data-en="500 forecasts a month">Ayda 500 tahmin</li><li data-en="Up to 24 hours">24 saate kadar</li><li data-en="Report and data download">Rapor ve veri indirme</li></ul>
+     <a class="btn plan-cta" href="hesap.html?plan=team" data-en="Choose">Seç</a>
+    </article>
+    <article class="plan" data-plan="institution">
+     <h3 data-en="Institution">Kurum</h3>
+     <p class="price" data-month="1.299 TL" data-year="12.990 TL" data-month-en="TRY 1,299" data-year-en="TRY 12,990"><span class="amount">1.299 TL</span> <small class="per" data-month="/ ay" data-year="/ yıl" data-month-en="/ month" data-year-en="/ year">/ ay</small></p>
+     <ul><li data-en="2,000 forecasts a month">Ayda 2.000 tahmin</li><li data-en="Up to 72 hours*">72 saate kadar*</li><li data-en="Report and data download">Rapor ve veri indirme</li></ul>
+     <a class="btn ghost plan-cta" href="hesap.html?plan=institution" data-en="Choose">Seç</a>
+    </article>
    </div>
-   <p class="note" data-en="* The running model currently forecasts up to 24 hours. The 48 and 72-hour horizons are in development; until then these plans cover all forecasts up to 24 hours.">* Çalışan model şu an en fazla 24 saatlik tahmin üretir. 48 ve 72 saatlik ufuk geliştirme aşamasındadır; o zamana kadar bu paketler 24 saate kadar tüm tahminleri kapsar.</p>
+   <p class="note" id="plansNote" data-en="* The 48 and 72-hour forecast is in development; the engine forecasts up to 24 hours today. Paid plans open soon.">* 48 ve 72 saatlik tahmin geliştiriliyor; motor bugün 24 saate kadar hesaplar. Ücretli paketler yakında açılacak.</p>
   </div>
  </section>
 
  <section id="ekip">
   <div class="wrap">
-   <div class="section-head">
-    <h2 data-en="Team">Ekip</h2>
-    <p data-en="FOCUS (Forecasting Ocean Contamination Using Satellites) is a research project combining satellite observation with ocean models. Our aim is to see where debris accumulates before it becomes a garbage patch.">FOCUS (Forecasting Ocean Contamination Using Satellites), uydu gözlemini deniz modelleriyle birleştiren bir araştırma projesidir. Amacımız, atığın nerede biriktiğini bir çöp adasına dönüşmeden görebilmek.</p>
-   </div>
-   <ul class="team">
-    <li>Muhammed Okbi</li><li>Ahmet Emre Yaşar</li><li>Müzeyyen Merve Bakangöz</li><li>Alperen Aydemir</li><li>Yiğit Mısırlı</li>
+   <div class="section-head"><h2 data-en="Team">Ekip</h2></div>
+   <ul class="team-grid">
+    <li><img src="assets/team/muhammed-okbi.jpg" alt="Muhammed Okbi" width="288" height="360" loading="lazy"><b>Muhammed Okbi</b><span data-en="CEO, data and reporting">CEO, veri ve raporlama</span></li>
+    <li><img src="assets/team/ahmet-emre-yasar.jpg" alt="Ahmet Emre Yaşar" width="288" height="360" loading="lazy"><b>Ahmet Emre Yaşar</b><span data-en="COO, operations">COO, operasyon ve sunum</span></li>
+    <li><img src="assets/team/muzeyyen-merve-bakangoz.jpg" alt="Müzeyyen Merve Bakangöz" width="288" height="360" loading="lazy"><b>Müzeyyen Merve Bakangöz</b><span data-en="Strategy advisor">Strateji danışmanı</span></li>
+    <li><img src="assets/team/alperen-aydemir.jpg" alt="Alperen Aydemir" width="288" height="360" loading="lazy"><b>Alperen Aydemir</b><span data-en="CTO, software and modelling">CTO, yazılım ve modelleme</span></li>
+    <li><img src="assets/team/yigit-misirli.jpg" alt="Yiğit Mısırlı" width="288" height="360" loading="lazy"><b>Yiğit Mısırlı</b><span data-en="CDO, design and brand">CDO, tasarım ve marka</span></li>
    </ul>
   </div>
+ </section>
+
+ <section id="sponsorlar" class="sponsors" aria-labelledby="sponsorHeading">
+  <div class="wrap"><h2 id="sponsorHeading" data-en="Sponsors">Sponsorlar</h2></div>
+  <div class="marquee" aria-hidden="true"><div class="marquee-track">
+   <span data-en="No sponsors yet">Henüz sponsorumuz yok</span><span data-en="Your logo could be here">Logonuz burada olabilir</span><span data-en="No sponsors yet">Henüz sponsorumuz yok</span><span data-en="Your logo could be here">Logonuz burada olabilir</span>
+   <span data-en="No sponsors yet">Henüz sponsorumuz yok</span><span data-en="Your logo could be here">Logonuz burada olabilir</span><span data-en="No sponsors yet">Henüz sponsorumuz yok</span><span data-en="Your logo could be here">Logonuz burada olabilir</span>
+  </div></div>
+  <p class="sr" data-en="No sponsors yet.">Henüz sponsorumuz yok.</p>
  </section>
 </main>
 
