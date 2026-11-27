@@ -37,10 +37,10 @@ window.FocusDetectionUI = (()=>{
       source:result.metadata.source,model_id:result.metadata.model_id,model_sha256:result.metadata.model_sha256,checkpoint_sha256:result.metadata.checkpoint_sha256,
       status:'unverified_model_candidate',geometry:structuredClone(selected.geometry)},assumption:assumption?structuredClone(assumption):null};}
     function render(){
-      document.getElementById('detectionHeading').textContent=words('Yapay zekâ ile atık adayları · araştırma','AI waste candidates · research');
+      document.getElementById('detectionHeading').textContent=words('Sentinel-2 atık adayları (araştırma modeli)','Sentinel-2 debris candidates (research model)');
       $('detectionIntro').textContent=words('Seçili nokta çevresinde yaklaşık 1 km² alanda gerçek Sentinel-2 L2A bantlarıyla UNet++ incelemesi. Üretilen konumlar doğrulanmamış atık adaylarıdır.','UNet++ inspection over about 1 km² around the selected point using actual Sentinel-2 L2A bands. Returned locations are unverified waste candidates.');
       $('detectionOrigin').textContent=origin?words('Arama merkezi: ','Search centre: ')+origin.lat.toFixed(4)+'°, '+origin.lon.toFixed(4)+'°':'';
-      $('detectionRun').textContent=published&&!window.FocusPublicAPI?.available?words('Yeni tarama servisi bağlı değil','New scan service disconnected'):words('Yapay zekâ ile atık adaylarını ara','Search for waste candidates with AI');
+      $('detectionRun').textContent=published&&!window.FocusPublicAPI?.available?words('Yeni tarama servisi bağlı değil','New scan service disconnected'):words('Uydu görüntüsünde atık adayı ara','Search satellite imagery for debris candidates');
       $('detectionClear').textContent=phase==='loading'?words('Aramayı iptal et','Cancel search'):words('Aday katmanını temizle','Clear candidate layer');
       $('detectionExport').textContent=words('Adayları GeoJSON indir','Download candidates as GeoJSON');
       $('detectionStatus').textContent=phase==='loading'?(progress||words('Uydu bantları ve araştırma modeli işleniyor…','Processing satellite bands and the research model…')):

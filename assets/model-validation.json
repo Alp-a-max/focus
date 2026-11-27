@@ -1,0 +1,80 @@
+{
+ "generated_by": "model/validate.py",
+ "step_minutes": 15,
+ "cases": [
+  {
+   "id": "uniform",
+   "name_tr": "Sabit akıntı + rüzgâr",
+   "name_en": "Uniform current + wind",
+   "hours": 24,
+   "error_km": {
+    "euler": 0.023435996991072017,
+    "midpoint": 0.023435996991072017,
+    "rk4": 0.023682429309634045
+   }
+  },
+  {
+   "id": "tidal",
+   "name_tr": "Gelgit benzeri zamanla değişen akıntı",
+   "name_en": "Tide-like time-varying current",
+   "hours": 24,
+   "error_km": {
+    "euler": 0.00113571657420386,
+    "midpoint": 0.00113571657420386,
+    "rk4": 3.743492384522845e-05
+   }
+  },
+  {
+   "id": "eddy24",
+   "name_tr": "Dönen girdap, 24 sa periyot",
+   "name_en": "Rotating eddy, 24 h period",
+   "hours": 24.0,
+   "error_km": {
+    "euler": 2.279739348004309,
+    "midpoint": 0.0448723890222173,
+    "rk4": 6.338396252632646e-06
+   },
+   "radius_drift_km": {
+    "euler": 2.2775409316748814,
+    "midpoint": 0.0021505291387207137,
+    "rk4": -5.309507695727689e-07
+   }
+  },
+  {
+   "id": "eddy12",
+   "name_tr": "Dönen girdap, 12 sa periyot",
+   "name_en": "Rotating eddy, 12 h period",
+   "hours": 12.0,
+   "error_km": {
+    "euler": 5.053982975717799,
+    "midpoint": 0.17951840220034956,
+    "rk4": 0.00013787315141580036
+   },
+   "radius_drift_km": {
+    "euler": 5.034978456928497,
+    "midpoint": 0.01742553984157702,
+    "rk4": -1.6577315259169723e-05
+   }
+  },
+  {
+   "id": "double_gyre",
+   "name_tr": "Çift girdap (25 parçacık, ort./en büyük)",
+   "name_en": "Double gyre (25 particles, mean/max)",
+   "hours": 24,
+   "error_km": {
+    "euler": {
+     "mean": 17.383339574048122,
+     "max": 85.52424280496565
+    },
+    "midpoint": {
+     "mean": 0.22108146776409904,
+     "max": 1.5014953890126992
+    },
+    "rk4": {
+     "mean": 0.00021711742561109624,
+     "max": 0.001524563179097304
+    }
+   }
+  }
+ ]
+}

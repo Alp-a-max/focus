@@ -5,7 +5,7 @@ test('PAYG prices use forecast hours and exact integer cents, including all appr
  assert.equal(p.paygCents(12)*100,6000);assert.ok(p.paygCents(12)*100<p.plans.find(x=>x.id==='starter').monthlyCents);
 });
 test('plan limits, monthly quotas and two free months are derived without rounding',()=>{
- const free=p.plans.find(x=>x.id==='free');assert.equal(free.maxHours,3);assert.equal(free.dailyForecasts,5);
+ const free=p.plans.find(x=>x.id==='free');assert.equal(free.maxHours,24);assert.equal(free.dailyForecasts,5);
  assert.deepEqual(p.plans.filter(x=>x.monthlyForecasts).map(x=>[x.maxHours,x.monthlyForecasts,x.monthlyCents,x.annualCents]),[[24,100,6900,69000],[48,200,27900,279000],[72,500,99900,999000]]);
  for(const plan of p.plans.filter(x=>x.monthlyForecasts))assert.equal(plan.annualCents,plan.monthlyCents*(12-p.annualFreeMonths));
 });

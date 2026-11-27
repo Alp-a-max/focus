@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en-text="Free trial | FOCUS">Ücretsiz deneme | FOCUS</title>
+<meta name="description" content="FOCUS'u ücretsiz deneyin.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b2342">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
+<link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/account-pages.js?v=20261128" defer></script>
+<script src="js/google-signin.js?v=20261128" defer></script>
+</head>
+<body data-page="register">
+<a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
+<header class="top">
+ <div class="wrap">
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
+  <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
+   <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="index.html#paketler" data-en="Plans">Paketler</a>
+  </nav>
+  <div class="top-actions">
+   <button class="icon-btn" type="button" data-lang-toggle>EN</button>
+   <button class="icon-btn" type="button" data-theme-toggle></button>
+   <a class="btn ghost small" href="giris.html" data-account-link data-en="Sign in">Giriş yap</a>
+   <a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a>
+  </div>
+ </div>
+</header>
+<main id="main">
+<div class="page"><div class="wrap narrow">
+ <h1 style="font-size:36px" data-en="Start your free trial">Ücretsiz denemeyi başlat</h1>
+ <p class="lead" style="margin-top:12px" data-en="Free trial: every feature, 10 forecasts a day. No card needed.">Ücretsiz deneme: tüm özellikler, günde 10 tahmin. Kart gerekmez.</p>
+ <div id="googleSignIn" hidden style="margin-top:24px"><div class="g-button"></div><p class="alert" role="alert"></p><p class="muted small" style="margin:14px 0 0" data-en="or with email">veya e-postayla</p></div>
+ <form class="form" id="registerForm" novalidate>
+  <p class="alert" role="alert" tabindex="-1"></p>
+  <div class="field"><label for="name" data-en="Full name">Ad soyad</label><input id="name" name="name" autocomplete="name" required minlength="2" maxlength="80"></div>
+  <div class="field"><label for="email" data-en="Email">E-posta</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="190"></div>
+  <div class="field"><label for="organization" data-en="Organisation (optional)">Kurum (isteğe bağlı)</label><input id="organization" name="organization" autocomplete="organization" maxlength="120"></div>
+  <div class="field"><label for="password" data-en="Password">Şifre</label><input id="password" name="password" type="password" autocomplete="new-password" required minlength="10" maxlength="128" aria-describedby="pwHint"><p class="hint" id="pwHint" data-en="At least 10 characters. A short sentence is strong and easy to remember.">En az 10 karakter. Kısa bir cümle hem güçlü hem akılda kalıcıdır.</p></div>
+  <div class="field"><label for="password2" data-en="Repeat password">Şifre (tekrar)</label><input id="password2" name="password2" type="password" autocomplete="new-password" required maxlength="128"></div>
+  <div class="trap" aria-hidden="true"><label for="website">Web sitesi</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+  <label class="check"><input type="checkbox" name="accept" required> <span data-en="I have read the &lt;a href=&quot;gizlilik.html&quot;&gt;privacy notice&lt;/a&gt;."><a href="gizlilik.html">Gizlilik bildirimini</a> okudum.</span></label>
+  <button class="btn" type="submit" data-en="Create account">Hesap oluştur</button>
+ </form>
+ <p class="muted" style="margin-top:24px"><span data-en="Already have an account?">Zaten hesabınız var mı?</span> <a href="giris.html" data-en="Sign in">Giriş yapın</a></p>
+</div></div>
+</main>
+<footer class="foot">
+ <div class="wrap">
+  <p data-en="Data: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth and OpenStreetMap contributors.">Veri: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth ve OpenStreetMap katkıcıları.</p>
+  <nav aria-label="Alt bağlantılar" data-en-aria-label="Footer links">
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="gizlilik.html" data-en="Privacy">Gizlilik</a>
+   <a href="platform.html" data-en="Map">Harita</a>
+  </nav>
+ </div>
+</footer>
+</body>
+</html>

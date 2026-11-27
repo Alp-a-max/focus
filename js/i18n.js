@@ -4,6 +4,8 @@
   'use strict';
   const entries=`
 Seçili konum karada. Deniz üzerinde bir nokta seçin.|This location is on land. Select a point at sea.
+Sürükleyerek gez, iki parmakla yakınlaştır; nokta seçmek için dokun.|Drag to explore, pinch to zoom; tap to pick a point.
+Nokta seçmek için haritaya tıkla; sürükleyerek gez, tekerlek veya + / − ile yakınlaştır.|Click to pick a point; drag to explore, scroll or use + / − to zoom.
 Bölge seç|Choose a region
 Kopuşu hesapla|Calculate release
 Sonucu incele|Inspect the result
@@ -19,7 +21,7 @@ Noktama dön|Back to my point
 Tüm rotayı göster|Show the full route
 Veri ve rapor indir|Download data and report
 Dalga koşulları|Wave conditions
-Seçili koordinat; atık tespiti değil|Selected coordinate; not a waste detection
+Seçili koordinat|Selected coordinate
 Birikimden kopan parçalar nereye gider?|Where do fragments released from an accumulation travel?
 Birikimin kenarındaki bir kopuş kesimini haritadan seçin. Bu kesimden ayrıldığı varsayılan sanal parçaların 6, 12 ve 24 saat sonraki yayılımını inceleyin.|Select a release section at the edge of an accumulation. Explore the spread of virtual fragments assumed to detach from this section after 6, 12 and 24 hours.
 Seçili harita noktasını kopuş kesimi yap|Use the selected map point as a release section
@@ -38,7 +40,7 @@ Model ve varsayımlar|Model and assumptions
 Girdiler değişti; yeni senaryo hesaplanabilir.|Inputs changed; calculate a new scenario.
 Kopuş kesiminin akıntı, rüzgâr ve dalga model alanları yükleniyor…|Loading current, wind and wave model fields for the release section…
 Seçili noktada kopuş tahmini oluştur →|Create a breakaway forecast at the selected point →
-Seçili noktada yapay zekâ adaylarını incele →|Inspect AI candidates at the selected point →
+Seçili noktada uydu adaylarını incele|Inspect satellite candidates at the selected point
 Daire, sizin seçtiğiniz küçük kopuş kesimidir; çöp adasının ölçülmüş sınırı değildir. Tek kopuşta 25, altı saatlik salımda saatte 5 olmak üzere 30 sanal parçacık kullanılır. Parçacık sayısı gerçek çöp sayısı veya tonaj değildir. Kopuşun gerçekleşmesi, zamanı ve miktarı ölçülmüş bir kırılma modeliyle tahmin edilmez; senaryo olarak girilir.|The circle is your selected small release section, not a measured garbage-patch boundary. A single release uses 25 virtual particles; the six-hour release uses 5 per hour, 30 in total. Particle counts do not represent actual waste counts or tonnage. Detachment, timing and amount are scenario inputs rather than outputs of a measured fragmentation model.
 Üç senaryoda doğrudan rüzgâr etkisi %0, %1 ve %3 alınır. Saatlik toplam yüzey deniz hızı ve rüzgâr alanları, 15 dakikalık adımlarda konuma göre yeniden örneklenir. Dalga yüksekliği, yönü ve periyodu ayrıca gösterilir. Sağlayıcı deniz hızını dalga ve gelgit katkılarını da içeren ürün olarak tanımlar; dalga etkisini iki kez saymamak için buna ayrıca Stokes hızı eklenmez. Dalga katkısı bu üründen ayrı bir vektör olarak doğrulanamaz.|The three scenarios use 0%, 1% and 3% direct windage. Hourly total surface-current and wind fields are resampled by position at 15-minute steps. Wave height, direction and period are displayed separately. The provider describes the current product as including wave and tidal contributions; no additional Stokes velocity is added to avoid double counting. The wave contribution cannot be independently verified as a separate vector from this product.
 Kıyıda, eksik veride veya sorgu alanı dışında hesap durur. Son noktalar senaryo konumlarıdır. Yayılım bir olasılık yüzdesi veya bağımsız doğrulanmış gerçek takip değildir.|The calculation stops at the coast, missing data or the query-domain boundary. Endpoints are scenario positions. The spread is not a probability percentage or an independently validated observed track.
@@ -343,7 +345,7 @@ Yakınlaştır|Zoom in
 Uzaklaştır|Zoom out
 `;
   const dictionary=new Map(entries.trim().split('\n').filter(Boolean).map(line=>{const i=line.indexOf('|');return[line.slice(0,i),line.slice(i+1)]}));
-  dictionary.set('Yapay zekâ adayı','AI candidate');
+  dictionary.set('Uydu modeli adayı','Satellite model candidate');
   dictionary.set('Bu uydu adayı için güncel başlangıç varsayımı gerekli.','A current-start assumption is required for this satellite candidate.');
   dictionary.set('Bu aday için kaynak bilgisi korunan çoklu senaryoyu kullanın.','Use the multi-particle scenarios that retain this candidate’s source information.');
   const extra=`

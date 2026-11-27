@@ -1,0 +1,86 @@
+/* FOCUS marka teması: logodaki lacivert (#0b2342), okyanus mavisi (#0a6399) ve camgöbeği (#1fb0d8).
+   Önceki tüm çalışma alanı stillerinin üzerine en son yüklenir; iki tema da burada tanımlanır. */
+:root{
+ --f-bg:#071a30;--f-surface:#0c2440;--f-surface-2:#12304f;--f-line:#24476a;--f-text:#e6f0f6;--f-muted:#9db4c6;
+ --f-accent:#3cc3e6;--f-accent-ink:#04182b;--f-primary:#1fb0d8;--f-danger:#f08a8a;
+ --f-sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--f-head:"Montserrat","Public Sans",sans-serif;
+}
+html[data-theme=light]{
+ --f-bg:#f4f7f9;--f-surface:#ffffff;--f-surface-2:#eaf1f5;--f-line:#cfdde6;--f-text:#0b2342;--f-muted:#4a6075;
+ --f-accent:#0a6399;--f-accent-ink:#ffffff;--f-primary:#0a6399;--f-danger:#a12a2a;
+}
+
+/* Yazı tipleri: tek gövde ailesi, başlıklarda logodaki geometrik yazı */
+html body.simple-app,html body.simple-app button,html body.simple-app input,html body.simple-app select,html body.simple-app textarea,
+html body.simple-app .map-legend,html body.simple-app .leaflet-container{font-family:var(--f-sans)!important}
+html body.simple-app h1,html body.simple-app h2,html body.simple-app h3,html body.simple-app #releaseHeading,html body.simple-app #simpleToolsTitle{font-family:var(--f-head)!important;letter-spacing:-.01em}
+
+/* Zemin ve yüzeyler */
+html body.simple-app{background:var(--f-bg)!important;color:var(--f-text)!important}
+html body.simple-app>header{border-bottom:1px solid var(--f-line)!important;background:var(--f-bg)!important}
+html body.simple-app .simple-control,html body.simple-app .map-panel,html body.simple-app dialog.simple-tools{background:var(--f-surface)!important;border:1px solid var(--f-line)!important;color:var(--f-text)!important;border-radius:14px!important;box-shadow:none!important}
+html body.simple-app .simple-tools-head{border-bottom-color:var(--f-line)!important}
+html body.simple-app .simple-control p,html body.simple-app .simple-control small,html body.simple-app #mapHelp,html body.simple-app .simple-tool-section p{color:var(--f-muted)}
+html body.simple-app #releaseHeading{color:var(--f-text)!important;font-size:22px!important;font-weight:700!important}
+
+/* Logo: temaya göre açık veya koyu sürüm */
+.brand-logo{display:inline-flex!important;align-items:center;line-height:0}
+.brand-logo img{height:40px;width:auto}
+.brand-logo i{display:none}
+.brand-logo .logo-dark-ink{display:none}
+html[data-theme=light] .brand-logo .logo-dark-ink{display:block}
+html[data-theme=light] .brand-logo .logo-light-ink{display:none}
+
+/* Düğmeler */
+html body.simple-app button,html body.simple-app .button{border-radius:10px!important}
+html body.simple-app #releaseRun{background:var(--f-primary)!important;color:var(--f-accent-ink)!important;border:1px solid var(--f-primary)!important;font-weight:700!important}
+html body.simple-app #releaseRun:disabled{opacity:.45;cursor:not-allowed}
+html body.simple-app #releaseExample,html body.simple-app #releaseClear,html body.simple-app .map-search button,html body.simple-app #simpleToolsOpen,html body.simple-app #experienceOpen,html body.simple-app .theme-toggle,html body.simple-app .simple-map-actions button,html body.simple-app .focus-account-chip,html body.simple-app #simpleToolsClose{background:transparent!important;color:var(--f-text)!important;border:1px solid var(--f-line)!important;box-shadow:none!important}
+html body.simple-app #releaseExample:hover,html body.simple-app .map-search button:hover,html body.simple-app #simpleToolsOpen:hover,html body.simple-app #experienceOpen:hover,html body.simple-app .theme-toggle:hover,html body.simple-app .simple-map-actions button:hover,html body.simple-app .focus-account-chip:hover{background:var(--f-surface-2)!important}
+html body.simple-app #simpleAiScan{background:var(--f-surface-2)!important;border:1px solid var(--f-line)!important;color:var(--f-text)!important}
+html body.simple-app :focus-visible{outline:2px solid var(--f-accent)!important;outline-offset:2px}
+
+/* Alanlar */
+html body.simple-app .map-search input,html body.simple-app select,html body.simple-app input[type=text],html body.simple-app input[type=number]{background:var(--f-bg)!important;color:var(--f-text)!important;border:1px solid var(--f-line)!important;border-radius:10px!important}
+
+/* Adımlar */
+html body.simple-app .release-steps li{color:var(--f-muted)!important}
+html body.simple-app .release-steps li[aria-current],html body.simple-app .release-steps li.active,html body.simple-app .release-steps li.done{color:var(--f-text)!important}
+
+/* Araçlar penceresi sekmeleri */
+html body.simple-app #simpleToolsTabs button{background:transparent!important;border:1px solid transparent!important;color:var(--f-muted)!important;text-align:left}
+html body.simple-app #simpleToolsTabs button[aria-selected=true]{background:var(--f-surface-2)!important;border-color:var(--f-line)!important;color:var(--f-text)!important}
+html body.simple-app #simpleToolsTabs button[hidden]{display:none!important}
+
+/* Harita kontrolleri */
+html body.simple-app .leaflet-control-zoom a{background:var(--f-surface)!important;color:var(--f-text)!important;border-color:var(--f-line)!important;width:36px!important;height:36px!important;line-height:34px!important;font-size:20px!important}
+html body.simple-app .leaflet-bar{border:1px solid var(--f-line)!important;border-radius:10px!important;overflow:hidden}
+html body.simple-app .map-legend{background:var(--f-surface)!important;border:1px solid var(--f-line)!important;color:var(--f-muted)!important}
+html body.simple-app .leaflet-container{background:var(--f-surface-2)!important}
+
+/* Çöp adası kartı (js/patch-info.js) */
+.patch-popup .leaflet-popup-content{margin:12px 14px;font-family:var(--f-sans)}
+.patch-card strong{display:block;font:700 15px/1.25 var(--f-head);margin-bottom:8px;color:#0b2342}
+.patch-card figure{margin:0 0 8px}
+.patch-card img{display:block;width:100%;height:150px;object-fit:cover;border-radius:8px;background:#eaf1f5}
+.patch-card figcaption{font-size:11px;margin-top:4px}
+.patch-card figcaption a{color:#4a6075}
+.patch-card p{margin:0 0 8px;font-size:13px;line-height:1.45;color:#21384f}
+.patch-card .patch-link{font-weight:700;color:#0a6399}
+.patch-card .patch-status{color:#4a6075}
+html body.simple-app .release-map-legend{background:var(--f-surface)!important;border:1px solid var(--f-line)!important;color:var(--f-text)!important;box-shadow:none!important}
+html body.simple-app .release-map-legend *{color:var(--f-text)}
+/* Harita etiketleri: tek satır, küçük, üst üste binmesin */
+html body.simple-app .leaflet-tooltip{white-space:nowrap!important;width:auto!important;max-width:none!important;font:600 12px/1.3 var(--f-sans)!important;padding:4px 8px!important;background:var(--f-surface)!important;color:var(--f-text)!important;border:1px solid var(--f-line)!important;border-radius:6px!important;box-shadow:0 2px 6px rgba(0,0,0,.18)!important}
+html body.simple-app .leaflet-tooltip::before{display:none}
+/* Lejant ve etiket metinleri: temayla aynı renk (theme.css'teki sabit açık renkleri ezer) */
+html body.simple-app .release-map-legend,html body.simple-app .release-map-legend div,html body.simple-app .release-map-legend span,html body.simple-app .release-label,html body.simple-app .release-label span{color:var(--f-text)!important;opacity:1!important}
+html body.simple-app .release-map-legend{font:600 12px/1.7 var(--f-sans)!important}
+html body.simple-app .release-label{background:var(--f-surface)!important;border:1px solid var(--f-line)!important;border-radius:999px!important;padding:3px 10px!important}
+/* Çöp adası bilgi kartı: haritanın üstünde değil, kontrol panelinde */
+.patch-panel{margin:16px 0 0;padding:16px;border:1px solid var(--f-line);border-radius:12px;background:var(--f-surface-2);color:var(--f-text);position:relative}
+.patch-panel .patch-card strong{color:var(--f-text)}
+.patch-panel .patch-card p{color:var(--f-text)}
+.patch-panel .patch-card figcaption a,.patch-panel .patch-card .patch-status{color:var(--f-muted)}
+.patch-panel .patch-card .patch-link{color:var(--f-accent)}
+.patch-panel .patch-close{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:8px!important;border:1px solid var(--f-line);background:var(--f-surface);color:var(--f-text);cursor:pointer;font-size:18px;line-height:1}

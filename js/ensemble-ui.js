@@ -6,7 +6,7 @@ window.OdakEnsembleUI = function(map, {getOrigin, coastReady}) {
   panel.setAttribute('aria-labelledby','ensembleTitle');
   panel.innerHTML = `<div class="panel-head"><span class="panel-title" id="ensembleTitle">Yayılım senaryoları</span><span class="live">Deneysel · 24 saat</span></div>
     <div class="ensemble-body"><div class="ensemble-intro"><div><h3>Tek rota yerine olası hareketler.</h3>
-    <p>Seçilen deniz noktasının çevresinden 25 sanal parçacık başlatın. Akıntı ve rüzgârın farklı etkilerini aynı haritada inceleyin.</p></div>
+    <p>Seçilen deniz noktasının çevresinden 25 parçacık başlatın. Akıntı ve rüzgârın farklı etkilerini aynı haritada inceleyin.</p></div>
     <button id="ensembleRun" class="primary" type="button">Senaryoları hesapla ↗</button></div>
     <p class="ensemble-origin" id="ensembleOrigin"></p><p id="ensembleObservation" class="ensemble-observation" translate="no" hidden></p>
     <div class="ensemble-toolbar"><div class="ensemble-times" role="group" aria-label="Senaryo zamanı">

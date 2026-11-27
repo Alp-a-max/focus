@@ -68,9 +68,12 @@
  const satelliteNotice=document.createElement('button');satelliteNotice.type='button';satelliteNotice.id='simpleObservation';satelliteNotice.hidden=true;satelliteNotice.setAttribute('translate','no');satelliteNotice.onclick=()=>openTool('satellite');intro.append(satelliteNotice);
  // The AI detection is the project's strongest feature: give it a visible entry point instead of burying it in Tools.
  const aiScan=document.createElement('button');aiScan.type='button';aiScan.id='simpleAiScan';aiScan.className='simple-ai-scan';aiScan.setAttribute('translate','no');aiScan.innerHTML='<span aria-hidden="true">🛰</span><span><strong></strong><small></small></span>';aiScan.onclick=()=>openTool('satellite',$('detectionRun'));intro.after(aiScan);
- window.FocusPublicAPI?.ready?.then(()=>render());
+ // Yalnızca bu adreste gerçekten çalışan araçlar gösterilir.
+ const isLocal=['localhost','127.0.0.1'].includes(window.location.hostname);
+ if(!isLocal){aiScan.hidden=true;window.FocusPublicAPI?.ready?.then(ok=>{aiScan.hidden=!ok;});}
+ fetch('api/health',{signal:AbortSignal.timeout(2500)}).then(r=>r.ok&&/json/.test(r.headers.get('content-type')||'')?r.json():null).then(v=>v?.service==='focus-local-api').catch(()=>false).then(ok=>{for(const id of ['advanced','records'])tabs.get(id).hidden=!ok;if(!ok&&['advanced','records'].includes(active))activate('layers');});
  let state={phase:'empty',source:null,hasResult:false},selected=null,observation=null;
- const placeNames={'Kuzey Pasifik':'North Pacific','Karadeniz':'Black Sea','Antalya Açıkları':'Offshore Antalya','Seçilen Koordinat':'Selected coordinates','Seçilen koordinat':'Selected coordinates','Yapay zekâ adayı':'AI candidate'};
+ const placeNames={'Kuzey Pasifik':'North Pacific','Karadeniz':'Black Sea','Antalya Açıkları':'Offshore Antalya','Seçilen Koordinat':'Selected coordinates','Seçilen koordinat':'Selected coordinates','Uydu modeli adayı':'Satellite model candidate'};
  Object.assign(placeNames,{'Marmara Denizi':'Sea of Marmara','Ege Denizi':'Aegean Sea','Alanya Açıkları':'Offshore Alanya','Mersin Açıkları':'Offshore Mersin','Sinop Açıkları':'Offshore Sinop','Samsun Açıkları':'Offshore Samsun','Trabzon Açıkları':'Offshore Trabzon','Zonguldak Açıkları':'Offshore Zonguldak','Çanakkale Açıkları':'Offshore Çanakkale','Bodrum Açıkları':'Offshore Bodrum','Karayipler · Belize':'Caribbean · Belize','Endonezya · Cakarta':'Indonesia · Jakarta','Hindistan · Mumbai':'India · Mumbai','Brezilya · Rio':'Brazil · Rio','Güney Afrika · Cape Town':'South Africa · Cape Town','Avustralya · Sidney':'Australia · Sydney','Güney Pasifik':'South Pacific','Kuzey Atlantik':'North Atlantic','Güney Atlantik':'South Atlantic','Hint Okyanusu':'Indian Ocean'});
  function render(){
   open.textContent=tr('Araçlar','Tools');$('simpleToolsTitle').textContent=tr('Araçlar','Tools');$('simpleToolsClose').textContent=tr('Kapat','Close');
@@ -80,15 +83,15 @@
   const stepText=[tr('Nokta seç','Pick a point'),tr('Hesapla','Calculate'),tr('Rotayı gör','See the route')];intro.querySelectorAll('.release-steps li').forEach((li,i)=>li.textContent=stepText[i]);
   document.querySelector('.map-search label').textContent=tr('Bölge veya koordinat','Area or coordinates');
   $('mapSearchInput').placeholder=tr('Antalya veya 32, -145','Antalya or 32, -145');$('mapSearchForm').querySelector('button').textContent=tr('Bul','Find');
-  $('releaseExample').textContent=tr('Örnek tahmini göster','Show an example forecast');
-  aiScan.querySelector('strong').textContent=tr('Uydudan atık adayı ara','Scan satellite imagery for debris');aiScan.querySelector('small').textContent=window.FocusPublicAPI&&!['localhost','127.0.0.1'].includes(window.location.hostname)&&!window.FocusPublicAPI.available?tr('Yapay zekâ · bu yayında tarama servisi kapalı','AI · scan service is offline on this site'):tr('Yapay zekâ · Sentinel-2 görüntüsü','AI · Sentinel-2 imagery');
+  $('releaseExample').textContent=tr('Antalya açığında dene','Try off Antalya');
+  aiScan.querySelector('strong').textContent=tr('Uydudan atık adayı ara','Scan satellite imagery for debris');aiScan.querySelector('small').textContent=tr('Sentinel-2 görüntüsü','Sentinel-2 imagery');
   const p=state.source,name=selected&&p&&selected.lat===p.lat&&selected.lon===p.lon?selected.name:'';
   location.textContent=p?(name?(window.OdakI18n.language==='en'?(placeNames[name]||name):name)+' · ':'')+p.lat.toFixed(4)+'°, '+p.lon.toFixed(4)+'°':tr('Henüz bölge seçilmedi. Haritaya da tıklayabilirsiniz.','No area selected yet. You can also click the map.');
   location.hidden=!p;$('releaseExample').hidden=Boolean(p);$('releaseStatus').hidden=!['loading','error'].includes(state.phase);
-  consentCopy.textContent=tr('Bu konumu varsayımsal başlangıç kabul ediyorum.','I accept this location as a hypothetical starting point.');$('releaseConsent').disabled=!p;
+  consent.hidden=true;
   $('releaseRun').textContent=state.phase==='loading'?tr('Hesaplanıyor…','Calculating…'):state.phase==='error'?tr('Tekrar dene','Try again'):tr('Tahmini başlat','Start forecast');
   $('releaseClear').textContent=state.phase==='loading'?tr('İptal et','Cancel'):tr('Tahmini temizle','Clear forecast');$('releaseClear').hidden=!['loading','result','error'].includes(state.phase);
-  scope.textContent=tr('Model senaryosu · Gerçek atık konumu değildir.','Model scenario · Not an observed waste location.');
+  scope.hidden=true;
   how.querySelector('summary').textContent=tr('Nasıl hesaplandı?','How was this calculated?');
   satelliteNotice.hidden=!observation;satelliteNotice.textContent=observation?tr('Uydu sonucu · ','Satellite result · ')+observation.observed_at.slice(0,10)+tr(' · Araçlarda incele',' · Inspect in tools'):'';
  }

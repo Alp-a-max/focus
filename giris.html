@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en-text="Sign in | FOCUS">Giriş yap | FOCUS</title>
+<meta name="description" content="FOCUS hesabınıza giriş yapın.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b2342">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
+<link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/account-pages.js?v=20261128" defer></script>
+<script src="js/google-signin.js?v=20261128" defer></script>
+</head>
+<body data-page="login">
+<a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
+<header class="top">
+ <div class="wrap">
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
+  <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
+   <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="index.html#paketler" data-en="Plans">Paketler</a>
+  </nav>
+  <div class="top-actions">
+   <button class="icon-btn" type="button" data-lang-toggle>EN</button>
+   <button class="icon-btn" type="button" data-theme-toggle></button>
+   <a class="btn ghost small" href="giris.html" data-account-link data-en="Sign in">Giriş yap</a>
+   <a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a>
+  </div>
+ </div>
+</header>
+<main id="main">
+<div class="page"><div class="wrap narrow">
+ <h1 style="font-size:36px" data-en="Sign in">Giriş yap</h1>
+ <div id="googleSignIn" hidden style="margin-top:24px"><div class="g-button"></div><p class="alert" role="alert"></p><p class="muted small" style="margin:14px 0 0" data-en="or with email">veya e-postayla</p></div>
+ <form class="form" id="loginForm" novalidate>
+  <p class="alert" role="alert" tabindex="-1"></p>
+  <div class="field"><label for="email" data-en="Email">E-posta</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="190"></div>
+  <div class="field"><label for="password" data-en="Password">Şifre</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128"></div>
+  <button class="btn" type="submit" data-en="Sign in">Giriş yap</button>
+ </form>
+ <p class="muted" style="margin-top:24px"><span data-en="No account yet?">Hesabınız yok mu?</span> <a href="kayit.html" data-en="Create a free account">Ücretsiz hesap açın</a></p>
+ <p class="muted small" data-en="Forgot your password? Email reset is not available yet; contact the FOCUS team.">Şifrenizi mi unuttunuz? E-postayla sıfırlama henüz yok; FOCUS ekibine yazın.</p>
+</div></div>
+</main>
+<footer class="foot">
+ <div class="wrap">
+  <p data-en="Data: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth and OpenStreetMap contributors.">Veri: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth ve OpenStreetMap katkıcıları.</p>
+  <nav aria-label="Alt bağlantılar" data-en-aria-label="Footer links">
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="gizlilik.html" data-en="Privacy">Gizlilik</a>
+   <a href="platform.html" data-en="Map">Harita</a>
+  </nav>
+ </div>
+</footer>
+</body>
+</html>

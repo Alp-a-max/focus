@@ -1,0 +1,30 @@
+# FOCUS — InfinityFree / Apache güvenlik ayarları (htdocs kökü)
+Options -Indexes
+DirectoryIndex index.html
+
+# HTTPS'e yönlendir (InfinityFree ücretsiz SSL etkinse)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Yanlışlıkla yüklenen geliştirme dosyalarını dışarıya kapat
+<IfModule mod_authz_core.c>
+  <FilesMatch "^\.|\.(md|cjs|py|sql|log|lock|ini|env|pptx|cmd)$|^(package(-lock)?\.json|playwright\.config\.cjs|config\.php|focus-config\.php)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteRule ^(\.git|tests|model|ml|tools|graphify-out|node_modules|data)(/|$) - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+  Header always set Content-Security-Policy "frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+  Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
+</IfModule>

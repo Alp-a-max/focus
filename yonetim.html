@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en-text="Admin | FOCUS">Yönetim | FOCUS</title>
+<meta name="description" content="FOCUS yönetim paneli.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b2342">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
+<link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/admin.js?v=20261128" defer></script>
+</head>
+<body data-page="adminpanel">
+<a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
+<header class="top">
+ <div class="wrap">
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
+  <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
+   <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="index.html#paketler" data-en="Plans">Paketler</a>
+  </nav>
+  <div class="top-actions">
+   <button class="icon-btn" type="button" data-lang-toggle>EN</button>
+   <button class="icon-btn" type="button" data-theme-toggle></button>
+   <a class="btn ghost small" href="giris.html" data-account-link data-en="Sign in">Giriş yap</a>
+   <a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a>
+  </div>
+ </div>
+</header>
+<main id="main">
+<div class="page"><div class="wrap">
+ <h1 style="font-size:34px" data-en="Admin">Yönetim</h1>
+ <p class="alert" id="adminState" role="alert" data-en="Loading…">Yükleniyor…</p>
+
+ <form class="panel form narrow" id="setupForm" hidden novalidate>
+  <h2 data-en="Create the admin account">Yönetici hesabını oluştur</h2>
+  <p class="small muted" style="margin:0" data-en="Only possible once. The setup key is in focus-config.php on the server.">Yalnızca bir kez yapılabilir. Kurulum anahtarı sunucudaki focus-config.php dosyasındadır.</p>
+  <p class="alert" role="alert" tabindex="-1"></p>
+  <div class="field"><label for="setupToken" data-en="Setup key">Kurulum anahtarı</label><input id="setupToken" name="token" type="password" autocomplete="off" required></div>
+  <div class="field"><label for="setupName" data-en="Name">Ad soyad</label><input id="setupName" name="name" autocomplete="name" required></div>
+  <div class="field"><label for="setupEmail" data-en="Email">E-posta</label><input id="setupEmail" name="email" type="email" autocomplete="email" required></div>
+  <div class="field"><label for="setupPassword" data-en="Password (at least 16 characters)">Şifre (en az 16 karakter)</label><input id="setupPassword" name="password" type="password" autocomplete="new-password" minlength="16" required><p class="hint" data-en="Use a password manager to generate it.">Bir şifre yöneticisiyle üretin.</p></div>
+  <button class="btn" type="submit" data-en="Create admin">Yöneticiyi oluştur</button>
+ </form>
+
+ <div id="adminBody" hidden>
+  <div class="seg" role="tablist" aria-label="Bölümler" data-en-aria-label="Sections" style="margin:18px 0 8px">
+   <button type="button" role="tab" data-tab="users" aria-selected="true" data-en="Users">Kullanıcılar</button>
+   <button type="button" role="tab" data-tab="settings" aria-selected="false" data-en="Settings">Ayarlar</button>
+   <button type="button" role="tab" data-tab="subs" aria-selected="false" data-en="Subscription requests">Abonelik talepleri</button>
+  </div>
+
+  <section class="admin-tab" id="tab-users" style="padding:8px 0;border:0">
+   <ul class="facts" id="userStats" style="margin:16px 0 20px"></ul>
+   <div class="field" style="max-width:360px"><label for="userFilter" data-en="Search">Ara</label><input id="userFilter" type="search" placeholder="ad, e-posta, kurum" data-en-placeholder="name, email, organisation"></div>
+   <div class="table-scroll"><table class="admin-table" style="margin-top:12px">
+    <thead><tr><th data-en="User">Kullanıcı</th><th data-en="Sign-in">Giriş</th><th data-en="Joined">Kayıt</th><th data-en="Last sign-in">Son giriş</th><th data-en="Last forecast">Son tahmin</th><th data-en="Forecasts 30 d / total">Tahmin 30 g / toplam</th><th data-en="Plan">Paket</th><th><span class="sr" data-en="Actions">İşlemler</span></th></tr></thead>
+    <tbody id="userRows"></tbody>
+   </table></div>
+  </section>
+
+  <section class="admin-tab" id="tab-settings" hidden style="padding:8px 0;border:0">
+   <form class="form" id="settingsForm" novalidate style="max-width:640px">
+    <p class="alert" role="status" tabindex="-1"></p>
+    <h2 style="font-size:22px" data-en="Access">Erişim</h2>
+    <div class="field"><label for="sTrial" data-en="Free trial length (hours)">Ücretsiz deneme süresi (saat)</label><input id="sTrial" name="trial_hours" type="number" min="1" max="8760" required></div>
+    <label class="check"><input type="checkbox" id="sSubs" name="subscriptions_enabled"> <span data-en="Paid plans are open">Ücretli paketler açık</span></label>
+    <label class="check"><input type="checkbox" id="sVerify" name="verification_required"> <span data-en="Require email verification code (when Gmail is set up)">E-posta doğrulama kodu iste (Gmail ayarlıysa)</span></label>
+    <h2 style="font-size:22px;margin-top:12px" data-en="Google sign-in">Google ile giriş</h2>
+    <div class="field"><label for="sGoogle" data-en="Google OAuth client ID">Google OAuth istemci kimliği</label><input id="sGoogle" name="google_client_id" placeholder="123…-abc.apps.googleusercontent.com" autocomplete="off"><p class="hint" data-en="Empty = Google button hidden.">Boş bırakılırsa Google düğmesi gizlenir.</p></div>
+    <h2 style="font-size:22px;margin-top:12px" data-en="Verification email (Gmail)">Doğrulama e-postası (Gmail)</h2>
+    <div class="field"><label for="sUser" data-en="Gmail address that sends">Gönderen Gmail adresi</label><input id="sUser" name="smtp_user" type="email" autocomplete="off"></div>
+    <div class="field"><label for="sPass" data-en="Gmail app password">Gmail uygulama şifresi</label><input id="sPass" name="smtp_pass" type="password" autocomplete="new-password"><p class="hint" id="sPassHint"></p></div>
+    <div class="field"><label for="sFromName" data-en="Sender name">Gönderen adı</label><input id="sFromName" name="mail_from_name" maxlength="80"></div>
+    <div class="field"><label for="sFrom" data-en="Sender address (optional, defaults to the Gmail address)">Gönderen adres (boşsa Gmail adresi)</label><input id="sFrom" name="mail_from" type="email" autocomplete="off"></div>
+    <div class="field"><label for="sSubject" data-en="Subject">Konu</label><input id="sSubject" name="mail_subject" maxlength="150"></div>
+    <div class="field"><label for="sBody" data-en="Message ({kod} = code, {ad} = name)">Metin ({kod} = kod, {ad} = ad)</label><textarea id="sBody" name="mail_body" rows="8" maxlength="4000" style="width:100%;padding:10px 12px;border:1px solid var(--isobath);border-radius:var(--radius);background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans)"></textarea></div>
+    <details class="small"><summary data-en="Advanced: SMTP server">Gelişmiş: SMTP sunucusu</summary>
+     <div class="field" style="margin-top:10px"><label for="sHost">SMTP</label><input id="sHost" name="smtp_host"></div>
+     <div class="field"><label for="sPort" data-en="Port">Port</label><select id="sPort" name="smtp_port"><option value="465">465 (SSL)</option><option value="587">587 (STARTTLS)</option></select></div>
+    </details>
+    <div class="row"><button class="btn" type="submit" data-en="Save settings">Ayarları kaydet</button><button class="btn ghost" type="button" id="testMail" data-en="Send me a test email">Bana deneme e-postası gönder</button></div>
+   </form>
+  </section>
+
+  <section class="admin-tab" id="tab-subs" hidden style="padding:8px 0;border:0">
+   <p class="muted" data-en="Approve a request only after the transfer with that reference code has arrived.">Bir talebi, o referans koduyla gelen ödemeyi hesapta gördükten sonra onaylayın.</p>
+   <div class="table-scroll"><table class="admin-table">
+    <thead><tr><th data-en="Reference">Referans</th><th data-en="User">Kullanıcı</th><th data-en="Plan">Paket</th><th data-en="Amount">Tutar</th><th data-en="Requested">Talep</th><th><span class="sr" data-en="Actions">İşlemler</span></th></tr></thead>
+    <tbody id="subRows"></tbody>
+   </table></div>
+   <p id="subEmpty" class="muted" hidden data-en="No pending requests.">Bekleyen talep yok.</p>
+  </section>
+ </div>
+</div></div>
+</main>
+<footer class="foot">
+ <div class="wrap">
+  <p data-en="Data: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth and OpenStreetMap contributors.">Veri: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth ve OpenStreetMap katkıcıları.</p>
+  <nav aria-label="Alt bağlantılar" data-en-aria-label="Footer links">
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="gizlilik.html" data-en="Privacy">Gizlilik</a>
+   <a href="platform.html" data-en="Map">Harita</a>
+  </nav>
+ </div>
+</footer>
+</body>
+</html>

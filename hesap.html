@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-en-text="My account | FOCUS">Hesabım | FOCUS</title>
+<meta name="description" content="FOCUS hesap ve paket bilgileri.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b2342">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css?v=20261128">
+<link rel="icon" href="assets/focus-mark.svg" type="image/svg+xml">
+<script src="js/site.js?v=20261128"></script>
+<script src="js/focus-api.js?v=20261128" defer></script>
+<script src="js/account-pages.js?v=20261128" defer></script>
+</head>
+<body data-page="account">
+<a class="skip" href="#main" data-en="Skip to content">İçeriğe geç</a>
+<header class="top">
+ <div class="wrap">
+  <a class="brand" href="index.html" aria-label="FOCUS ana sayfa" data-en-aria-label="FOCUS home"><img class="logo-dark-ink" src="assets/focus-logo.png" alt="FOCUS" width="93" height="34"><img class="logo-light-ink" src="assets/focus-logo-light.png" alt="FOCUS" width="93" height="34"></a>
+  <nav aria-label="Ana gezinme" data-en-aria-label="Main navigation">
+   <a href="index.html#nasil" data-en="How it works">Nasıl çalışır</a>
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="index.html#paketler" data-en="Plans">Paketler</a>
+  </nav>
+  <div class="top-actions">
+   <button class="icon-btn" type="button" data-lang-toggle>EN</button>
+   <button class="icon-btn" type="button" data-theme-toggle></button>
+   <a class="btn ghost small" href="giris.html" data-account-link data-en="Sign in">Giriş yap</a>
+   <a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a>
+  </div>
+ </div>
+</header>
+<main id="main">
+<div class="page"><div class="wrap" style="max-width:760px">
+ <p class="alert" id="accountState" data-en="Loading…">Yükleniyor…</p>
+ <div id="accountBody" hidden>
+  <h1 style="font-size:36px" id="who"></h1>
+  <div class="row" style="margin-top:12px"><a class="btn small" href="platform.html" data-en="Open the map">Haritayı aç</a><a class="btn ghost small" href="yonetim.html" id="adminLink" hidden data-en="Admin">Yönetim</a><button class="btn ghost small" type="button" id="logout" data-en="Sign out">Çıkış yap</button></div>
+
+  <div class="panel" id="verifyPanel" hidden>
+   <h2 data-en="Verify your email">E-postanı doğrula</h2>
+   <p class="small" id="verifyText"></p>
+   <form class="form" id="verifyForm" novalidate style="margin-top:8px">
+    <p class="alert" role="alert" tabindex="-1"></p>
+    <div class="field" style="max-width:220px"><label for="code" data-en="6-digit code">6 haneli kod</label><input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required></div>
+    <div class="row" style="margin-top:0"><button class="btn" type="submit" data-en="Verify">Doğrula</button><button class="btn ghost" type="button" id="resendCode" data-en="Send a new code">Yeni kod gönder</button></div>
+   </form>
+  </div>
+
+  <div class="panel">
+   <h2 data-en="Your plan">Paketiniz</h2>
+   <p style="font:500 24px var(--serif);margin:0" id="planName"></p>
+   <div class="meter" id="meterWrap" role="progressbar" aria-valuemin="0" aria-label="Kullanılan tahmin hakkı" data-en-aria-label="Forecasts used"><span id="meter"></span></div>
+   <p class="small" style="margin:0"><span id="usage"></span>. <span id="resets"></span>. <span id="horizon"></span>.</p>
+   <div id="activeSub" hidden style="margin-top:16px">
+    <p class="small muted" style="margin:0"><span id="subEnd"></span>. <span data-en="Reference">Referans</span>: <span id="subRef"></span></p>
+    <button class="btn ghost small" type="button" id="cancelSub" style="margin-top:10px" data-en="End at period end">Dönem sonunda bitir</button>
+   </div>
+  </div>
+
+  <div class="panel" id="pending" hidden tabindex="-1">
+   <h2 data-en="Request waiting for payment">Ödeme bekleyen talep</h2>
+   <dl class="kv"><dt data-en="Plan">Paket</dt><dd id="pendingPlan"></dd><dt data-en="Amount">Tutar</dt><dd id="pendingAmount"></dd><dt data-en="Reference code">Referans kodu</dt><dd><span class="ref-code" id="pendingRef"></span></dd></dl>
+   <p class="small" style="margin-top:14px" data-en="Write the reference code in the transfer description. The plan activates as soon as the payment is confirmed.">Havale/EFT açıklamasına referans kodunu yazın. Ödeme onaylanınca paket hemen etkinleşir.</p>
+   <p class="small muted" id="paymentNote"></p>
+   <button class="btn ghost small" type="button" id="cancelRequest" data-en="Cancel request">Talebi iptal et</button>
+  </div>
+
+  <form class="panel form" id="requestForm" novalidate>
+   <h2 data-en="Choose a plan">Paket seç</h2>
+   <p class="alert" role="alert" tabindex="-1"></p>
+   <div class="field"><label for="reqPlan" data-en="Plan">Paket</label><select id="reqPlan" name="plan"><option value="team" data-en="Team: 500 forecasts a month, up to 24 h">Ekip: ayda 500 tahmin, 24 saate kadar</option><option value="institution" data-en="Institution: 2,000 forecasts a month, up to 72 h">Kurum: ayda 2.000 tahmin, 72 saate kadar</option></select></div>
+   <div class="field"><label for="reqBilling" data-en="Billing">Ödeme dönemi</label><select id="reqBilling" name="billing"><option value="month" data-en="Monthly">Aylık</option><option value="year" data-en="Yearly (2 months free)">Yıllık (2 ay bedava)</option></select><p class="hint"><span data-en="Amount">Tutar</span>: <b id="reqPrice"></b></p></div>
+   <button class="btn" type="submit" data-en="Send request">Talep gönder</button>
+   <p class="small muted" style="margin:0" data-en="You get a reference code for the bank transfer. Nothing is charged automatically.">Havale/EFT için bir referans kodu alırsınız. Otomatik ödeme alınmaz.</p>
+  </form>
+
+  <div class="panel">
+   <h2 data-en="Account">Hesap</h2>
+   <dl class="kv"><dt data-en="Email">E-posta</dt><dd id="email"></dd><dt data-en="Organisation">Kurum</dt><dd id="org"></dd><dt data-en="Member since">Üyelik</dt><dd id="since"></dd></dl>
+  </div>
+
+  <form class="panel form" id="passwordForm" novalidate>
+   <h2 id="pwTitle" data-en="Change password">Şifreyi değiştir</h2>
+   <p class="alert" role="status" tabindex="-1"></p>
+   <div class="field" id="currentField"><label for="current" data-en="Current password">Mevcut şifre</label><input id="current" name="current" type="password" autocomplete="current-password" required></div>
+   <div class="field"><label for="new" data-en="New password">Yeni şifre</label><input id="new" name="new" type="password" autocomplete="new-password" required minlength="10"></div>
+   <button class="btn ghost" type="submit" data-en="Change password">Şifreyi değiştir</button>
+  </form>
+
+  <details class="panel">
+   <summary style="cursor:pointer;font-weight:600" data-en="Delete account">Hesabı sil</summary>
+   <form class="form" id="deleteForm" novalidate>
+    <p class="small" style="margin:0" data-en="Your account, subscription records and usage history are deleted permanently.">Hesabınız, abonelik kayıtlarınız ve kullanım geçmişiniz kalıcı olarak silinir.</p>
+    <p class="alert" role="alert" tabindex="-1"></p>
+    <div class="field"><label for="delPassword" id="delLabel" data-en="Password">Şifre</label><input id="delPassword" name="password" type="password" autocomplete="current-password" required></div>
+    <button class="btn danger" type="submit" data-en="Delete my account permanently">Hesabımı kalıcı olarak sil</button>
+   </form>
+  </details>
+ </div>
+</div></div>
+</main>
+<footer class="foot">
+ <div class="wrap">
+  <p data-en="Data: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth and OpenStreetMap contributors.">Veri: Open-Meteo, Copernicus Sentinel-2, NASA GIBS, Natural Earth ve OpenStreetMap katkıcıları.</p>
+  <nav aria-label="Alt bağlantılar" data-en-aria-label="Footer links">
+   <a href="yontem.html" data-en="Method">Yöntem</a>
+   <a href="gizlilik.html" data-en="Privacy">Gizlilik</a>
+   <a href="platform.html" data-en="Map">Harita</a>
+  </nav>
+ </div>
+</footer>
+</body>
+</html>

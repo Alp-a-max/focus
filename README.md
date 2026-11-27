@@ -1,5 +1,14 @@
 # FOCUS
 
+## Site yapısı (Kasım 2026)
+
+- `index.html` ana sayfa, `yontem.html` model, veri, sayısal doğrulama ve kaynakça, `platform.html` harita çalışma alanı.
+- `giris.html`, `kayit.html`, `hesap.html`, `yonetim.html`, `gizlilik.html` hesap ve abonelik sayfaları; sunucu tarafı `api/` (PHP 8.1+, MySQL). Kurulum: [tools/KURULUM-INFINITYFREE.md](tools/KURULUM-INFINITYFREE.md), güvenlik: [tools/GUVENLIK.md](tools/GUVENLIK.md).
+- `model/` sürüklenme modelinin Python referansı ve analitik doğrulaması (`python -m unittest discover -s model`, `python model/validate.py`).
+- Yayın paketi: `python tools/paketle.py` → `dist/focus-site.zip`.
+- API testleri: `tests/test_api_accounts.py` (yerel PHP + MariaDB).
+
+
 ## Çoklu parçacık sürüklenme senaryoları
 
 Sürüklenme bölümündeki **Senaryoları hesapla**, seçili güncel konum çevresindeki 25 başlangıcı %0, %1 ve %3 rüzgâr varsayımlarıyla hesaplar. 6/12/24 saatlik sonuçlar ve tamamlanamayan parçacık sayıları gösterilir. Harita katmanı temizlenebilir, bütün hesaplanan yollar JSON olarak indirilebilir. Alanlar iki toplu API isteğiyle alınır ve 15 dakika önbelleklenir. Hareket boyunca konum ve saat yeniden örneklenir.
